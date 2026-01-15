@@ -73,10 +73,14 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         # Check if calendar is connected
         calendar_connected = await user_service.is_calendar_connected(user)
 
+        # Extract user settings while session is active (avoid detached object issues)
+        user_timezone = user.timezone
+        user_default_duration = user.default_duration
+
     # Parse the query
     parser = MeetingParser(
-        user_timezone=user.timezone if user else "UTC",
-        default_duration=user.default_duration if user else 60,
+        user_timezone=user_timezone,
+        default_duration=user_default_duration,
     )
     meeting = parser.parse(text)
 
