@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     database_url: str = (
         "postgresql+asyncpg://calendarbot:calendarbot@localhost:5432/calendarbot"
     )
+    db_password: str = ""  # Used by docker-compose
 
     # Google OAuth
     google_client_id: str = ""
