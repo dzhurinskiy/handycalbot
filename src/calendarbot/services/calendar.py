@@ -57,16 +57,17 @@ class CalendarService:
                 )
                 access_token = new_tokens["access_token"]
 
-        # Convert to UTC for API
-        start_utc = TimezoneHelper.to_utc(meeting_data.start_datetime, user.timezone)
-        end_utc = TimezoneHelper.to_utc(meeting_data.end_datetime, user.timezone)
+        # Keep times in user's local timezone for Google API
+        # (Google handles timezone conversion when we specify the timeZone field)
+        start_local = meeting_data.start_datetime
+        end_local = meeting_data.end_datetime
 
         # Create event via Google Calendar API
-        client = GoogleCalendarClient(access_token=access_token)
+        client = GoogleCalendarClient(access_token=access_token, refresh_token=refresh_token)
         result = await client.create_event(
             summary=meeting_data.title,
-            start_time=start_utc,
-            end_time=end_utc,
+            start_time=start_local,
+            end_time=end_local,
             attendees=meeting_data.attendees,
             timezone=user.timezone,
             calendar_id=token.calendar_id or "primary",
@@ -74,6 +75,10 @@ class CalendarService:
 
         if "error" in result:
             return result
+
+        # Convert to UTC for local cache storage
+        start_utc = TimezoneHelper.to_utc(meeting_data.start_datetime, user.timezone)
+        end_utc = TimezoneHelper.to_utc(meeting_data.end_datetime, user.timezone)
 
         # Cache meeting locally
         await self.meeting_repo.save_meeting(
@@ -99,50 +104,134 @@ class CalendarService:
     async def get_upcoming_meetings(
         self, user: User, limit: int = 10
     ) -> list[dict]:
-        """Get upcoming meetings for user."""
-        meetings = await self.meeting_repo.get_upcoming(user.id, limit=limit)
+        """Get upcoming meetings from Google Calendar."""
+        # Get user's Google token
+        token = await self.token_repo.get_token(user.id, "google")
+        if not token:
+            return []
 
-        return [
-            {
-                "id": m.id,
-                "external_id": m.external_id,
-                "title": m.title,
-                "start_time": TimezoneHelper.from_utc(m.start_time, user.timezone),
-                "end_time": TimezoneHelper.from_utc(m.end_time, user.timezone),
-                "attendees": m.attendees.get("emails", []) if m.attendees else [],
-            }
-            for m in meetings
-        ]
+        # Decrypt tokens
+        access_token = self.encryption.decrypt(token.access_token_encrypted)
+        refresh_token = self.encryption.decrypt(token.refresh_token_encrypted)
 
-    async def cancel_meeting(self, user: User, meeting_id: int) -> dict:
-        """Cancel a meeting."""
+        # Check if token needs refresh
+        if datetime.utcnow() >= token.expires_at:
+            client = GoogleCalendarClient(
+                access_token=access_token,
+                refresh_token=refresh_token,
+            )
+            new_tokens = await client.refresh_access_token()
+            if new_tokens:
+                await self.token_repo.save_token(
+                    user_id=user.id,
+                    provider="google",
+                    access_token_encrypted=self.encryption.encrypt(new_tokens["access_token"]),
+                    refresh_token_encrypted=self.encryption.encrypt(
+                        new_tokens.get("refresh_token", refresh_token)
+                    ),
+                    expires_at=new_tokens["expires_at"],
+                )
+                access_token = new_tokens["access_token"]
+
+        # Fetch from Google Calendar API
+        client = GoogleCalendarClient(access_token=access_token, refresh_token=refresh_token)
+        result = await client.list_events(
+            calendar_id=token.calendar_id or "primary",
+            time_min=datetime.utcnow(),
+            max_results=limit,
+        )
+
+        if "error" in result:
+            return []
+
+        events = result.get("items", [])
+        meetings = []
+
+        for event in events:
+            start_data = event.get("start", {})
+            end_data = event.get("end", {})
+
+            # Handle both dateTime (timed events) and date (all-day events)
+            start_str = start_data.get("dateTime") or start_data.get("date")
+            end_str = end_data.get("dateTime") or end_data.get("date")
+
+            if not start_str or not end_str:
+                continue
+
+            # Parse datetime - Google returns ISO format with timezone
+            from dateutil import parser as dateutil_parser
+            start_time = dateutil_parser.isoparse(start_str)
+            end_time = dateutil_parser.isoparse(end_str)
+
+            # Convert to user's timezone for display
+            if start_time.tzinfo:
+                start_time = start_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
+                end_time = end_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
+
+            attendees = [a.get("email", "") for a in event.get("attendees", [])]
+
+            meetings.append({
+                "id": event.get("id"),
+                "external_id": event.get("id"),
+                "title": event.get("summary", "(No title)"),
+                "start_time": start_time,
+                "end_time": end_time,
+                "attendees": attendees,
+            })
+
+        return meetings
+
+    async def cancel_meeting(self, user: User, event_id: str) -> dict:
+        """Cancel a meeting by Google event ID."""
         # Get token
         token = await self.token_repo.get_token(user.id, "google")
         if not token:
             return {"error": "Google Calendar not connected"}
 
         access_token = self.encryption.decrypt(token.access_token_encrypted)
+        refresh_token = self.encryption.decrypt(token.refresh_token_encrypted)
 
-        # Get meeting from local cache
-        meetings = await self.meeting_repo.get_upcoming(user.id)
-        meeting = next((m for m in meetings if m.id == meeting_id), None)
+        # Check if token needs refresh
+        if datetime.utcnow() >= token.expires_at:
+            client = GoogleCalendarClient(
+                access_token=access_token,
+                refresh_token=refresh_token,
+            )
+            new_tokens = await client.refresh_access_token()
+            if new_tokens:
+                await self.token_repo.save_token(
+                    user_id=user.id,
+                    provider="google",
+                    access_token_encrypted=self.encryption.encrypt(new_tokens["access_token"]),
+                    refresh_token_encrypted=self.encryption.encrypt(
+                        new_tokens.get("refresh_token", refresh_token)
+                    ),
+                    expires_at=new_tokens["expires_at"],
+                )
+                access_token = new_tokens["access_token"]
 
-        if not meeting:
+        # Get event details first (for the title in response)
+        client = GoogleCalendarClient(access_token=access_token, refresh_token=refresh_token)
+        event = await client.get_event(
+            event_id=event_id,
+            calendar_id=token.calendar_id or "primary",
+        )
+
+        if "error" in event:
             return {"error": "Meeting not found"}
 
+        title = event.get("summary", "(No title)")
+
         # Delete from Google Calendar
-        client = GoogleCalendarClient(access_token=access_token)
         result = await client.delete_event(
-            event_id=meeting.external_id,
+            event_id=event_id,
             calendar_id=token.calendar_id or "primary",
         )
 
         if "error" in result:
             return result
 
-        # Remove from local cache
-        await self.meeting_repo.delete_by_external_id(
-            user.id, meeting.external_id, "google"
-        )
+        # Remove from local cache if exists
+        await self.meeting_repo.delete_by_external_id(user.id, event_id, "google")
 
-        return {"success": True, "title": meeting.title}
+        return {"success": True, "title": title}

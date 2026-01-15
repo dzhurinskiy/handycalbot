@@ -113,7 +113,8 @@ async def cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await query.edit_message_text("No meeting cancelled.")
         return
 
-    meeting_id = int(query.data.replace("cancel_", ""))
+    # Event ID is a string (Google event ID)
+    event_id = query.data.replace("cancel_", "")
 
     async with async_session_factory() as session:
         user_service = UserService(session)
@@ -124,7 +125,7 @@ async def cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             return
 
         calendar_service = CalendarService(session)
-        result = await calendar_service.cancel_meeting(user, meeting_id)
+        result = await calendar_service.cancel_meeting(user, event_id)
         await session.commit()
 
     if "error" in result:
