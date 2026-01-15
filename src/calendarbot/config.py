@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     # Google OAuth
     google_client_id: str = ""
     google_client_secret: str = ""
-    google_redirect_uri: str = "https://164-92-157-14.nip.io/oauth/google/callback"
+    google_redirect_uri: str = "https://handycal.dzhurinskiy.com/oauth/google/callback"
 
     # Security
     encryption_key: str = ""

@@ -63,7 +63,7 @@ Fill in the form:
 
 Click **Add URI** and enter:
 ```
-https://164-92-157-14.nip.io/oauth/google/callback
+https://handycal.dzhurinskiy.com/oauth/google/callback
 ```
 
 > **Note**: Replace with your actual domain if you have one
@@ -129,5 +129,5 @@ Once testing is complete:
 |---------|-------|
 | API | Google Calendar API |
 | App Type | Web application |
-| Redirect URI | `https://164-92-157-14.nip.io/oauth/google/callback` |
+| Redirect URI | `https://handycal.dzhurinskiy.com/oauth/google/callback` |
 | Required Scopes | `calendar.events`, `calendar.readonly` |

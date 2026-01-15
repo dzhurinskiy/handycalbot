@@ -105,8 +105,8 @@ pytest tests/ -v --cov=src/calendarbot
 
 4. **Get SSL certificate**
    ```bash
-   certbot certonly --standalone -d 164-92-157-14.nip.io
-   cp /etc/letsencrypt/live/164-92-157-14.nip.io/* /opt/handycal/ssl/
+   certbot certonly --standalone -d handycal.dzhurinskiy.com
+   cp /etc/letsencrypt/live/handycal.dzhurinskiy.com/* /opt/handycal/ssl/
    ```
 
 5. **Start services**
@@ -146,7 +146,7 @@ Add these secrets to your GitHub repository:
 2. Create a new project
 3. Enable **Google Calendar API**
 4. Create OAuth 2.0 credentials (Web application)
-5. Add redirect URI: `https://164-92-157-14.nip.io/oauth/google/callback`
+5. Add redirect URI: `https://handycal.dzhurinskiy.com/oauth/google/callback`
 6. Download credentials and add to `.env`
 
 ## Architecture
