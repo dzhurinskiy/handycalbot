@@ -55,24 +55,11 @@ jobs:
 
             echo ">>> .env generated"
 
-            # Build and restart containers
+            # Build and restart containers (--wait waits for health checks)
             docker compose build --no-cache app
-            docker compose up -d
+            docker compose up -d --wait --wait-timeout 120
 
-            # Wait for services and health check with retry
-            echo ">>> Waiting for services to be healthy..."
-            for i in {1..10}; do
-              if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
-                echo ">>> Health check passed on attempt $i"
-                break
-              fi
-              echo ">>> Health check attempt $i failed, retrying in 5s..."
-              sleep 5
-              if [ $i -eq 10 ]; then
-                echo ">>> Health check failed after 10 attempts"
-                exit 1
-              fi
-            done
+            echo ">>> All containers healthy"
 
             # Cleanup old images
             docker image prune -f
