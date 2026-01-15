@@ -155,10 +155,21 @@ async def timezone_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 
 async def timezone_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Handle timezone button selection."""
+    """Handle timezone button selection (within conversation)."""
+    await _handle_timezone_selection(update)
+    return ConversationHandler.END
+
+
+async def timezone_callback_standalone(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle timezone button selection (standalone, e.g., from OAuth callback)."""
+    await _handle_timezone_selection(update)
+
+
+async def _handle_timezone_selection(update: Update) -> None:
+    """Common logic for handling timezone selection."""
     query = update.callback_query
     if not query or not query.data or not update.effective_user:
-        return ConversationHandler.END
+        return
 
     await query.answer()
 
@@ -172,8 +183,12 @@ async def timezone_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             await user_service.update_timezone(user, tz)
             await session.commit()
 
-    await query.edit_message_text(f"Timezone set to: `{tz}`", parse_mode="Markdown")
-    return ConversationHandler.END
+    await query.edit_message_text(
+        f"✅ Timezone set to: `{tz}`\n\n"
+        "You're all set! Create meetings using:\n"
+        "`@handycalbot 14:30 \"Meeting Title\"`",
+        parse_mode="Markdown"
+    )
 
 
 async def timezone_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -267,7 +282,12 @@ def setup_settings_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("connect", connect_command))
     app.add_handler(CommandHandler("disconnect", disconnect_command))
 
-    # Timezone conversation
+    # Standalone timezone callback (handles tz_ buttons from OAuth and other contexts)
+    # This must be registered BEFORE the ConversationHandler to catch callbacks
+    # that happen outside the /timezone conversation
+    app.add_handler(CallbackQueryHandler(timezone_callback_standalone, pattern=r"^tz_"))
+
+    # Timezone conversation (for /timezone command flow)
     tz_handler = ConversationHandler(
         entry_points=[CommandHandler("timezone", timezone_command)],
         states={
