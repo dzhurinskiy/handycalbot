@@ -31,11 +31,16 @@ Fill in the form:
 - Click **Save and Continue**
 
 ### Scopes
-1. Click **Add or Remove Scopes**
-2. Search and select:
-   - `https://www.googleapis.com/auth/calendar.events`
-   - `https://www.googleapis.com/auth/calendar.readonly`
-3. Click **Update** → **Save and Continue**
+1. On the "Scopes" step, click the **Add or Remove Scopes** button (it's a blue button in the middle of the page)
+   - If you don't see it, make sure you clicked "Save and Continue" on the previous step
+2. In the popup that appears, search for "Google Calendar API" in the filter box
+3. Check these scopes:
+   - `../auth/calendar.events` - "See, edit, share, and permanently delete all the calendars..."
+   - `../auth/calendar.readonly` - "See and download any calendar..."
+4. Scroll down and click **Update**
+5. Click **Save and Continue**
+
+> **Note**: If scopes don't appear, make sure you enabled "Google Calendar API" in Step 2 first.
 
 ### Test Users (for development)
 1. Click **Add Users**
