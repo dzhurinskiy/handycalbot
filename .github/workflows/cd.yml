@@ -59,11 +59,20 @@ jobs:
             docker compose build --no-cache app
             docker compose up -d
 
-            # Wait for services
-            sleep 15
-
-            # Health check
-            curl -f http://localhost:8000/health || exit 1
+            # Wait for services and health check with retry
+            echo ">>> Waiting for services to be healthy..."
+            for i in {1..10}; do
+              if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+                echo ">>> Health check passed on attempt $i"
+                break
+              fi
+              echo ">>> Health check attempt $i failed, retrying in 5s..."
+              sleep 5
+              if [ $i -eq 10 ]; then
+                echo ">>> Health check failed after 10 attempts"
+                exit 1
+              fi
+            done
 
             # Cleanup old images
             docker image prune -f
