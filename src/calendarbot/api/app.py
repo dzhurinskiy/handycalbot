@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from calendarbot.api.health import router as health_router
 from calendarbot.api.oauth import router as oauth_router
+from calendarbot.api.pages import router as pages_router
 from calendarbot.config import get_settings
 
 
@@ -29,6 +30,7 @@ def create_app() -> FastAPI:
     )
 
     # Include routers
+    app.include_router(pages_router)  # Landing, privacy, terms pages
     app.include_router(health_router)
     app.include_router(oauth_router, prefix="/oauth")
 
