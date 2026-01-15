@@ -116,9 +116,12 @@ class CalendarService:
         if "error" in result:
             return result
 
-        # Convert to UTC for local cache storage
+        # Convert to UTC for local cache storage (naive datetime for PostgreSQL)
         start_utc = TimezoneHelper.to_utc(meeting_data.start_datetime, user.timezone)
         end_utc = TimezoneHelper.to_utc(meeting_data.end_datetime, user.timezone)
+        # Strip timezone info for database (TIMESTAMP WITHOUT TIME ZONE)
+        start_utc_naive = start_utc.replace(tzinfo=None)
+        end_utc_naive = end_utc.replace(tzinfo=None)
 
         # Cache meeting locally
         await self.meeting_repo.save_meeting(
@@ -126,8 +129,8 @@ class CalendarService:
             external_id=result["id"],
             provider="google",
             title=meeting_data.title,
-            start_time=start_utc,
-            end_time=end_utc,
+            start_time=start_utc_naive,
+            end_time=end_utc_naive,
             attendees=meeting_data.attendees,
         )
 
