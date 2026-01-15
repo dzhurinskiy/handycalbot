@@ -160,69 +160,77 @@ async def create_meeting_callback(
 
     result_id = query.data.replace("create_", "")
 
-    # Get stored meeting data
-    if context.bot_data is None:
-        await query.edit_message_text("Error: Meeting data expired. Please try again.")
-        return
-
-    meeting_data = context.bot_data.get(f"meeting_{result_id}")
-    if not meeting_data:
-        await query.edit_message_text("Error: Meeting data expired. Please try again.")
-        return
-
-    # Verify user
-    if meeting_data["user_id"] != update.effective_user.id:
-        await query.answer("This is not your meeting!", show_alert=True)
-        return
-
-    async with async_session_factory() as session:
-        user_service = UserService(session)
-        user = await user_service.get_user(update.effective_user.id)
-
-        if not user:
-            await query.edit_message_text("Error: User not found. Please /start the bot.")
+    try:
+        # Get stored meeting data
+        if context.bot_data is None:
+            await query.edit_message_text("Error: Meeting data expired. Please try again.")
             return
 
-        # Reconstruct ParsedMeeting
-        from datetime import datetime
-        from calendarbot.services.parser import ParsedMeeting
+        meeting_data = context.bot_data.get(f"meeting_{result_id}")
+        if not meeting_data:
+            await query.edit_message_text("Error: Meeting data expired. Please try again.")
+            return
 
-        m = meeting_data["meeting"]
-        parsed = ParsedMeeting(
-            time=m["time"],
-            date=m["date"],
-            title=m["title"],
-            attendees=m["attendees"],
-            start_datetime=datetime.fromisoformat(m["start_datetime"]),
-            end_datetime=datetime.fromisoformat(m["end_datetime"]),
-        )
+        # Verify user
+        if meeting_data["user_id"] != update.effective_user.id:
+            await query.answer("This is not your meeting!", show_alert=True)
+            return
 
-        calendar_service = CalendarService(session)
-        result = await calendar_service.create_meeting(user, parsed)
-        await session.commit()
+        async with async_session_factory() as session:
+            user_service = UserService(session)
+            user = await user_service.get_user(update.effective_user.id)
 
-    # Clean up stored data
-    del context.bot_data[f"meeting_{result_id}"]
+            if not user:
+                await query.edit_message_text("Error: User not found. Please /start the bot.")
+                return
 
-    if "error" in result:
-        await query.edit_message_text(f"❌ Error: {result['error']}")
-    else:
-        start_str = result["start"].strftime("%H:%M on %d %b %Y")
-        text = f"✅ Meeting created!\n\n"
-        text += f"**{result['title']}**\n"
-        text += f"🕐 {start_str}\n"
-        if result["attendees"]:
-            text += f"👥 Invites sent to: {', '.join(result['attendees'])}\n"
+            # Reconstruct ParsedMeeting
+            from datetime import datetime
+            from calendarbot.services.parser import ParsedMeeting
 
-        # Add button to open/modify in Google Calendar
-        keyboard = None
-        if result.get("link"):
-            keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("📅 Open in Google Calendar", url=result["link"])]
-            ])
-            text += "\n_Click below to view or modify the meeting_"
+            m = meeting_data["meeting"]
+            parsed = ParsedMeeting(
+                time=m["time"],
+                date=m["date"],
+                title=m["title"],
+                attendees=m["attendees"],
+                start_datetime=datetime.fromisoformat(m["start_datetime"]),
+                end_datetime=datetime.fromisoformat(m["end_datetime"]),
+            )
 
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=keyboard)
+            calendar_service = CalendarService(session)
+            result = await calendar_service.create_meeting(user, parsed)
+            await session.commit()
+
+        # Clean up stored data
+        context.bot_data.pop(f"meeting_{result_id}", None)
+
+        if "error" in result:
+            await query.edit_message_text(f"❌ Error: {result['error']}")
+        else:
+            start_str = result["start"].strftime("%H:%M on %d %b %Y")
+            text = f"✅ Meeting created!\n\n"
+            text += f"**{result['title']}**\n"
+            text += f"🕐 {start_str}\n"
+            if result["attendees"]:
+                text += f"👥 Invites sent to: {', '.join(result['attendees'])}\n"
+
+            # Add button to open/modify in Google Calendar
+            keyboard = None
+            if result.get("link"):
+                keyboard = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("📅 Open in Google Calendar", url=result["link"])]
+                ])
+                text += "\n_Click below to view or modify the meeting_"
+
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=keyboard)
+
+    except Exception as e:
+        logger.exception(f"Error creating meeting: {e}")
+        try:
+            await query.edit_message_text(f"❌ Error creating meeting: {str(e)}")
+        except Exception:
+            pass  # If we can't edit, at least we logged it
 
 
 async def discard_meeting_callback(

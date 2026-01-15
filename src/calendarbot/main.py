@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from starlette.requests import Request
-from telegram import BotCommand
+from telegram import BotCommand, MenuButtonCommands
 from telegram.ext import Application
 
 from calendarbot.api.app import create_app
@@ -70,7 +70,9 @@ async def run_bot_polling(app: Application) -> None:
 
     # Set bot commands for Telegram UI
     await app.bot.set_my_commands(BOT_COMMANDS)
-    logger.info("Bot commands registered")
+    # Set menu button to show commands
+    await app.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
+    logger.info("Bot commands and menu button registered")
 
     logger.info("Bot is running. Press Ctrl+C to stop.")
 
@@ -113,7 +115,9 @@ async def run_with_webhook(app: Application, fastapi_app) -> None:
 
     # Set bot commands for Telegram UI
     await app.bot.set_my_commands(BOT_COMMANDS)
-    logger.info("Bot commands registered")
+    # Set menu button to show commands
+    await app.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
+    logger.info("Bot commands and menu button registered")
 
     logger.info(f"Webhook set to: {settings.webhook_url}")
 

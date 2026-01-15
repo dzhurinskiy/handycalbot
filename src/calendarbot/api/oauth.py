@@ -2,15 +2,39 @@
 
 import logging
 
+import httpx
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import HTMLResponse
 
+from calendarbot.config import get_settings
 from calendarbot.db.session import async_session_factory
 from calendarbot.db.repository import OAuthTokenRepository, UserRepository
 from calendarbot.integrations.google import GoogleOAuthFlow
 from calendarbot.utils.encryption import TokenEncryption
 
 logger = logging.getLogger(__name__)
+
+
+async def send_telegram_message(chat_id: int, text: str, reply_markup: dict | None = None) -> bool:
+    """Send a message to a Telegram user via Bot API."""
+    settings = get_settings()
+    url = f"https://api.telegram.org/bot{settings.telegram_bot_token}/sendMessage"
+
+    payload = {
+        "chat_id": chat_id,
+        "text": text,
+        "parse_mode": "Markdown",
+    }
+    if reply_markup:
+        payload["reply_markup"] = reply_markup
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=payload, timeout=10.0)
+            return response.status_code == 200
+    except Exception as e:
+        logger.error(f"Failed to send Telegram message: {e}")
+        return False
 
 router = APIRouter(tags=["oauth"])
 
@@ -188,7 +212,41 @@ async def google_oauth_callback(
             )
             await session.commit()
 
+            # Get user's current timezone for the message
+            user_timezone = user.timezone
+
         logger.info(f"Google Calendar connected for user {telegram_id}")
+
+        # Send timezone confirmation message to user
+        timezone_message = (
+            "✅ *Google Calendar connected successfully!*\n\n"
+            f"📍 Your current timezone is set to: `{user_timezone}`\n\n"
+            "Please confirm this is correct, or choose a different timezone.\n"
+            "_Correct timezone is important for scheduling meetings at the right time._"
+        )
+
+        # Build inline keyboard with timezone options
+        from calendarbot.utils.timezone import TimezoneHelper
+        common_tzs = TimezoneHelper.get_common_timezones()[:8]  # Top 8 timezones
+
+        keyboard_rows = []
+        row = []
+        for tz in common_tzs:
+            label = f"✓ {tz}" if tz == user_timezone else tz
+            row.append({"text": label, "callback_data": f"tz_{tz}"})
+            if len(row) == 2:
+                keyboard_rows.append(row)
+                row = []
+        if row:
+            keyboard_rows.append(row)
+
+        # Add "Keep current" button
+        keyboard_rows.append([{"text": f"✅ Keep {user_timezone}", "callback_data": f"tz_{user_timezone}"}])
+
+        reply_markup = {"inline_keyboard": keyboard_rows}
+
+        await send_telegram_message(telegram_id, timezone_message, reply_markup)
+
         return HTMLResponse(content=SUCCESS_HTML)
 
     except Exception as e:
