@@ -13,18 +13,31 @@
 - The VPS at 164.92.157.14 should be accessed via SSH key authentication
 - GitHub remote should use SSH URL format: `git@github.com:dzhurinskiy/handycalbot.git`
 
-## VPS Connection Management
+## VPS Connection Management - CRITICAL RULES
 
-- **Limit SSH connections**: Never run multiple SSH commands in parallel to the VPS
-- **Chain commands**: Use `&&` to chain multiple commands in a single SSH session instead of separate calls
-- **Use timeouts**: Always use `-o ConnectTimeout=10` for SSH connections
-- **Avoid background SSH**: Don't run SSH commands in background mode - they can accumulate and overwhelm the server
-- **Wait between operations**: After triggering a deployment, wait for it to complete before running more SSH commands
-- **Single verification**: When checking VPS status, use one SSH call with all needed commands:
-  ```bash
-  ssh -o ConnectTimeout=10 root@164.92.157.14 "docker compose ps && docker compose logs app --tail 20"
-  ```
-- **If VPS becomes unresponsive**: Wait 2-3 minutes for connections to timeout before retrying
+**NEVER violate these rules - they prevent VPS lockups that require power cycling:**
+
+1. **ONE SSH connection at a time** - NEVER run SSH in parallel, NEVER use background mode for SSH
+2. **Chain all commands** - Use `&&` to run multiple commands in a single SSH call
+3. **Always use timeout** - Every SSH command must include `-o ConnectTimeout=10`
+4. **Prefer HTTPS health checks** - Use `curl https://handycal.dzhurinskiy.com/health` instead of SSH when possible
+5. **Trust the CI/CD** - After `git push`, let GitHub Actions handle deployment. Don't SSH to monitor.
+6. **Max 1 SSH per minute** - Wait at least 60 seconds between SSH connections
+
+**Standard SSH command format (use the handycal alias from ~/.ssh/config):**
+```bash
+ssh -o ConnectTimeout=10 -o BatchMode=yes handycal "command1 && command2 && command3"
+```
+
+- `handycal` - SSH alias configured in `~/.ssh/config` with correct key and host
+- `-o BatchMode=yes` - REQUIRED: prevents password prompts, fails fast if key doesn't work
+
+**Deployment workflow (NO SSH monitoring):**
+1. Make code changes
+2. `git push` - triggers GitHub Actions
+3. Wait for Telegram notification (success/failure)
+4. Verify via HTTPS: `curl https://handycal.dzhurinskiy.com/health`
+5. Only SSH if health check fails AND you need to debug
 
 ## Environment & Deployment
 
