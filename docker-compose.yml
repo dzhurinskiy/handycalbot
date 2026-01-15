@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: calendarbot
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://calendarbot:${DB_PASSWORD}@db:5432/calendarbot
+      - APP_ENV=production
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - calendarbot-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: postgres:15-alpine
+    container_name: calendarbot-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=calendarbot
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=calendarbot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - calendarbot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calendarbot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    image: nginx:alpine
+    container_name: calendarbot-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - calendarbot-network
+
+networks:
+  calendarbot-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -1,0 +1,54 @@
+name: CD
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/handycal
+
+            # Pull latest code
+            git fetch origin
+            git reset --hard origin/main
+
+            # Build and restart containers
+            docker compose build --no-cache app
+            docker compose up -d
+
+            # Run migrations
+            docker compose exec -T app alembic upgrade head
+
+            # Health check
+            sleep 10
+            curl -f http://localhost:8000/health || exit 1
+
+            # Cleanup old images
+            docker image prune -f
+
+            echo "Deployment successful!"
+
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "Deployment completed successfully"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Deployment failed!"
+          exit 1

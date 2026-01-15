@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: calendarbot-dev
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://calendarbot:devpassword@db:5432/calendarbot
+      - APP_ENV=development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - calendarbot-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: calendarbot-db-dev
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=calendarbot
+      - POSTGRES_PASSWORD=devpassword
+      - POSTGRES_DB=calendarbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - calendarbot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calendarbot"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  calendarbot-network:
+    driver: bridge
+
+volumes:
+  postgres_data_dev:
