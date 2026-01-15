@@ -91,8 +91,15 @@ pytest tests/ -v --cov=src/calendarbot
 
 2. **SSH into server and run setup**
    ```bash
-   ssh root@164.92.157.14
-   curl -sSL <setup-script-url> | bash
+   # Use SSH key to avoid password prompts
+   ssh -i ~/.ssh/calendarbot_deploy root@164.92.157.14
+
+   # Or add to ~/.ssh/config for easier access:
+   # Host handycal
+   #   HostName 164.92.157.14
+   #   User root
+   #   IdentityFile ~/.ssh/calendarbot_deploy
+   # Then just: ssh handycal
    ```
 
 3. **Clone and configure**
