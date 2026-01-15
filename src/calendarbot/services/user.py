@@ -15,10 +15,10 @@ class UserService:
         self.token_repo = OAuthTokenRepository(session)
 
     async def get_or_create_user(
-        self, telegram_id: int, telegram_username: str | None = None
+        self, telegram_id: int, telegram_username: str | None = None, timezone: str | None = None
     ) -> tuple[User, bool]:
         """Get or create user. Returns (user, is_new)."""
-        return await self.user_repo.get_or_create(telegram_id, telegram_username)
+        return await self.user_repo.get_or_create(telegram_id, telegram_username, timezone)
 
     async def get_user(self, telegram_id: int) -> User | None:
         """Get user by Telegram ID."""

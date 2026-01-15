@@ -213,10 +213,16 @@ async def create_meeting_callback(
         text += f"🕐 {start_str}\n"
         if result["attendees"]:
             text += f"👥 Invites sent to: {', '.join(result['attendees'])}\n"
-        if result.get("link"):
-            text += f"\n[Open in Google Calendar]({result['link']})"
 
-        await query.edit_message_text(text, parse_mode="Markdown")
+        # Add button to open/modify in Google Calendar
+        keyboard = None
+        if result.get("link"):
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("📅 Open in Google Calendar", url=result["link"])]
+            ])
+            text += "\n_Click below to view or modify the meeting_"
+
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=keyboard)
 
 
 async def discard_meeting_callback(

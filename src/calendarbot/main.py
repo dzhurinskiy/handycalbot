@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from starlette.requests import Request
+from telegram import BotCommand
 from telegram.ext import Application
 
 from calendarbot.api.app import create_app
@@ -18,6 +19,19 @@ from calendarbot.bot.handlers import (
 )
 from calendarbot.config import get_settings
 from calendarbot.db.session import init_db
+
+# Bot commands to show in Telegram UI
+BOT_COMMANDS = [
+    BotCommand("start", "Start the bot and see welcome message"),
+    BotCommand("help", "Show help and usage instructions"),
+    BotCommand("meetings", "List your upcoming meetings"),
+    BotCommand("cancel", "Cancel a meeting"),
+    BotCommand("connect", "Connect Google Calendar"),
+    BotCommand("disconnect", "Disconnect Google Calendar"),
+    BotCommand("settings", "View your current settings"),
+    BotCommand("timezone", "Change your timezone"),
+    BotCommand("duration", "Set default meeting duration"),
+]
 
 # Configure logging
 logging.basicConfig(
@@ -53,6 +67,10 @@ async def run_bot_polling(app: Application) -> None:
     await app.initialize()
     await app.start()
     await app.updater.start_polling(drop_pending_updates=True)
+
+    # Set bot commands for Telegram UI
+    await app.bot.set_my_commands(BOT_COMMANDS)
+    logger.info("Bot commands registered")
 
     logger.info("Bot is running. Press Ctrl+C to stop.")
 
@@ -92,6 +110,10 @@ async def run_with_webhook(app: Application, fastapi_app) -> None:
         url=f"{settings.webhook_url}",
         allowed_updates=["message", "callback_query", "inline_query", "chosen_inline_result"],
     )
+
+    # Set bot commands for Telegram UI
+    await app.bot.set_my_commands(BOT_COMMANDS)
+    logger.info("Bot commands registered")
 
     logger.info(f"Webhook set to: {settings.webhook_url}")
 

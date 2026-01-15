@@ -7,6 +7,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 
 from calendarbot.db.session import async_session_factory
 from calendarbot.services.user import UserService
+from calendarbot.utils.timezone import guess_timezone_from_language
 
 logger = logging.getLogger(__name__)
 
@@ -72,19 +73,30 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     if not update.effective_user or not update.message:
         return
 
+    # Guess timezone from Telegram language setting
+    guessed_timezone = guess_timezone_from_language(update.effective_user.language_code)
+
     async with async_session_factory() as session:
         user_service = UserService(session)
         user, is_new = await user_service.get_or_create_user(
             telegram_id=update.effective_user.id,
             telegram_username=update.effective_user.username,
+            timezone=guessed_timezone,
         )
         await session.commit()
 
         if is_new:
-            logger.info(f"New user registered: {update.effective_user.id}")
+            logger.info(
+                f"New user registered: {update.effective_user.id} "
+                f"(lang={update.effective_user.language_code}, tz={guessed_timezone})"
+            )
+            # Inform user about detected timezone
+            timezone_msg = f"\n\n📍 I've set your timezone to `{guessed_timezone}` based on your Telegram language. Use /timezone to change it if needed."
+        else:
+            timezone_msg = ""
 
     await update.message.reply_text(
-        WELCOME_MESSAGE,
+        WELCOME_MESSAGE + timezone_msg,
         parse_mode="Markdown",
     )
 

@@ -6,6 +6,49 @@ from zoneinfo import ZoneInfo
 import pytz
 
 
+# Map Telegram language codes to likely timezones
+LANGUAGE_TO_TIMEZONE: dict[str, str] = {
+    "ru": "Europe/Moscow",
+    "uk": "Europe/Kiev",
+    "be": "Europe/Minsk",
+    "kk": "Asia/Almaty",
+    "uz": "Asia/Tashkent",
+    "en": "America/New_York",  # Default for English
+    "de": "Europe/Berlin",
+    "fr": "Europe/Paris",
+    "es": "Europe/Madrid",
+    "it": "Europe/Rome",
+    "pt": "Europe/Lisbon",
+    "pl": "Europe/Warsaw",
+    "nl": "Europe/Amsterdam",
+    "tr": "Europe/Istanbul",
+    "ar": "Asia/Riyadh",
+    "fa": "Asia/Tehran",
+    "he": "Asia/Jerusalem",
+    "ja": "Asia/Tokyo",
+    "ko": "Asia/Seoul",
+    "zh": "Asia/Shanghai",
+    "hi": "Asia/Kolkata",
+    "th": "Asia/Bangkok",
+    "vi": "Asia/Ho_Chi_Minh",
+    "id": "Asia/Jakarta",
+}
+
+
+def guess_timezone_from_language(language_code: str | None) -> str:
+    """Guess timezone from Telegram language code.
+
+    Returns best guess timezone or 'UTC' if unknown.
+    """
+    if not language_code:
+        return "UTC"
+
+    # Handle language codes like "en-US", "ru-RU"
+    lang = language_code.split("-")[0].lower()
+
+    return LANGUAGE_TO_TIMEZONE.get(lang, "UTC")
+
+
 class TimezoneHelper:
     """Helper for timezone conversions."""
 
