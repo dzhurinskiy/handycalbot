@@ -3,8 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Integer, String, Text, func
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Integer, JSON, String, Text, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -12,7 +11,7 @@ class Base(DeclarativeBase):
     """Base class for all models."""
 
     type_annotation_map = {
-        dict[str, Any]: JSONB,
+        dict[str, Any]: JSON,
     }
 
 
@@ -87,7 +86,7 @@ class Meeting(Base):
     title: Mapped[str | None] = mapped_column(String(500), nullable=True)
     start_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     end_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    attendees: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    attendees: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     # Relationships
