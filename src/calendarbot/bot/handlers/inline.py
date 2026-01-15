@@ -219,9 +219,9 @@ async def create_meeting_callback(
             keyboard = None
             if result.get("link"):
                 keyboard = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("📅 Open in Google Calendar", url=result["link"])]
+                    [InlineKeyboardButton("📅 Add to my Calendar", url=result["link"])]
                 ])
-                text += "\n_Click below to view or modify the meeting_"
+                text += "\n_Attendees will receive invites. Others can add to their calendar below._"
 
             await query.edit_message_text(text, parse_mode="Markdown", reply_markup=keyboard)
 
