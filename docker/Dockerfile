@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN groupadd -r calendarbot && useradd -r -g calendarbot calendarbot
 
 # Copy requirements first for caching
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
 # Install dependencies
