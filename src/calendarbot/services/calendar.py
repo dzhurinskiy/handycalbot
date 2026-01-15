@@ -9,6 +9,7 @@ from calendarbot.db.models import User
 from calendarbot.db.repository import MeetingRepository, OAuthTokenRepository
 from calendarbot.integrations.google import GoogleCalendarClient
 from calendarbot.services.parser import ParsedMeeting
+from calendarbot.utils.calendar_url import generate_google_calendar_link
 from calendarbot.utils.encryption import TokenEncryption
 from calendarbot.utils.timezone import TimezoneHelper
 
@@ -134,10 +135,19 @@ class CalendarService:
             attendees=meeting_data.attendees,
         )
 
+        # Generate a universal calendar link that anyone can use to add the event
+        universal_link = generate_google_calendar_link(
+            title=meeting_data.title,
+            start_time=meeting_data.start_datetime,
+            end_time=meeting_data.end_datetime,
+            timezone=user.timezone,
+            attendees=meeting_data.attendees,
+        )
+
         return {
             "success": True,
             "event_id": result["id"],
-            "link": result.get("htmlLink", ""),
+            "link": universal_link,
             "title": meeting_data.title,
             "start": meeting_data.start_datetime,
             "end": meeting_data.end_datetime,
