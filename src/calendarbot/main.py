@@ -6,6 +6,7 @@ import sys
 from contextlib import asynccontextmanager
 
 import uvicorn
+from starlette.requests import Request
 from telegram.ext import Application
 
 from calendarbot.api.app import create_app
@@ -78,9 +79,8 @@ async def run_with_webhook(app: Application, fastapi_app) -> None:
 
     # Add webhook route to FastAPI
     @fastapi_app.post("/webhook")
-    async def telegram_webhook(request):
+    async def telegram_webhook(request: Request):
         from telegram import Update
-        import json
 
         data = await request.json()
         update = Update.de_json(data, app.bot)
