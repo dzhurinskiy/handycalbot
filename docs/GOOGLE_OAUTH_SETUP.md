@@ -30,25 +30,27 @@ Fill in the form:
 - Leave other fields empty for now
 - Click **Save and Continue**
 
-### Scopes
-1. On the "Scopes" step, click the **Add or Remove Scopes** button (it's a blue button in the middle of the page)
-   - If you don't see it, make sure you clicked "Save and Continue" on the previous step
-2. In the popup that appears, search for "Google Calendar API" in the filter box
-3. Check these scopes:
+### Scopes (Data Access section)
+
+1. Go to the **Data Access** section
+2. Click **Add or Remove Scopes**
+3. Search for "Google Calendar API" in the filter
+4. Select these scopes:
    - `../auth/calendar.events` - "See, edit, share, and permanently delete all the calendars..."
    - `../auth/calendar.readonly` - "See and download any calendar..."
-4. Scroll down and click **Update**
-5. Click **Save and Continue**
+5. Click **Update**
+6. Click **Save and Continue**
 
 > **Note**: If scopes don't appear, make sure you enabled "Google Calendar API" in Step 2 first.
 
-### Test Users (for development)
-1. Click **Add Users**
-2. Add your email address
-3. Click **Save and Continue**
+### Test Users (Audience section)
 
-### Summary
-1. Review and click **Back to Dashboard**
+1. Go to the **Audience** section in the left sidebar
+2. Under "Test users", click **Add Users**
+3. Enter your email address
+4. Click **Save**
+
+> **Note**: While the app is in "Testing" mode, only test users can authorize the app.
 
 ## Step 4: Create OAuth 2.0 Credentials
 
@@ -80,19 +82,19 @@ You can also download the JSON file for backup.
 
 ## Step 6: Configure the Bot
 
-Add these to your `.env` file on the VPS:
+Credentials are now stored in GitHub Secrets and automatically deployed to VPS.
 
+To update manually on VPS:
 ```bash
-GOOGLE_CLIENT_ID=your_client_id_here.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-your_secret_here
-GOOGLE_REDIRECT_URI=https://164-92-157-14.nip.io/oauth/google/callback
+ssh root@164.92.157.14
+nano /opt/handycal/.env
 ```
 
 ## Step 7: Publish the App (for production)
 
 Once testing is complete:
 
-1. Go to **OAuth consent screen**
+1. Go to **OAuth consent screen** → **Audience**
 2. Click **Publish App**
 3. Confirm the prompts
 
@@ -105,11 +107,11 @@ Once testing is complete:
 - Ensure there are no trailing slashes or typos
 
 ### "Error 403: access_denied"
-- Make sure your email is added as a test user
+- Make sure your email is added as a test user in the **Audience** section
 - Or publish the app for production use
 
 ### "Error 400: redirect_uri_mismatch"
-- The redirect URI in your `.env` must exactly match the one in Google Cloud Console
+- The redirect URI must exactly match the one in Google Cloud Console
 - Check for http vs https, trailing slashes, port numbers
 
 ## Security Notes

@@ -87,6 +87,7 @@ logs/
 *.key
 secrets/
 .ssh/
+*client_secret*.json
 
 # SSL certificates
 ssl/
