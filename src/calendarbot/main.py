@@ -100,7 +100,8 @@ async def run_bot_polling(app: Application) -> None:
 
     await app.initialize()
     await app.start()
-    await app.updater.start_polling(drop_pending_updates=True)
+    if app.updater:
+        await app.updater.start_polling(drop_pending_updates=True)
 
     # Set bot commands and menu button for Telegram UI
     await setup_bot_commands_and_menu(app)
@@ -114,7 +115,8 @@ async def run_bot_polling(app: Application) -> None:
     except asyncio.CancelledError:
         pass
     finally:
-        await app.updater.stop()
+        if app.updater:
+            await app.updater.stop()
         await app.stop()
         await app.shutdown()
 

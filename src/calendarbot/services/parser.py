@@ -108,7 +108,7 @@ class MeetingParser:
             use_default_reminder=use_default_reminder,
         )
 
-    def _parse_reminders(self, reminder_str: str) -> list[int]:
+    def _parse_reminders(self, reminder_str: str) -> list[int] | None:
         """Parse reminder string like '10m', '30m/60m', '1d' into minutes."""
         reminders = []
         parts = reminder_str.split("/")

@@ -120,7 +120,7 @@ class GoogleCalendarClient:
             event_body["description"] = description
 
         if attendees:
-            event_body["attendees"] = [{"email": email} for email in attendees]
+            event_body["attendees"] = [{"email": email} for email in attendees]  # type: ignore[misc]
             event_body["sendUpdates"] = "all"  # Send invitations
 
         # Handle reminders

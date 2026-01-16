@@ -24,7 +24,7 @@ class CalendarService:
         self.token_repo = OAuthTokenRepository(session)
         self.encryption = TokenEncryption()
 
-    async def _get_valid_client(self, user: User) -> GoogleCalendarClient | dict:
+    async def _get_valid_client(self, user: User) -> tuple[GoogleCalendarClient, str] | dict:
         """Get a Google Calendar client with valid tokens, refreshing if needed.
 
         Returns GoogleCalendarClient on success, or dict with error on failure.

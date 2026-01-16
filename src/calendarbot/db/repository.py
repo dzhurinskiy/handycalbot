@@ -1,11 +1,15 @@
 """Data access layer."""
 
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from calendarbot.db.models import Meeting, OAuthToken, User
+
+# Sentinel value to distinguish "not provided" from None
+_UNSET: Any = object()
 
 
 class UserRepository:
@@ -44,14 +48,14 @@ class UserRepository:
         user: User,
         timezone: str | None = None,
         default_duration: int | None = None,
-        default_reminder: str | None = ...,  # Use ... as sentinel to distinguish from None
+        default_reminder: str | None = _UNSET,
     ) -> User:
         """Update user settings."""
         if timezone is not None:
             user.timezone = timezone
         if default_duration is not None:
             user.default_duration = default_duration
-        if default_reminder is not ...:  # Allow setting to None
+        if default_reminder is not _UNSET:  # Allow setting to None
             user.default_reminder = default_reminder
         await self.session.flush()
         return user
