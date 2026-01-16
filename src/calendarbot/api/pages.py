@@ -1,11 +1,15 @@
 """Static pages - landing, privacy policy, terms of service."""
 
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 
 router = APIRouter(tags=["pages"])
+
+# Current year for copyright
+CURRENT_YEAR = datetime.now().year
 
 # Path to static files
 STATIC_DIR = Path(__file__).parent.parent / "static"
@@ -70,6 +74,14 @@ COMMON_STYLES = """
 
         .nav-links a:hover {
             color: #006BFF;
+        }
+
+        .nav-links .btn-primary {
+            color: white;
+        }
+
+        .nav-links .btn-primary:hover {
+            color: white;
         }
 
         /* Hero Section */
@@ -551,7 +563,7 @@ async def landing_page():
 
     <footer>
         <div class="footer-content">
-            <span>© 2025 HandyCalBot. Open source project.</span>
+            <span>© {CURRENT_YEAR} HandyCalBot. Open source project.</span>
             <div class="footer-links">
                 <a href="/privacy">Privacy</a>
                 <a href="/terms">Terms</a>
@@ -681,7 +693,7 @@ async def privacy_policy():
 
     <footer>
         <div class="footer-content">
-            <span>© 2025 HandyCalBot. Open source project.</span>
+            <span>© {CURRENT_YEAR} HandyCalBot. Open source project.</span>
             <div class="footer-links">
                 <a href="/">Home</a>
                 <a href="/terms">Terms</a>
@@ -828,7 +840,7 @@ async def terms_of_service():
 
     <footer>
         <div class="footer-content">
-            <span>© 2025 HandyCalBot. Open source project.</span>
+            <span>© {CURRENT_YEAR} HandyCalBot. Open source project.</span>
             <div class="footer-links">
                 <a href="/">Home</a>
                 <a href="/privacy">Privacy</a>
