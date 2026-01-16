@@ -69,10 +69,18 @@ async def run_bot_polling(app: Application) -> None:
     await app.updater.start_polling(drop_pending_updates=True)
 
     # Set bot commands for Telegram UI
-    await app.bot.set_my_commands(BOT_COMMANDS)
+    try:
+        await app.bot.set_my_commands(BOT_COMMANDS)
+        logger.info(f"Registered {len(BOT_COMMANDS)} bot commands")
+    except Exception as e:
+        logger.error(f"Failed to set bot commands: {e}")
+
     # Set menu button to show commands
-    await app.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
-    logger.info("Bot commands and menu button registered")
+    try:
+        await app.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
+        logger.info("Menu button set to show commands")
+    except Exception as e:
+        logger.error(f"Failed to set menu button: {e}")
 
     logger.info("Bot is running. Press Ctrl+C to stop.")
 
@@ -114,10 +122,18 @@ async def run_with_webhook(app: Application, fastapi_app) -> None:
     )
 
     # Set bot commands for Telegram UI
-    await app.bot.set_my_commands(BOT_COMMANDS)
+    try:
+        await app.bot.set_my_commands(BOT_COMMANDS)
+        logger.info(f"Registered {len(BOT_COMMANDS)} bot commands")
+    except Exception as e:
+        logger.error(f"Failed to set bot commands: {e}")
+
     # Set menu button to show commands
-    await app.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
-    logger.info("Bot commands and menu button registered")
+    try:
+        await app.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
+        logger.info("Menu button set to show commands")
+    except Exception as e:
+        logger.error(f"Failed to set menu button: {e}")
 
     logger.info(f"Webhook set to: {settings.webhook_url}")
 

@@ -83,7 +83,7 @@ class GoogleCalendarClient:
 
             return {
                 "access_token": data["access_token"],
-                "refresh_token": data.get("refresh_token"),
+                "refresh_token": data.get("refresh_token"),  # May be None, caller handles fallback
                 "expires_at": expires_at,
             }
 
@@ -208,6 +208,6 @@ class GoogleOAuthFlow:
 
             return {
                 "access_token": data["access_token"],
-                "refresh_token": data.get("refresh_token", ""),
+                "refresh_token": data.get("refresh_token") or "",
                 "expires_at": expires_at,
             }

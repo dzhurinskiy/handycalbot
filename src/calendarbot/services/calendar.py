@@ -51,7 +51,7 @@ class CalendarService:
                     provider="google",
                     access_token_encrypted=self.encryption.encrypt(new_tokens["access_token"]),
                     refresh_token_encrypted=self.encryption.encrypt(
-                        new_tokens.get("refresh_token", refresh_token)
+                        new_tokens.get("refresh_token") or refresh_token
                     ),
                     expires_at=new_tokens["expires_at"],
                 )
