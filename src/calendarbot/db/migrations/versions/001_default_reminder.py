@@ -1,6 +1,6 @@
 """Add default_reminder column to users table.
 
-Revision ID: 001_add_default_reminder
+Revision ID: 001_default_reminder
 Revises:
 Create Date: 2026-01-16
 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "001_add_default_reminder"
+revision: str = "001_default_reminder"
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None

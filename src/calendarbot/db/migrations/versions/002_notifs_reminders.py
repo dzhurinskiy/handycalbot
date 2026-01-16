@@ -1,7 +1,7 @@
 """Add notifications_enabled to users and reminders to meetings.
 
-Revision ID: 002_add_notifications_and_meeting_reminders
-Revises: 001_add_default_reminder
+Revision ID: 002_notifs_reminders
+Revises: 001_default_reminder
 Create Date: 2026-01-16
 
 """
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "002_add_notifications_and_meeting_reminders"
-down_revision: str | None = "001_add_default_reminder"
+revision: str = "002_notifs_reminders"
+down_revision: str | None = "001_default_reminder"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
