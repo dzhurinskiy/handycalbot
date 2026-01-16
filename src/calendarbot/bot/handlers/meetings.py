@@ -69,7 +69,11 @@ async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if not update.effective_user or not update.message:
         return
 
-    await show_cancel_menu(update, context, page=0, is_callback=False)
+    try:
+        await show_cancel_menu(update, context, page=0, is_callback=False)
+    except Exception as e:
+        logger.exception(f"Error in cancel_command: {e}")
+        await update.message.reply_text(f"Error loading meetings: {str(e)}")
 
 
 async def show_cancel_menu(
@@ -81,38 +85,43 @@ async def show_cancel_menu(
     """Show paginated list of meetings to cancel."""
     user_id = update.effective_user.id if update.effective_user else None
     if not user_id:
+        logger.warning("show_cancel_menu called without user_id")
         return
 
-    async with async_session_factory() as session:
-        user_service = UserService(session)
-        user = await user_service.get_user(user_id)
+    async def send_message(text: str, reply_markup=None):
+        """Helper to send message based on context."""
+        if is_callback and update.callback_query:
+            await update.callback_query.edit_message_text(
+                text, reply_markup=reply_markup, parse_mode="Markdown"
+            )
+        elif update.message:
+            await update.message.reply_text(
+                text, reply_markup=reply_markup, parse_mode="Markdown"
+            )
 
-        if not user:
-            text = "Please run /start first."
-            if is_callback and update.callback_query:
-                await update.callback_query.edit_message_text(text)
-            elif update.message:
-                await update.message.reply_text(text)
-            return
+    try:
+        async with async_session_factory() as session:
+            user_service = UserService(session)
+            user = await user_service.get_user(user_id)
 
-        if not await user_service.is_calendar_connected(user):
-            text = "Please connect your Google Calendar first with /connect"
-            if is_callback and update.callback_query:
-                await update.callback_query.edit_message_text(text)
-            elif update.message:
-                await update.message.reply_text(text)
-            return
+            if not user:
+                await send_message("Please run /start first.")
+                return
 
-        calendar_service = CalendarService(session)
-        # Fetch more meetings to enable pagination
-        all_meetings = await calendar_service.get_upcoming_meetings(user, limit=50)
+            if not await user_service.is_calendar_connected(user):
+                await send_message("Please connect your Google Calendar first with /connect")
+                return
+
+            calendar_service = CalendarService(session)
+            # Fetch more meetings to enable pagination
+            all_meetings = await calendar_service.get_upcoming_meetings(user, limit=50)
+    except Exception as e:
+        logger.exception(f"Error fetching meetings for cancel: {e}")
+        await send_message(f"Error fetching meetings: {str(e)}")
+        return
 
     if not all_meetings:
-        text = "No upcoming meetings to cancel."
-        if is_callback and update.callback_query:
-            await update.callback_query.edit_message_text(text)
-        elif update.message:
-            await update.message.reply_text(text)
+        await send_message("No upcoming meetings to cancel.")
         return
 
     # Pagination
@@ -154,18 +163,7 @@ async def show_cancel_menu(
     page_info = f"Page {page + 1}/{(total_meetings + MEETINGS_PER_PAGE - 1) // MEETINGS_PER_PAGE}"
     text = f"**Select a meeting to cancel:**\n_{page_info} • {total_meetings} total meetings_"
 
-    if is_callback and update.callback_query:
-        await update.callback_query.edit_message_text(
-            text,
-            reply_markup=InlineKeyboardMarkup(buttons),
-            parse_mode="Markdown",
-        )
-    elif update.message:
-        await update.message.reply_text(
-            text,
-            reply_markup=InlineKeyboardMarkup(buttons),
-            parse_mode="Markdown",
-        )
+    await send_message(text, reply_markup=InlineKeyboardMarkup(buttons))
 
 
 async def cancel_page_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -176,9 +174,13 @@ async def cancel_page_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 
     await query.answer()
 
-    # Extract page number
-    page = int(query.data.replace("cancelpage_", ""))
-    await show_cancel_menu(update, context, page=page, is_callback=True)
+    try:
+        # Extract page number
+        page = int(query.data.replace("cancelpage_", ""))
+        await show_cancel_menu(update, context, page=page, is_callback=True)
+    except Exception as e:
+        logger.exception(f"Error in cancel_page_callback: {e}")
+        await query.edit_message_text(f"Error: {str(e)}")
 
 
 async def cancel_meeting_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
