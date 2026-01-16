@@ -132,7 +132,7 @@ class CalendarService:
         start_utc_naive = start_utc.replace(tzinfo=None)
         end_utc_naive = end_utc.replace(tzinfo=None)
 
-        # Cache meeting locally
+        # Cache meeting locally with reminders for notification system
         await self.meeting_repo.save_meeting(
             user_id=user.id,
             external_id=result["id"],
@@ -141,6 +141,7 @@ class CalendarService:
             start_time=start_utc_naive,
             end_time=end_utc_naive,
             attendees=meeting_data.attendees,
+            reminders=reminders if reminders else None,
         )
 
         return {

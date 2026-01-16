@@ -1,0 +1,188 @@
+"""Telegram Stars donation handlers."""
+
+import logging
+
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice, Message, Update
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    PreCheckoutQueryHandler,
+    filters,
+)
+
+logger = logging.getLogger(__name__)
+
+# Donation amounts in Telegram Stars
+DONATION_OPTIONS = [
+    (50, "50 Stars"),
+    (100, "100 Stars"),
+    (500, "500 Stars"),
+    (1000, "1000 Stars"),
+]
+
+
+async def donate_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /donate command - show donation options."""
+    if not update.effective_user or not update.message:
+        return
+
+    # Create buttons for each donation amount
+    buttons = []
+    row = []
+    for amount, label in DONATION_OPTIONS:
+        row.append(InlineKeyboardButton(f"⭐ {label}", callback_data=f"donate_{amount}"))
+        if len(row) == 2:
+            buttons.append(row)
+            row = []
+    if row:
+        buttons.append(row)
+
+    # Add custom amount button
+    buttons.append([InlineKeyboardButton("💫 Custom Amount", callback_data="donate_custom")])
+
+    keyboard = InlineKeyboardMarkup(buttons)
+
+    await update.message.reply_text(
+        "**Support HandyCalBot** ⭐\n\n"
+        "If you find this bot useful, consider supporting its development "
+        "with Telegram Stars!\n\n"
+        "Your support helps keep the bot running and enables new features.\n\n"
+        "Select an amount:",
+        reply_markup=keyboard,
+        parse_mode="Markdown",
+    )
+
+
+async def donate_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle donation amount selection."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    await query.answer()
+
+    if query.data == "donate_custom":
+        await query.edit_message_text(
+            "**Custom Donation** 💫\n\n"
+            "Please enter the number of Stars you'd like to donate (1-10000):",
+            parse_mode="Markdown",
+        )
+        # Store state in context to handle the next message
+        if context.user_data is None:
+            context.user_data = {}
+        context.user_data["awaiting_custom_donation"] = True
+        return
+
+    # Extract amount from callback data
+    amount = int(query.data.replace("donate_", ""))
+
+    # Send invoice (check that message is accessible)
+    if isinstance(query.message, Message):
+        await send_donation_invoice(query.message.chat_id, amount, context)
+        await query.delete_message()
+
+
+async def custom_donation_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle custom donation amount input."""
+    if not update.message or not update.message.text or not update.effective_user:
+        return
+
+    # Check if we're expecting a custom donation amount
+    if not context.user_data or not context.user_data.get("awaiting_custom_donation"):
+        return
+
+    # Clear the state
+    context.user_data["awaiting_custom_donation"] = False
+
+    try:
+        amount = int(update.message.text.strip())
+        if amount < 1 or amount > 10000:
+            await update.message.reply_text(
+                "Please enter a valid amount between 1 and 10000 Stars."
+            )
+            return
+    except ValueError:
+        await update.message.reply_text("Please enter a valid number (1-10000).")
+        return
+
+    # Send invoice
+    await send_donation_invoice(update.message.chat_id, amount, context)
+
+
+async def send_donation_invoice(
+    chat_id: int, amount: int, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Send a Telegram Stars invoice for donation."""
+    title = "Support HandyCalBot"
+    description = f"Donate {amount} Telegram Stars to support HandyCalBot development"
+    payload = f"donation_{amount}"
+
+    # Create the invoice
+    # For Telegram Stars, we use "XTR" as currency
+    prices = [LabeledPrice(label=f"{amount} Stars", amount=amount)]
+
+    try:
+        await context.bot.send_invoice(
+            chat_id=chat_id,
+            title=title,
+            description=description,
+            payload=payload,
+            provider_token="",  # Empty for Telegram Stars
+            currency="XTR",  # Telegram Stars currency code
+            prices=prices,
+            start_parameter=f"donate_{amount}",
+        )
+    except Exception as e:
+        logger.error(f"Failed to send donation invoice: {e}")
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Sorry, there was an error processing your donation. Please try again later.",
+        )
+
+
+async def precheckout_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle pre-checkout query - approve all donations."""
+    query = update.pre_checkout_query
+    if not query:
+        return
+
+    # Always approve donation payments
+    await query.answer(ok=True)
+
+
+async def successful_payment_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle successful payment - thank the user."""
+    if not update.message or not update.message.successful_payment:
+        return
+
+    payment = update.message.successful_payment
+    amount = payment.total_amount
+
+    await update.message.reply_text(
+        f"**Thank you for your donation!** 🙏\n\n"
+        f"You donated {amount} Telegram Stars. Your support means a lot!\n\n"
+        "Thank you for helping keep HandyCalBot running! ⭐",
+        parse_mode="Markdown",
+    )
+
+    if update.effective_user:
+        logger.info(f"Received donation of {amount} Stars from user {update.effective_user.id}")
+
+
+def setup_donation_handlers(app: Application) -> None:
+    """Register donation handlers."""
+    app.add_handler(CommandHandler("donate", donate_command))
+    app.add_handler(CallbackQueryHandler(donate_callback, pattern=r"^donate_"))
+    app.add_handler(PreCheckoutQueryHandler(precheckout_callback))
+    app.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
+    # Handle custom donation amount - must be after other handlers
+    app.add_handler(
+        MessageHandler(
+            filters.TEXT & ~filters.COMMAND,
+            custom_donation_handler,
+        ),
+        group=1,  # Lower priority group
+    )

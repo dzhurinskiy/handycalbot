@@ -10,6 +10,7 @@ from telegram.ext import Application
 
 from calendarbot.api.app import create_app
 from calendarbot.bot.handlers import (
+    setup_donation_handlers,
     setup_inline_handlers,
     setup_meeting_handlers,
     setup_settings_handlers,
@@ -17,6 +18,7 @@ from calendarbot.bot.handlers import (
 )
 from calendarbot.config import get_settings
 from calendarbot.db.session import init_db
+from calendarbot.services.reminder import reminder_service
 
 # Bot commands to show in Telegram UI
 BOT_COMMANDS = [
@@ -30,6 +32,8 @@ BOT_COMMANDS = [
     BotCommand("timezone", "Change your timezone"),
     BotCommand("duration", "Set default meeting duration"),
     BotCommand("reminder", "Set default reminder"),
+    BotCommand("notifications", "Toggle meeting notifications"),
+    BotCommand("donate", "Support the bot with Telegram Stars"),
 ]
 
 # Configure logging
@@ -90,6 +94,7 @@ def create_bot_application() -> Application:
     setup_settings_handlers(app)
     setup_meeting_handlers(app)
     setup_inline_handlers(app)
+    setup_donation_handlers(app)
 
     return app
 
@@ -161,6 +166,10 @@ async def main() -> None:
     # Initialize database
     await init_db()
     logger.info("Database initialized")
+
+    # Start reminder scheduler (checks every minute)
+    reminder_service.start(interval_seconds=60)
+    logger.info("Reminder scheduler started")
 
     # Create applications
     bot_app = create_bot_application()

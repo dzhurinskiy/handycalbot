@@ -36,6 +36,10 @@ class UserService:
         """Update default reminder setting."""
         return await self.user_repo.update_settings(user, default_reminder=reminder)
 
+    async def update_notifications(self, user: User, enabled: bool) -> User:
+        """Update notifications enabled setting."""
+        return await self.user_repo.update_settings(user, notifications_enabled=enabled)
+
     async def is_calendar_connected(self, user: User, provider: str = "google") -> bool:
         """Check if user has connected their calendar."""
         token = await self.token_repo.get_token(user.id, provider)

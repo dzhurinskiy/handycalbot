@@ -55,18 +55,23 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
         # Format reminder display
         reminder_display = _format_reminder_setting(user.default_reminder)
 
+    # Format notifications status
+    notifications_status = "✅ Enabled" if user.notifications_enabled else "❌ Disabled"
+
     text = f"""
 **Your Settings** ⚙️
 
 📍 Timezone: `{summary['timezone']}`
 ⏱️ Default Duration: `{summary['default_duration']} minutes`
 🔔 Default Reminder: `{reminder_display}`
+📬 Notifications: {notifications_status}
 📅 Google Calendar: {summary['google_calendar']}
 
 **Change Settings:**
 /timezone - Change timezone
 /duration - Change default duration
 /reminder - Change default reminder
+/notifications - Toggle meeting notifications
 /connect - Connect Google Calendar
 /disconnect - Disconnect Google Calendar
 """
@@ -357,12 +362,91 @@ async def cancel_conversation(update: Update, _context: ContextTypes.DEFAULT_TYP
     return ConversationHandler.END
 
 
+async def notifications_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /notifications command - toggle meeting notifications."""
+    if not update.effective_user or not update.message:
+        return
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            await update.message.reply_text("Please run /start first.")
+            return
+
+        # Store current state for display
+        current_state = user.notifications_enabled
+
+    # Show toggle buttons
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "✅ Enable" + (" (current)" if current_state else ""),
+                    callback_data="notif_on",
+                ),
+                InlineKeyboardButton(
+                    "❌ Disable" + (" (current)" if not current_state else ""),
+                    callback_data="notif_off",
+                ),
+            ]
+        ]
+    )
+
+    await update.message.reply_text(
+        f"**Meeting Notifications** 📬\n\n"
+        f"Status: {'✅ Enabled' if current_state else '❌ Disabled'}\n\n"
+        "When enabled, you'll receive Telegram notifications before your meetings "
+        "(based on the reminder times you set).\n\n"
+        "Select an option:",
+        reply_markup=keyboard,
+        parse_mode="Markdown",
+    )
+
+
+async def notifications_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle notification toggle button press."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    await query.answer()
+
+    # Determine new state
+    new_state = query.data == "notif_on"
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            await query.edit_message_text("Error: User not found.")
+            return
+
+        # Update notifications setting
+        await user_service.update_notifications(user, new_state)
+        await session.commit()
+
+    status = "enabled" if new_state else "disabled"
+    emoji = "✅" if new_state else "❌"
+    await query.edit_message_text(
+        f"{emoji} Meeting notifications {status}.\n\n"
+        f"{'You will now receive reminders before your meetings.' if new_state else 'You will no longer receive meeting reminders.'}",
+        parse_mode="Markdown",
+    )
+
+
 def setup_settings_handlers(app: Application) -> None:
     """Register settings handlers."""
     # Simple commands
     app.add_handler(CommandHandler("settings", settings_command))
     app.add_handler(CommandHandler("connect", connect_command))
     app.add_handler(CommandHandler("disconnect", disconnect_command))
+    app.add_handler(CommandHandler("notifications", notifications_command))
+
+    # Notifications callback
+    app.add_handler(CallbackQueryHandler(notifications_callback, pattern=r"^notif_"))
 
     # Standalone timezone callback (handles tz_ buttons from OAuth and other contexts)
     # This must be registered BEFORE the ConversationHandler to catch callbacks

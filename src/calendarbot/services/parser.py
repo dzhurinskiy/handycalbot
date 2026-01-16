@@ -42,9 +42,33 @@ class MeetingParser:
     # Reminder pattern: r followed by optional time values like 10m, 30m/60m, 1d
     REMINDER_PATTERN = r"\br\s*((?:\d+[mhd](?:/\d+[mhd])*)?)\b"
 
+    # Various quote characters to normalize (Russian, curly, single, guillemets, etc.)
+    QUOTE_CHARS = [
+        '"',
+        '"',  # Curly double quotes
+        "«",
+        "»",  # Russian/French guillemets
+        "„",
+        '"',  # German-style quotes
+        "'",
+        "'",  # Curly single quotes
+        "‹",
+        "›",  # Single guillemets
+        "「",
+        "」",  # CJK quotes
+        "'",  # Straight single quote
+        "′",  # Prime (often used as quote)
+    ]
+
     def __init__(self, user_timezone: str = "UTC", default_duration: int = 60):
         self.user_timezone = user_timezone
         self.default_duration = default_duration
+
+    def _normalize_quotes(self, text: str) -> str:
+        """Normalize various quote characters to standard double quotes."""
+        for quote_char in self.QUOTE_CHARS:
+            text = text.replace(quote_char, '"')
+        return text
 
     def parse(self, text: str) -> ParsedMeeting | None:
         """Parse inline command text into MeetingData.
@@ -52,6 +76,9 @@ class MeetingParser:
         Returns None if parsing fails.
         """
         text = text.strip()
+
+        # Normalize various quote characters to standard double quotes
+        text = self._normalize_quotes(text)
 
         # Extract time (required)
         time_match = re.search(self.TIME_PATTERN, text)

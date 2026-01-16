@@ -49,6 +49,7 @@ class UserRepository:
         timezone: str | None = None,
         default_duration: int | None = None,
         default_reminder: str | None = _UNSET,
+        notifications_enabled: bool | None = None,
     ) -> User:
         """Update user settings."""
         if timezone is not None:
@@ -57,6 +58,8 @@ class UserRepository:
             user.default_duration = default_duration
         if default_reminder is not _UNSET:  # Allow setting to None
             user.default_reminder = default_reminder
+        if notifications_enabled is not None:
+            user.notifications_enabled = notifications_enabled
         await self.session.flush()
         return user
 
@@ -148,8 +151,12 @@ class MeetingRepository:
         start_time: datetime,
         end_time: datetime,
         attendees: list[str] | None = None,
+        reminders: list[int] | None = None,
     ) -> Meeting:
         """Save meeting to local cache."""
+        # Convert reminders list to comma-separated string
+        reminders_str = ",".join(str(r) for r in reminders) if reminders else None
+
         meeting = Meeting(
             user_id=user_id,
             external_id=external_id,
@@ -158,10 +165,42 @@ class MeetingRepository:
             start_time=start_time,
             end_time=end_time,
             attendees={"emails": attendees} if attendees else None,
+            reminders=reminders_str,
+            reminders_sent=None,
         )
         self.session.add(meeting)
         await self.session.flush()
         return meeting
+
+    async def get_meetings_with_pending_reminders(self, now: datetime) -> list[Meeting]:
+        """Get meetings that have reminders that need to be sent.
+
+        Returns meetings where:
+        - start_time is in the future
+        - reminders field is set
+        - there are reminders that haven't been sent yet
+        """
+        result = await self.session.execute(
+            select(Meeting)
+            .where(
+                Meeting.start_time > now,
+                Meeting.reminders.isnot(None),
+            )
+            .order_by(Meeting.start_time)
+        )
+        return list(result.scalars().all())
+
+    async def mark_reminder_sent(self, meeting_id: int, reminder_minutes: int) -> None:
+        """Mark a specific reminder as sent for a meeting."""
+        result = await self.session.execute(select(Meeting).where(Meeting.id == meeting_id))
+        meeting = result.scalar_one_or_none()
+        if meeting:
+            sent = set()
+            if meeting.reminders_sent:
+                sent = set(meeting.reminders_sent.split(","))
+            sent.add(str(reminder_minutes))
+            meeting.reminders_sent = ",".join(sorted(sent, key=int))
+            await self.session.flush()
 
     async def delete_by_external_id(self, user_id: int, external_id: str, provider: str) -> bool:
         """Delete meeting by external ID."""

@@ -3,7 +3,18 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, BigInteger, DateTime, ForeignKey, Index, Integer, String, Text, func
+from sqlalchemy import (
+    JSON,
+    BigInteger,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    func,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -28,6 +39,8 @@ class User(Base):
     # Default reminder in minutes before meeting (None = no reminder)
     # Can store multiple reminders as comma-separated: "10,30" means 10min and 30min before
     default_reminder: Mapped[str | None] = mapped_column(String(100), nullable=True, default=None)
+    # Whether to send Telegram notifications for meeting reminders
+    notifications_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
@@ -88,6 +101,10 @@ class Meeting(Base):
     start_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     end_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     attendees: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    # Reminders in minutes before meeting (comma-separated, e.g., "10,30")
+    reminders: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    # Which reminders have been sent (comma-separated minutes that were sent)
+    reminders_sent: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     # Relationships
