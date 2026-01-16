@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from starlette.requests import Request
-from telegram import BotCommand, MenuButtonCommands
+from telegram import BotCommand, BotCommandScopeAllPrivateChats, MenuButtonCommands
 from telegram.ext import Application
 
 from calendarbot.api.app import create_app
@@ -44,6 +44,44 @@ logger = logging.getLogger(__name__)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
+async def setup_bot_commands_and_menu(app: Application) -> None:
+    """Set up bot commands and menu button for Telegram UI."""
+    try:
+        # First, delete any existing commands to ensure clean state
+        await app.bot.delete_my_commands()
+        logger.info("Cleared existing bot commands")
+    except Exception as e:
+        logger.warning(f"Could not clear existing commands: {e}")
+
+    try:
+        # Set commands for all private chats (default scope)
+        await app.bot.set_my_commands(BOT_COMMANDS)
+        logger.info(f"Registered {len(BOT_COMMANDS)} bot commands (default scope)")
+
+        # Also set for private chats scope explicitly
+        await app.bot.set_my_commands(
+            BOT_COMMANDS,
+            scope=BotCommandScopeAllPrivateChats()
+        )
+        logger.info("Registered bot commands for private chats scope")
+    except Exception as e:
+        logger.error(f"Failed to set bot commands: {e}")
+
+    try:
+        # Set menu button to show commands (for all users by default)
+        await app.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
+        logger.info("Menu button set to show commands")
+    except Exception as e:
+        logger.error(f"Failed to set menu button: {e}")
+
+    # Verify commands were set
+    try:
+        commands = await app.bot.get_my_commands()
+        logger.info(f"Verified: {len(commands)} commands active")
+    except Exception as e:
+        logger.error(f"Failed to verify commands: {e}")
+
+
 def create_bot_application() -> Application:
     """Create and configure the Telegram bot application."""
     settings = get_settings()
@@ -68,19 +106,8 @@ async def run_bot_polling(app: Application) -> None:
     await app.start()
     await app.updater.start_polling(drop_pending_updates=True)
 
-    # Set bot commands for Telegram UI
-    try:
-        await app.bot.set_my_commands(BOT_COMMANDS)
-        logger.info(f"Registered {len(BOT_COMMANDS)} bot commands")
-    except Exception as e:
-        logger.error(f"Failed to set bot commands: {e}")
-
-    # Set menu button to show commands
-    try:
-        await app.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
-        logger.info("Menu button set to show commands")
-    except Exception as e:
-        logger.error(f"Failed to set menu button: {e}")
+    # Set bot commands and menu button for Telegram UI
+    await setup_bot_commands_and_menu(app)
 
     logger.info("Bot is running. Press Ctrl+C to stop.")
 
@@ -121,19 +148,8 @@ async def run_with_webhook(app: Application, fastapi_app) -> None:
         allowed_updates=["message", "callback_query", "inline_query", "chosen_inline_result"],
     )
 
-    # Set bot commands for Telegram UI
-    try:
-        await app.bot.set_my_commands(BOT_COMMANDS)
-        logger.info(f"Registered {len(BOT_COMMANDS)} bot commands")
-    except Exception as e:
-        logger.error(f"Failed to set bot commands: {e}")
-
-    # Set menu button to show commands
-    try:
-        await app.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
-        logger.info("Menu button set to show commands")
-    except Exception as e:
-        logger.error(f"Failed to set menu button: {e}")
+    # Set bot commands and menu button for Telegram UI
+    await setup_bot_commands_and_menu(app)
 
     logger.info(f"Webhook set to: {settings.webhook_url}")
 
