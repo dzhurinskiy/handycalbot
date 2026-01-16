@@ -124,6 +124,15 @@ async def show_cancel_menu(
         await send_message("No upcoming meetings to cancel.")
         return
 
+    # Store meeting IDs in context.bot_data with short keys
+    # (Google Calendar event IDs can be very long, exceeding Telegram's 64-byte callback_data limit)
+    if context.bot_data is None:
+        context.bot_data = {}
+
+    # Create a mapping for this user's cancel session
+    cancel_key = f"cancel_meetings_{user_id}"
+    context.bot_data[cancel_key] = {str(i): m["id"] for i, m in enumerate(all_meetings)}
+
     # Pagination
     total_meetings = len(all_meetings)
     start_idx = page * MEETINGS_PER_PAGE
@@ -137,22 +146,24 @@ async def show_cancel_menu(
         end_idx = MEETINGS_PER_PAGE
         meetings_page = all_meetings[start_idx:end_idx]
 
-    # Build meeting buttons
+    # Build meeting buttons using short numeric indices
     buttons = []
-    for m in meetings_page:
+    for idx, m in enumerate(meetings_page):
+        global_idx = start_idx + idx  # Index in full list
         start = m["start_time"].strftime("%H:%M %d %b")
         title = m["title"][:25] + "..." if len(m["title"]) > 25 else m["title"]
         attendees = len(m.get("attendees", []))
         attendee_str = f" 👥{attendees}" if attendees > 0 else ""
         label = f"🗑 {title} | {start}{attendee_str}"
-        buttons.append([InlineKeyboardButton(label, callback_data=f"cancelm_{m['id']}")])
+        # Use short index instead of full event ID
+        buttons.append([InlineKeyboardButton(label, callback_data=f"cm_{user_id}_{global_idx}")])
 
     # Navigation buttons
     nav_buttons = []
     if page > 0:
-        nav_buttons.append(InlineKeyboardButton("⬅️ Previous", callback_data=f"cancelpage_{page - 1}"))
+        nav_buttons.append(InlineKeyboardButton("⬅️ Previous", callback_data=f"cp_{user_id}_{page - 1}"))
     if end_idx < total_meetings:
-        nav_buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"cancelpage_{page + 1}"))
+        nav_buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"cp_{user_id}_{page + 1}"))
     if nav_buttons:
         buttons.append(nav_buttons)
 
@@ -175,8 +186,9 @@ async def cancel_page_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     await query.answer()
 
     try:
-        # Extract page number
-        page = int(query.data.replace("cancelpage_", ""))
+        # Extract page number from format: cp_{user_id}_{page}
+        parts = query.data.split("_")
+        page = int(parts[2])
         await show_cancel_menu(update, context, page=page, is_callback=True)
     except Exception as e:
         logger.exception(f"Error in cancel_page_callback: {e}")
@@ -191,29 +203,54 @@ async def cancel_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
 
     await query.answer("Cancelling meeting...")
 
-    # Event ID is a string (Google event ID)
-    event_id = query.data.replace("cancelm_", "")
+    try:
+        # Extract user_id and index from format: cm_{user_id}_{index}
+        parts = query.data.split("_")
+        stored_user_id = int(parts[1])
+        meeting_idx = parts[2]
 
-    async with async_session_factory() as session:
-        user_service = UserService(session)
-        user = await user_service.get_user(update.effective_user.id)
-
-        if not user:
-            await query.edit_message_text("Error: User not found.")
+        # Verify user
+        if stored_user_id != update.effective_user.id:
+            await query.edit_message_text("Error: This is not your cancel menu.")
             return
 
-        calendar_service = CalendarService(session)
-        result = await calendar_service.cancel_meeting(user, event_id)
-        await session.commit()
+        # Get actual event ID from stored mapping
+        cancel_key = f"cancel_meetings_{stored_user_id}"
+        if not context.bot_data or cancel_key not in context.bot_data:
+            await query.edit_message_text("Error: Session expired. Please use /cancel again.")
+            return
 
-    if "error" in result:
-        await query.edit_message_text(f"❌ Error: {result['error']}")
-    else:
-        await query.edit_message_text(
-            f"✅ Meeting cancelled: **{result['title']}**\n\n"
-            "_Attendees will be notified automatically._",
-            parse_mode="Markdown",
-        )
+        event_id = context.bot_data[cancel_key].get(meeting_idx)
+        if not event_id:
+            await query.edit_message_text("Error: Meeting not found. Please use /cancel again.")
+            return
+
+        async with async_session_factory() as session:
+            user_service = UserService(session)
+            user = await user_service.get_user(update.effective_user.id)
+
+            if not user:
+                await query.edit_message_text("Error: User not found.")
+                return
+
+            calendar_service = CalendarService(session)
+            result = await calendar_service.cancel_meeting(user, event_id)
+            await session.commit()
+
+        # Clean up stored data
+        context.bot_data.pop(cancel_key, None)
+
+        if "error" in result:
+            await query.edit_message_text(f"❌ Error: {result['error']}")
+        else:
+            await query.edit_message_text(
+                f"✅ Meeting cancelled: **{result['title']}**\n\n"
+                "_Attendees will be notified automatically._",
+                parse_mode="Markdown",
+            )
+    except Exception as e:
+        logger.exception(f"Error in cancel_meeting_callback: {e}")
+        await query.edit_message_text(f"Error cancelling meeting: {str(e)}")
 
 
 async def cancel_none_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -230,7 +267,9 @@ def setup_meeting_handlers(app: Application) -> None:
     """Register meeting handlers."""
     app.add_handler(CommandHandler("meetings", meetings_command))
     app.add_handler(CommandHandler("cancel", cancel_command))
-    # Cancel menu callbacks - order matters for pattern matching
+    # Cancel menu callbacks - patterns use short format to fit Telegram's 64-byte limit
+    # cm_{user_id}_{index} - cancel meeting
+    # cp_{user_id}_{page} - change page
     app.add_handler(CallbackQueryHandler(cancel_none_callback, pattern=r"^cancel_none$"))
-    app.add_handler(CallbackQueryHandler(cancel_page_callback, pattern=r"^cancelpage_\d+$"))
-    app.add_handler(CallbackQueryHandler(cancel_meeting_callback, pattern=r"^cancelm_"))
+    app.add_handler(CallbackQueryHandler(cancel_page_callback, pattern=r"^cp_\d+_\d+$"))
+    app.add_handler(CallbackQueryHandler(cancel_meeting_callback, pattern=r"^cm_\d+_\d+$"))
