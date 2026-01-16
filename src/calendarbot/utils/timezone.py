@@ -3,9 +3,6 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-import pytz
-
-
 # Map Telegram language codes to likely timezones
 LANGUAGE_TO_TIMEZONE: dict[str, str] = {
     "ru": "Europe/Moscow",

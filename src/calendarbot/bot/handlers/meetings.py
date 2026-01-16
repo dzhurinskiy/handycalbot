@@ -17,7 +17,7 @@ from calendarbot.services.user import UserService
 logger = logging.getLogger(__name__)
 
 
-async def meetings_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def meetings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /meetings command - list upcoming meetings."""
     if not update.effective_user or not update.message:
         return
@@ -253,7 +253,7 @@ async def cancel_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
         await query.edit_message_text(f"Error cancelling meeting: {str(e)}")
 
 
-async def cancel_none_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def cancel_none_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle 'Don't cancel' button press."""
     query = update.callback_query
     if not query:

@@ -3,12 +3,12 @@
 import logging
 
 import httpx
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Query
 from fastapi.responses import HTMLResponse
 
 from calendarbot.config import get_settings
-from calendarbot.db.session import async_session_factory
 from calendarbot.db.repository import OAuthTokenRepository, UserRepository
+from calendarbot.db.session import async_session_factory
 from calendarbot.integrations.google import GoogleOAuthFlow
 from calendarbot.utils.encryption import TokenEncryption
 

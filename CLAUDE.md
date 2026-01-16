@@ -45,3 +45,28 @@ ssh -o ConnectTimeout=10 -o BatchMode=yes handycal "command1 && command2 && comm
 - The `.env` file is recreated during CI/CD automated deployment from GitHub Secrets
 - Never manually edit `.env` on VPS - update GitHub Secrets instead and redeploy
 - Production domain: `handycal.dzhurinskiy.com`
+
+## Deployment Verification - CRITICAL
+
+**After every `git push`, you MUST verify deployment success:**
+
+1. **Check GitHub Actions** - Go to the repository's Actions tab or use `gh run list` to see the latest workflow runs
+2. **Both CI and CD must pass**:
+   - CI (lint/tests) - runs ruff linter and any tests
+   - CD (deploy) - deploys to VPS
+3. **If CI fails (lint errors)**:
+   - Read the error output carefully
+   - Fix all lint errors (unused imports, import sorting, f-strings without placeholders, unused arguments)
+   - Push again and verify
+4. **Repeat until fully successful** - Never consider deployment done until both CI and CD show green checkmarks
+
+**Common lint errors to watch for:**
+- Unused imports: Remove them
+- Import blocks unsorted: Use `ruff --fix` or manually sort (stdlib → third-party → local)
+- f-strings without placeholders: Remove the `f` prefix
+- Unused function arguments: Prefix with underscore (e.g., `_context`)
+
+**Quick verification command:**
+```bash
+gh run list --limit 5
+```

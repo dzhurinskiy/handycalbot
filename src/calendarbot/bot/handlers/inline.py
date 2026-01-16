@@ -1,5 +1,6 @@
 """Inline query handler for meeting creation."""
 
+import contextlib
 import logging
 import uuid
 from datetime import datetime
@@ -15,7 +16,6 @@ from telegram import (
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
-    ChosenInlineResultHandler,
     ContextTypes,
     InlineQueryHandler,
 )
@@ -260,7 +260,7 @@ async def create_meeting_callback(
             await query.edit_message_text(f"❌ Error: {result['error']}")
         else:
             start_str = result["start"].strftime("%H:%M on %d %b %Y")
-            text = f"✅ Meeting created!\n\n"
+            text = "✅ Meeting created!\n\n"
             text += f"**{result['title']}**\n"
             text += f"🕐 {start_str}\n"
 
@@ -271,7 +271,7 @@ async def create_meeting_callback(
                 text += f"🔔 {reminder_text}\n"
 
             if result["attendees"]:
-                text += f"\n📧 Invitations sent to:\n"
+                text += "\n📧 Invitations sent to:\n"
                 for email in result["attendees"]:
                     text += f"  • {email}\n"
                 text += "\n_These attendees will receive a calendar invitation automatically._\n"
@@ -297,10 +297,8 @@ async def create_meeting_callback(
 
     except Exception as e:
         logger.exception(f"Error creating meeting: {e}")
-        try:
+        with contextlib.suppress(Exception):
             await query.edit_message_text(f"❌ Error creating meeting: {str(e)}")
-        except Exception:
-            pass  # If we can't edit, at least we logged it
 
 
 async def discard_meeting_callback(

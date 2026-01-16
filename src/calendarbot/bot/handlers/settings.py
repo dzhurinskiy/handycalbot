@@ -37,7 +37,7 @@ REMINDER_OPTIONS = [
 ]
 
 
-async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /settings command - show current settings."""
     if not update.effective_user or not update.message:
         return
@@ -134,7 +134,7 @@ async def connect_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     )
 
 
-async def disconnect_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def disconnect_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /disconnect command."""
     if not update.effective_user or not update.message:
         return
@@ -160,7 +160,7 @@ async def disconnect_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     )
 
 
-async def timezone_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def timezone_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handle /timezone command - start timezone selection."""
     if not update.message:
         return ConversationHandler.END
@@ -188,13 +188,13 @@ async def timezone_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     return AWAITING_TIMEZONE
 
 
-async def timezone_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def timezone_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handle timezone button selection (within conversation)."""
     await _handle_timezone_selection(update)
     return ConversationHandler.END
 
 
-async def timezone_callback_standalone(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def timezone_callback_standalone(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle timezone button selection (standalone, e.g., from OAuth callback)."""
     await _handle_timezone_selection(update)
 
@@ -225,7 +225,7 @@ async def _handle_timezone_selection(update: Update) -> None:
     )
 
 
-async def timezone_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def timezone_text(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handle manual timezone input."""
     if not update.message or not update.message.text or not update.effective_user:
         return ConversationHandler.END
@@ -252,7 +252,7 @@ async def timezone_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     return ConversationHandler.END
 
 
-async def duration_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def duration_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handle /duration command."""
     if not update.message:
         return ConversationHandler.END
@@ -280,7 +280,7 @@ async def duration_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     return AWAITING_DURATION
 
 
-async def duration_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def duration_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handle duration button selection."""
     query = update.callback_query
     if not query or not query.data or not update.effective_user:
@@ -302,7 +302,7 @@ async def duration_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return ConversationHandler.END
 
 
-async def reminder_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def reminder_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handle /reminder command."""
     if not update.message:
         return ConversationHandler.END
@@ -322,7 +322,7 @@ async def reminder_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     return AWAITING_REMINDER
 
 
-async def reminder_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def reminder_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handle reminder button selection."""
     query = update.callback_query
     if not query or not query.data or not update.effective_user:
@@ -332,10 +332,7 @@ async def reminder_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
     # Parse the reminder value
     value = query.data.replace("rem_", "")
-    if value == "none":
-        reminder = None
-    else:
-        reminder = value  # Store as string
+    reminder = None if value == "none" else value
 
     async with async_session_factory() as session:
         user_service = UserService(session)
@@ -355,7 +352,7 @@ async def reminder_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return ConversationHandler.END
 
 
-async def cancel_conversation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def cancel_conversation(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
     """Cancel any conversation."""
     if update.message:
         await update.message.reply_text("Cancelled.")

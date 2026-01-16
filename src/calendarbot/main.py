@@ -2,8 +2,6 @@
 
 import asyncio
 import logging
-import sys
-from contextlib import asynccontextmanager
 
 import uvicorn
 from starlette.requests import Request
