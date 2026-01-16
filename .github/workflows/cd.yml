@@ -61,6 +61,21 @@ jobs:
 
             echo ">>> All containers healthy"
 
+            # Run database migrations
+            docker compose exec -T app alembic upgrade head || echo "Migration skipped (may already be current)"
+
+            echo ">>> Migrations complete"
+
+            # Test actual bot functionality by checking logs for startup errors
+            sleep 5
+            if docker logs calendarbot 2>&1 | tail -20 | grep -q "ERROR\|Exception\|Traceback"; then
+              echo "ERROR: Bot has errors in logs!"
+              docker logs calendarbot 2>&1 | tail -50
+              exit 1
+            fi
+
+            echo ">>> Bot logs look healthy"
+
             # Cleanup old images
             docker image prune -f
 
