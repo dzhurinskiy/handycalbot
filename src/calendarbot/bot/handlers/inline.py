@@ -2,6 +2,8 @@
 
 import logging
 import uuid
+from datetime import datetime
+from urllib.parse import quote
 
 from telegram import (
     InlineKeyboardButton,
@@ -22,8 +24,37 @@ from calendarbot.db.session import async_session_factory
 from calendarbot.services.calendar import CalendarService
 from calendarbot.services.parser import MeetingParser
 from calendarbot.services.user import UserService
+from calendarbot.utils.timezone import TimezoneHelper
 
 logger = logging.getLogger(__name__)
+
+
+def build_add_to_calendar_url(
+    title: str,
+    start: datetime,
+    end: datetime,
+    timezone: str,
+) -> str:
+    """Build a universal Google Calendar 'Add to Calendar' URL.
+
+    This URL works for anyone - they can add the event to their own calendar.
+    """
+    # Convert to UTC for the URL
+    start_utc = TimezoneHelper.to_utc(start, timezone)
+    end_utc = TimezoneHelper.to_utc(end, timezone)
+
+    # Format: YYYYMMDDTHHmmssZ
+    start_str = start_utc.strftime("%Y%m%dT%H%M%SZ")
+    end_str = end_utc.strftime("%Y%m%dT%H%M%SZ")
+
+    params = {
+        "action": "TEMPLATE",
+        "text": title,
+        "dates": f"{start_str}/{end_str}",
+    }
+
+    query = "&".join(f"{k}={quote(str(v))}" for k, v in params.items())
+    return f"https://calendar.google.com/calendar/render?{query}"
 
 
 async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -185,7 +216,6 @@ async def create_meeting_callback(
                 return
 
             # Reconstruct ParsedMeeting
-            from datetime import datetime
             from calendarbot.services.parser import ParsedMeeting
 
             m = meeting_data["meeting"]
@@ -212,16 +242,29 @@ async def create_meeting_callback(
             text = f"✅ Meeting created!\n\n"
             text += f"**{result['title']}**\n"
             text += f"🕐 {start_str}\n"
-            if result["attendees"]:
-                text += f"👥 Invites sent to: {', '.join(result['attendees'])}\n"
 
-            # Add button to open/modify in Google Calendar
-            keyboard = None
-            if result.get("link"):
-                keyboard = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("📅 Open in Google Calendar", url=result["link"])]
-                ])
-                text += "\n_Click below to view or modify the meeting_"
+            if result["attendees"]:
+                text += f"\n📧 Invitations sent to:\n"
+                for email in result["attendees"]:
+                    text += f"  • {email}\n"
+                text += "\n_These attendees will receive a calendar invitation automatically._\n"
+
+            # Build universal "Add to Calendar" link that works for anyone
+            add_to_cal_url = build_add_to_calendar_url(
+                title=result["title"],
+                start=result["start"],
+                end=result["end"],
+                timezone=user.timezone,
+            )
+
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("📅 Add to My Calendar", url=add_to_cal_url)]
+            ])
+
+            if result["attendees"]:
+                text += "\n_Not listed above? Click below to add to your calendar:_"
+            else:
+                text += "\n_Click below to add to your calendar:_"
 
             await query.edit_message_text(text, parse_mode="Markdown", reply_markup=keyboard)
 
