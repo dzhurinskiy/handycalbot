@@ -1,0 +1,11 @@
+{
+  "autoApprove": [
+    "Bash",
+    "Read",
+    "Write",
+    "Edit",
+    "Glob",
+    "Grep",
+    "NotebookEdit"
+  ]
+}
