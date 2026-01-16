@@ -64,6 +64,31 @@ async def donate_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     await query.answer()
 
+    # Handle donate_menu from welcome message button
+    if query.data == "donate_menu":
+        buttons = []
+        row = []
+        for amount, label in DONATION_OPTIONS:
+            row.append(InlineKeyboardButton(f"⭐ {label}", callback_data=f"donate_{amount}"))
+            if len(row) == 2:
+                buttons.append(row)
+                row = []
+        if row:
+            buttons.append(row)
+        buttons.append([InlineKeyboardButton("💫 Custom Amount", callback_data="donate_custom")])
+        keyboard = InlineKeyboardMarkup(buttons)
+
+        await query.edit_message_text(
+            "**Support HandyCalBot** ⭐\n\n"
+            "If you find this bot useful, consider supporting its development "
+            "with Telegram Stars!\n\n"
+            "Your support helps keep the bot running and enables new features.\n\n"
+            "Select an amount:",
+            reply_markup=keyboard,
+            parse_mode="Markdown",
+        )
+        return
+
     if query.data == "donate_custom":
         await query.edit_message_text(
             "**Custom Donation** 💫\n\n"

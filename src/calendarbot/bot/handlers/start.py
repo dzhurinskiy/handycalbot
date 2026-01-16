@@ -2,7 +2,7 @@
 
 import logging
 
-from telegram import Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 from calendarbot.db.session import async_session_factory
@@ -12,76 +12,72 @@ from calendarbot.utils.timezone import guess_timezone_from_language
 logger = logging.getLogger(__name__)
 
 WELCOME_MESSAGE = """
-Welcome to HandyCalBot! 📅
+Welcome to *HandyCalBot*! 📅
 
 I help you schedule meetings directly from Telegram.
 
-**Quick Start:**
-1. Connect your Google Calendar with /connect
-2. Create meetings by typing @handycalbot in any chat
+*Quick Start:*
+1️⃣ Connect your Google Calendar with /connect
+2️⃣ Create meetings by typing @handycalbot in any chat
 
-**Inline Usage:**
+*Inline Usage:*
 `@handycalbot 14:30 "Meeting Title" email@example.com`
 `@handycalbot 10:00 25-01-2026 "Project Sync"`
 `@handycalbot 14:30 "Meeting" r 10m` (with reminder)
 
-**Commands:**
+*All Commands:*
+/start - Welcome message
+/help - Show help and usage
 /connect - Connect Google Calendar
 /disconnect - Disconnect calendar
-/settings - View/change settings
-/timezone - Change your timezone
-/duration - Set default meeting duration
-/reminder - Set default reminder
 /meetings - List upcoming meetings
 /cancel - Cancel a meeting
-/help - Show this message
-
-Need help? Just type /help anytime!
+/settings - View your settings
+/timezone - Change timezone
+/duration - Set default duration
+/reminder - Set default reminder
+/notifications - Toggle reminders
+/donate - Support the bot ⭐
 """
 
 HELP_MESSAGE = """
-**HandyCalBot Help** 📅
+*HandyCalBot Help* 📅
 
-**Creating Meetings (Inline):**
+*Creating Meetings (Inline):*
 Type `@handycalbot` in any chat followed by:
-- Time (required): `HH:MM` (24-hour format)
-- Date (optional): `DD-MM-YYYY`
-- Title (required): `"Your Meeting Title"`
-- Attendees (optional): `email1@example.com`
-- Reminder (optional): `r 10m` or `r 10m/30m` or just `r`
+• Time (required): `HH:MM` (24-hour format)
+• Date (optional): `DD-MM-YYYY`
+• Title (required): `"Your Meeting Title"`
+• Attendees (optional): `email@example.com`
+• Reminder (optional): `r 10m` or `r 10m/30m` or just `r`
 
-**Reminder Format:**
-- `r 10m` - remind 10 minutes before
-- `r 1h` - remind 1 hour before
-- `r 1d` - remind 1 day before
-- `r 10m/30m` - multiple reminders
-- `r` - use your default reminder
-- (no r) - no reminder
+*Reminder Format:*
+• `r 10m` - remind 10 minutes before
+• `r 1h` - remind 1 hour before
+• `r 1d` - remind 1 day before
+• `r 10m/30m` - multiple reminders
+• `r` - use your default reminder
+• (no r) - no reminder
 
-**Examples:**
-```
-@handycalbot 14:30 "Team Standup"
-@handycalbot 10:00 25-01-2026 "Project Review" john@company.com
-@handycalbot 16:00 "Quick Call" r 15m
-@handycalbot 14:00 "Important Meeting" alice@corp.com r 10m/1h
-```
+*Examples:*
+`@handycalbot 14:30 "Team Standup"`
+`@handycalbot 10:00 25-01-2026 "Review" john@co.com`
+`@handycalbot 16:00 "Quick Call" r 15m`
+`@handycalbot 14:00 "Meeting" alice@co.com r 10m/1h`
 
-**Commands:**
+*All Commands:*
 /start - Welcome message
+/help - This help message
 /connect - Connect Google Calendar
 /disconnect - Disconnect calendar
-/settings - View and modify settings
+/meetings - Show upcoming meetings
+/cancel - Cancel a meeting
+/settings - View your settings
 /timezone - Set your timezone
 /duration - Set default meeting duration
 /reminder - Set default reminder
-/meetings - Show upcoming meetings
-/cancel - Cancel a meeting
-/help - This help message
-
-**Settings:**
-- Timezone: Used for meeting times
-- Duration: Default meeting length
-- Reminder: Default reminder time
+/notifications - Toggle reminder notifications
+/donate - Support the bot with Stars ⭐
 """
 
 
@@ -112,9 +108,15 @@ async def start_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> 
         else:
             timezone_msg = ""
 
+    # Add Donate button
+    keyboard = InlineKeyboardMarkup(
+        [[InlineKeyboardButton("⭐ Support HandyCalBot", callback_data="donate_menu")]]
+    )
+
     await update.message.reply_text(
         WELCOME_MESSAGE + timezone_msg,
         parse_mode="Markdown",
+        reply_markup=keyboard,
     )
 
 

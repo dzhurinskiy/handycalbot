@@ -1,135 +1,438 @@
 """Static pages - landing, privacy policy, terms of service."""
 
+from pathlib import Path
+
 from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 
 router = APIRouter(tags=["pages"])
 
-# Common styles for all pages
+# Path to static files
+STATIC_DIR = Path(__file__).parent.parent / "static"
+
+# Calendly-inspired styles
 COMMON_STYLES = """
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: #f8f9fa;
+            color: #1a1a1a;
+            background: #ffffff;
         }
-        .container {
-            max-width: 800px;
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
         }
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 2rem;
-            text-align: center;
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #1a1a1a;
+            text-decoration: none;
         }
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-        header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        main {
-            background: white;
-            padding: 3rem 2rem;
-            margin: 2rem auto;
-            max-width: 800px;
+
+        .logo img {
+            width: 40px;
+            height: 40px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        h1, h2, h3 {
-            color: #1a202c;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
         }
-        h2 {
-            font-size: 1.5rem;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 0.5rem;
-        }
-        p {
-            margin-bottom: 1rem;
-        }
-        ul, ol {
-            margin-left: 2rem;
-            margin-bottom: 1rem;
-        }
-        li {
-            margin-bottom: 0.5rem;
-        }
-        a {
-            color: #667eea;
+
+        .nav-links a {
+            color: #4d4d4d;
             text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
         }
-        a:hover {
-            text-decoration: underline;
+
+        .nav-links a:hover {
+            color: #006BFF;
         }
-        .button {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            text-decoration: none;
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .hero h1 span {
+            color: #006BFF;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #4d4d4d;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            border-radius: 40px;
             font-weight: 600;
-            margin: 0.5rem;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #006BFF;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0052cc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 107, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1a1a1a;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+            border-color: #d0d0d0;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            background: #f8fafc;
+        }
+
+        .features-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: #1a1a1a;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-            text-decoration: none;
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
         }
-        .button-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-        .button-secondary:hover {
-            background: #f0f0ff;
-        }
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: #666;
-            font-size: 0.9rem;
-        }
-        footer a {
-            color: #666;
-            margin: 0 0.5rem;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        .feature {
-            text-align: center;
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
+
         .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: #e8f2ff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: #1a1a1a;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .step {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #006BFF;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #1a1a1a;
+        }
+
+        .step-content p {
+            color: #666;
+        }
+
+        .step-content code {
+            background: #f1f5f9;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #006BFF;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, #006BFF 0%, #0052cc 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .cta h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .cta .btn-primary {
+            background: white;
+            color: #006BFF;
+        }
+
+        .cta .btn-primary:hover {
+            background: #f0f0f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            background: #1a1a1a;
+            color: #999;
+        }
+
+        .footer-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: #999;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Legal Pages */
+        .legal-header {
+            background: #f8fafc;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .legal-header h1 {
             font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
             margin-bottom: 0.5rem;
         }
-        .last-updated {
+
+        .legal-header p {
             color: #666;
-            font-style: italic;
+        }
+
+        .legal-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .legal-content h2 {
+            font-size: 1.375rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #006BFF;
+        }
+
+        .legal-content h2:first-of-type {
+            margin-top: 0;
+        }
+
+        .legal-content p {
+            color: #4d4d4d;
+            margin-bottom: 1rem;
+        }
+
+        .legal-content ul, .legal-content ol {
+            color: #4d4d4d;
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .legal-content a {
+            color: #006BFF;
+            text-decoration: none;
+        }
+
+        .legal-content a:hover {
+            text-decoration: underline;
+        }
+
+        .legal-content code {
+            background: #f1f5f9;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .last-updated {
+            color: #999;
+            font-size: 0.9rem;
             margin-bottom: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
         }
     </style>
 """
+
+FAVICON_LINK = '<link rel="icon" type="image/x-icon" href="/favicon.ico">'
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -142,73 +445,119 @@ async def landing_page():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HandyCalBot - Schedule Meetings from Telegram</title>
-    <meta name="description" content="A Telegram bot that helps you schedule Google Calendar meetings directly from any chat.">
+    <meta name="description" content="Schedule Google Calendar meetings directly from Telegram. Fast, simple, and free.">
+    {FAVICON_LINK}
     {COMMON_STYLES}
 </head>
 <body>
-    <header>
-        <h1>HandyCalBot</h1>
-        <p>Schedule Google Calendar meetings directly from Telegram</p>
-    </header>
-
-    <main>
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <a href="https://t.me/handycalbot" class="button">Open in Telegram</a>
-            <a href="https://github.com/dzhurinskiy/handycalbot" class="button button-secondary">View on GitHub</a>
+    <nav>
+        <a href="/" class="logo">
+            <img src="/logo.jpg" alt="HandyCalBot">
+            HandyCalBot
+        </a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How it works</a>
+            <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>
+            <a href="https://t.me/handycalbot" class="btn btn-primary">Open Bot</a>
         </div>
+    </nav>
 
-        <h2>What is HandyCalBot?</h2>
-        <p>
-            HandyCalBot is an open-source Telegram bot that lets you create Google Calendar events
-            without leaving your chat. Simply mention the bot with meeting details, and it handles the rest.
-        </p>
+    <section class="hero">
+        <h1>Schedule meetings <span>directly from Telegram</span></h1>
+        <p>Create Google Calendar events in seconds using inline mode. No more switching between apps.</p>
+        <div class="hero-buttons">
+            <a href="https://t.me/handycalbot" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.904-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.015-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.242-1.865-.442-.751-.244-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.121.1.154.234.169.331.015.096.034.315.019.486z"/></svg>
+                Start Scheduling
+            </a>
+            <a href="https://github.com/dzhurinskiy/handycalbot" class="btn btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                View Source
+            </a>
+        </div>
+    </section>
 
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">💬</div>
-                <h3>Inline Mode</h3>
-                <p>Create meetings from any chat using @handycalbot</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">📅</div>
-                <h3>Google Calendar</h3>
-                <p>Events sync directly to your calendar</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">👥</div>
-                <h3>Invite Attendees</h3>
-                <p>Add participants by email address</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🌍</div>
-                <h3>Timezone Support</h3>
-                <p>Automatic timezone detection</p>
+    <section class="features" id="features">
+        <div class="features-container">
+            <h2>Everything you need to schedule smarter</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Inline Mode</h3>
+                    <p>Create meetings from any Telegram chat. Just type @handycalbot and your meeting details.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3>Google Calendar Sync</h3>
+                    <p>Events are created directly in your Google Calendar with all details synced automatically.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>Invite Attendees</h3>
+                    <p>Add participants by email. They'll receive calendar invitations automatically.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Smart Reminders</h3>
+                    <p>Get notified before meetings. Set custom reminders for each event or use defaults.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Timezone Aware</h3>
+                    <p>Automatic timezone detection based on your Telegram settings. Never miss a meeting.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is encrypted. We only access what's needed for calendar management.</p>
+                </div>
             </div>
         </div>
+    </section>
 
-        <h2>How to Use</h2>
-        <ol>
-            <li>Start a chat with <a href="https://t.me/handycalbot">@handycalbot</a></li>
-            <li>Connect your Google Calendar with <code>/connect</code></li>
-            <li>In any chat, type: <code>@handycalbot 14:30 "Meeting Title" email@example.com</code></li>
-            <li>Click "Create Meeting" to confirm</li>
-        </ol>
+    <section class="how-it-works" id="how-it-works">
+        <h2>Get started in 3 steps</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Connect your calendar</h3>
+                    <p>Start a chat with <a href="https://t.me/handycalbot">@handycalbot</a> and use <code>/connect</code> to link your Google Calendar.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Create a meeting</h3>
+                    <p>In any chat, type <code>@handycalbot 14:30 "Team Standup"</code> and select your meeting from the dropdown.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Done!</h3>
+                    <p>Your meeting is created in Google Calendar. Attendees are notified, and you'll get reminders.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <h2>Open Source</h2>
-        <p>
-            HandyCalBot is open source and available on
-            <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>.
-            Contributions are welcome!
-        </p>
-    </main>
+    <section class="cta">
+        <h2>Ready to simplify your scheduling?</h2>
+        <p>Join thousands of users who schedule meetings smarter with HandyCalBot.</p>
+        <a href="https://t.me/handycalbot" class="btn btn-primary">Get Started — It's Free</a>
+    </section>
 
     <footer>
-        <p>
-            <a href="/privacy">Privacy Policy</a> |
-            <a href="/terms">Terms of Service</a> |
-            <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>
-        </p>
-        <p style="margin-top: 1rem;">&copy; 2025 HandyCalBot. All rights reserved.</p>
+        <div class="footer-content">
+            <span>© 2025 HandyCalBot. Open source project.</span>
+            <div class="footer-links">
+                <a href="/privacy">Privacy</a>
+                <a href="/terms">Terms</a>
+                <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>
+            </div>
+        </div>
     </footer>
 </body>
 </html>
@@ -225,16 +574,29 @@ async def privacy_policy():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - HandyCalBot</title>
+    {FAVICON_LINK}
     {COMMON_STYLES}
 </head>
 <body>
-    <header>
+    <nav>
+        <a href="/" class="logo">
+            <img src="/logo.jpg" alt="HandyCalBot">
+            HandyCalBot
+        </a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/terms">Terms</a>
+            <a href="https://t.me/handycalbot" class="btn btn-primary">Open Bot</a>
+        </div>
+    </nav>
+
+    <header class="legal-header">
         <h1>Privacy Policy</h1>
-        <p>HandyCalBot</p>
+        <p>How we handle your data</p>
     </header>
 
-    <main>
-        <p class="last-updated">Last updated: January 15, 2025</p>
+    <main class="legal-content">
+        <p class="last-updated">Last updated: January 16, 2026</p>
 
         <h2>1. Introduction</h2>
         <p>
@@ -259,6 +621,7 @@ async def privacy_policy():
             <li>Create, modify, and manage calendar events on your behalf</li>
             <li>Display your upcoming meetings</li>
             <li>Send meeting invitations to attendees you specify</li>
+            <li>Send you reminder notifications before meetings</li>
             <li>Provide timezone-aware scheduling</li>
         </ul>
 
@@ -317,11 +680,14 @@ async def privacy_policy():
     </main>
 
     <footer>
-        <p>
-            <a href="/">Home</a> |
-            <a href="/terms">Terms of Service</a> |
-            <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>
-        </p>
+        <div class="footer-content">
+            <span>© 2025 HandyCalBot. Open source project.</span>
+            <div class="footer-links">
+                <a href="/">Home</a>
+                <a href="/terms">Terms</a>
+                <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>
+            </div>
+        </div>
     </footer>
 </body>
 </html>
@@ -338,16 +704,29 @@ async def terms_of_service():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service - HandyCalBot</title>
+    {FAVICON_LINK}
     {COMMON_STYLES}
 </head>
 <body>
-    <header>
+    <nav>
+        <a href="/" class="logo">
+            <img src="/logo.jpg" alt="HandyCalBot">
+            HandyCalBot
+        </a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/privacy">Privacy</a>
+            <a href="https://t.me/handycalbot" class="btn btn-primary">Open Bot</a>
+        </div>
+    </nav>
+
+    <header class="legal-header">
         <h1>Terms of Service</h1>
-        <p>HandyCalBot</p>
+        <p>Rules and guidelines for using HandyCalBot</p>
     </header>
 
-    <main>
-        <p class="last-updated">Last updated: January 15, 2025</p>
+    <main class="legal-content">
+        <p class="last-updated">Last updated: January 16, 2026</p>
 
         <h2>1. Acceptance of Terms</h2>
         <p>
@@ -448,12 +827,60 @@ async def terms_of_service():
     </main>
 
     <footer>
-        <p>
-            <a href="/">Home</a> |
-            <a href="/privacy">Privacy Policy</a> |
-            <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>
-        </p>
+        <div class="footer-content">
+            <span>© 2025 HandyCalBot. Open source project.</span>
+            <div class="footer-links">
+                <a href="/">Home</a>
+                <a href="/privacy">Privacy</a>
+                <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>
+            </div>
+        </div>
     </footer>
 </body>
 </html>
 """
+
+
+@router.get("/logo.jpg", response_class=FileResponse)
+async def logo():
+    """Serve the logo image."""
+    logo_path = STATIC_DIR / "logo.jpg"
+    return FileResponse(logo_path, media_type="image/jpeg")
+
+
+@router.get("/favicon.ico", response_class=FileResponse)
+async def favicon():
+    """Serve favicon (uses the logo)."""
+    favicon_path = STATIC_DIR / "logo.jpg"
+    return FileResponse(favicon_path, media_type="image/jpeg")
+
+
+@router.get("/robots.txt", response_class=PlainTextResponse)
+async def robots():
+    """Serve robots.txt."""
+    robots_path = STATIC_DIR / "robots.txt"
+    return PlainTextResponse(robots_path.read_text())
+
+
+@router.get("/sitemap.xml", response_class=PlainTextResponse)
+async def sitemap():
+    """Generate sitemap.xml."""
+    sitemap_content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://handycal.dzhurinskiy.com/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://handycal.dzhurinskiy.com/privacy</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://handycal.dzhurinskiy.com/terms</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+</urlset>"""
+    return PlainTextResponse(sitemap_content, media_type="application/xml")

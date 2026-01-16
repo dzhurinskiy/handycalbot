@@ -148,7 +148,13 @@ async def run_with_webhook(app: Application, fastapi_app) -> None:
     await app.start()
     await app.bot.set_webhook(
         url=f"{settings.webhook_url}",
-        allowed_updates=["message", "callback_query", "inline_query", "chosen_inline_result"],
+        allowed_updates=[
+            "message",
+            "callback_query",
+            "inline_query",
+            "chosen_inline_result",
+            "pre_checkout_query",
+        ],
     )
 
     # Set bot commands and menu button for Telegram UI

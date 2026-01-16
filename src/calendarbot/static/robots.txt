@@ -1,0 +1,11 @@
+# HandyCalBot robots.txt
+User-agent: *
+Allow: /
+Allow: /privacy
+Allow: /terms
+
+Disallow: /health
+Disallow: /oauth/
+Disallow: /webhook
+
+Sitemap: https://handycal.dzhurinskiy.com/sitemap.xml
