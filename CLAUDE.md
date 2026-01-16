@@ -32,12 +32,29 @@ ssh -o ConnectTimeout=10 -o BatchMode=yes handycal "command1 && command2 && comm
 - `handycal` - SSH alias configured in `~/.ssh/config` with correct key and host
 - `-o BatchMode=yes` - REQUIRED: prevents password prompts, fails fast if key doesn't work
 
-**Deployment workflow (NO SSH monitoring):**
+**Deployment workflow:**
 1. Make code changes
 2. `git push` - triggers GitHub Actions
 3. Wait for Telegram notification (success/failure)
 4. Verify via HTTPS: `curl https://handycal.dzhurinskiy.com/health`
-5. Only SSH if health check fails AND you need to debug
+5. **ALWAYS check logs after deployment** - even if health check passes:
+   ```bash
+   ssh -o ConnectTimeout=10 -o BatchMode=yes handycal "docker logs calendarbot --tail=50 2>&1"
+   ```
+6. Look for `ERROR`, `Exception`, or `Traceback` in logs
+7. If errors found, fix them and redeploy
+
+## Database Migrations
+
+- Use Alembic for database migrations
+- **Keep revision IDs short** - max 32 characters (e.g., `001_default_reminder`, not `001_add_default_reminder_column`)
+- After adding new model fields, create a migration file in `src/calendarbot/db/migrations/versions/`
+- CD workflow runs `alembic upgrade head` automatically
+- If migrations fail, you may need to manually stamp: `docker exec calendarbot alembic stamp head`
+- To apply columns manually if migration fails:
+  ```bash
+  ssh handycal "docker exec calendarbot-db psql -U calendarbot -d calendarbot -c 'ALTER TABLE ... ADD COLUMN ...'"
+  ```
 
 ## Environment & Deployment
 
