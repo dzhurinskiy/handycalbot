@@ -23,6 +23,7 @@ I help you schedule meetings directly from Telegram.
 **Inline Usage:**
 `@handycalbot 14:30 "Meeting Title" email@example.com`
 `@handycalbot 10:00 25-01-2026 "Project Sync"`
+`@handycalbot 14:30 "Meeting" r 10m` (with reminder)
 
 **Commands:**
 /connect - Connect Google Calendar
@@ -30,6 +31,7 @@ I help you schedule meetings directly from Telegram.
 /settings - View/change settings
 /timezone - Change your timezone
 /duration - Set default meeting duration
+/reminder - Set default reminder
 /meetings - List upcoming meetings
 /cancel - Cancel a meeting
 /help - Show this message
@@ -45,13 +47,23 @@ Type `@handycalbot` in any chat followed by:
 - Time (required): `HH:MM` (24-hour format)
 - Date (optional): `DD-MM-YYYY`
 - Title (required): `"Your Meeting Title"`
-- Attendees (optional): `email1@example.com, email2@example.com`
+- Attendees (optional): `email1@example.com`
+- Reminder (optional): `r 10m` or `r 10m/30m` or just `r`
+
+**Reminder Format:**
+- `r 10m` - remind 10 minutes before
+- `r 1h` - remind 1 hour before
+- `r 1d` - remind 1 day before
+- `r 10m/30m` - multiple reminders
+- `r` - use your default reminder
+- (no r) - no reminder
 
 **Examples:**
 ```
 @handycalbot 14:30 "Team Standup"
 @handycalbot 10:00 25-01-2026 "Project Review" john@company.com
-@handycalbot 16:00 "Quick Call" alice@corp.com, bob@corp.com
+@handycalbot 16:00 "Quick Call" r 15m
+@handycalbot 14:00 "Important Meeting" alice@corp.com r 10m/1h
 ```
 
 **Commands:**
@@ -61,13 +73,15 @@ Type `@handycalbot` in any chat followed by:
 /settings - View and modify settings
 /timezone - Set your timezone
 /duration - Set default meeting duration
+/reminder - Set default reminder
 /meetings - Show upcoming meetings
 /cancel - Cancel a meeting
 /help - This help message
 
 **Settings:**
 - Timezone: Used for meeting times
-- Duration: Default meeting length (currently 60 min)
+- Duration: Default meeting length
+- Reminder: Default reminder time
 """
 
 

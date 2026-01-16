@@ -46,12 +46,15 @@ class UserRepository:
         user: User,
         timezone: str | None = None,
         default_duration: int | None = None,
+        default_reminder: str | None = ...,  # Use ... as sentinel to distinguish from None
     ) -> User:
         """Update user settings."""
         if timezone is not None:
             user.timezone = timezone
         if default_duration is not None:
             user.default_duration = default_duration
+        if default_reminder is not ...:  # Allow setting to None
+            user.default_reminder = default_reminder
         await self.session.flush()
         return user
 

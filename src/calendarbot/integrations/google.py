@@ -96,8 +96,14 @@ class GoogleCalendarClient:
         description: str | None = None,
         timezone: str = "UTC",
         calendar_id: str = "primary",
+        reminders: list[int] | None = None,
     ) -> dict:
-        """Create a calendar event."""
+        """Create a calendar event.
+
+        Args:
+            reminders: List of reminder times in minutes before the event.
+                       None means use calendar default, empty list means no reminders.
+        """
         event_body = {
             "summary": summary,
             "start": {
@@ -116,6 +122,24 @@ class GoogleCalendarClient:
         if attendees:
             event_body["attendees"] = [{"email": email} for email in attendees]
             event_body["sendUpdates"] = "all"  # Send invitations
+
+        # Handle reminders
+        if reminders is not None:
+            if reminders:
+                # Specific reminders requested
+                event_body["reminders"] = {
+                    "useDefault": False,
+                    "overrides": [
+                        {"method": "popup", "minutes": m} for m in reminders
+                    ]
+                }
+            else:
+                # Empty list means no reminders
+                event_body["reminders"] = {
+                    "useDefault": False,
+                    "overrides": []
+                }
+        # If reminders is None, don't set it - use calendar default
 
         url = f"{GOOGLE_CALENDAR_API}/calendars/{calendar_id}/events"
         return await self._request("POST", url, json=event_body)

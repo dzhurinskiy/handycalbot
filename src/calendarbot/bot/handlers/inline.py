@@ -29,6 +29,21 @@ from calendarbot.utils.timezone import TimezoneHelper
 logger = logging.getLogger(__name__)
 
 
+def _format_reminders(reminders: list[int]) -> str:
+    """Format reminder list for display."""
+    parts = []
+    for m in reminders:
+        if m >= 1440:
+            days = m // 1440
+            parts.append(f"{days} day{'s' if days > 1 else ''}")
+        elif m >= 60:
+            hours = m // 60
+            parts.append(f"{hours} hour{'s' if hours > 1 else ''}")
+        else:
+            parts.append(f"{m} min")
+    return "Reminder: " + ", ".join(parts) + " before"
+
+
 def build_add_to_calendar_url(
     title: str,
     start: datetime,
@@ -107,6 +122,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         # Extract user settings while session is active (avoid detached object issues)
         user_timezone = user.timezone
         user_default_duration = user.default_duration
+        user_default_reminder = user.default_reminder
 
     # Parse the query
     parser = MeetingParser(
@@ -124,15 +140,16 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 input_message_content=InputTextMessageContent(
                     "Could not parse meeting. Use format:\n"
                     '14:30 "Meeting Title" email@example.com\n\n'
-                    "Time and title in quotes are required."
+                    "Time and title in quotes are required.\n"
+                    "Add r 10m for reminder, or just r for default."
                 ),
             )
         ]
         await query.answer(results, cache_time=10)
         return
 
-    # Generate preview
-    preview = parser.format_preview(meeting)
+    # Generate preview with reminder info
+    preview = parser.format_preview(meeting, default_reminder=user_default_reminder)
 
     if not calendar_connected:
         preview += "\n\n⚠️ Calendar not connected - /connect first"
@@ -152,6 +169,8 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             "attendees": meeting.attendees,
             "start_datetime": meeting.start_datetime.isoformat(),
             "end_datetime": meeting.end_datetime.isoformat(),
+            "reminders": meeting.reminders,
+            "use_default_reminder": meeting.use_default_reminder,
         },
     }
 
@@ -226,6 +245,8 @@ async def create_meeting_callback(
                 attendees=m["attendees"],
                 start_datetime=datetime.fromisoformat(m["start_datetime"]),
                 end_datetime=datetime.fromisoformat(m["end_datetime"]),
+                reminders=m.get("reminders"),
+                use_default_reminder=m.get("use_default_reminder", False),
             )
 
             calendar_service = CalendarService(session)
@@ -242,6 +263,12 @@ async def create_meeting_callback(
             text = f"✅ Meeting created!\n\n"
             text += f"**{result['title']}**\n"
             text += f"🕐 {start_str}\n"
+
+            # Show reminder info
+            reminders = result.get("reminders")
+            if reminders:
+                reminder_text = _format_reminders(reminders)
+                text += f"🔔 {reminder_text}\n"
 
             if result["attendees"]:
                 text += f"\n📧 Invitations sent to:\n"

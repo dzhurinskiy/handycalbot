@@ -97,6 +97,9 @@ class CalendarService:
         start_local = meeting_data.start_datetime
         end_local = meeting_data.end_datetime
 
+        # Determine reminders to use
+        reminders = self._resolve_reminders(user, meeting_data)
+
         async def do_create():
             return await client.create_event(
                 summary=meeting_data.title,
@@ -105,6 +108,7 @@ class CalendarService:
                 attendees=meeting_data.attendees,
                 timezone=user.timezone,
                 calendar_id=calendar_id,
+                reminders=reminders,
             )
 
         result = await do_create()
@@ -142,7 +146,29 @@ class CalendarService:
             "start": meeting_data.start_datetime,
             "end": meeting_data.end_datetime,
             "attendees": meeting_data.attendees,
+            "reminders": reminders,
         }
+
+    def _resolve_reminders(self, user: User, meeting_data: ParsedMeeting) -> list[int] | None:
+        """Resolve which reminders to use for the meeting.
+
+        Returns:
+            - list[int]: specific reminder minutes
+            - []: empty list means no reminders
+            - None: use calendar default (but we default to no reminders if not specified)
+        """
+        if meeting_data.reminders:
+            # Specific reminders in the request
+            return meeting_data.reminders
+        elif meeting_data.use_default_reminder:
+            # 'r' was specified, use user's default
+            if user.default_reminder:
+                return [int(x) for x in user.default_reminder.split(",")]
+            else:
+                return []  # User has no default, so no reminders
+        else:
+            # No 'r' in request - no reminders
+            return []
 
     async def get_upcoming_meetings(
         self, user: User, limit: int = 10

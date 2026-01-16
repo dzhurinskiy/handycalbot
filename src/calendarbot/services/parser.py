@@ -17,6 +17,9 @@ class ParsedMeeting:
     attendees: list[str]
     start_datetime: datetime  # Combined datetime in user's timezone
     end_datetime: datetime
+    # Reminders in minutes before meeting, None means no reminder, empty list means use default
+    reminders: list[int] | None = None
+    use_default_reminder: bool = False  # True if 'r' was specified without values
 
 
 class MeetingParser:
@@ -26,6 +29,9 @@ class MeetingParser:
         14:30 25-01-2026 "Project Sync" john@example.com, jane@example.com
         10:00 "Daily Standup"
         16:00 "Quick Call"
+        14:30 "Meeting" r 10m          # 10 min reminder
+        14:30 "Meeting" r 10m/30m      # 10 and 30 min reminders
+        14:30 "Meeting" r              # use default reminder
     """
 
     # Regex patterns
@@ -33,6 +39,8 @@ class MeetingParser:
     DATE_PATTERN = r"(\d{1,2}-\d{1,2}-\d{4})"
     TITLE_PATTERN = r'"([^"]+)"'
     EMAIL_PATTERN = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+    # Reminder pattern: r followed by optional time values like 10m, 30m/60m, 1d
+    REMINDER_PATTERN = r"\br\s*((?:\d+[mhd](?:/\d+[mhd])*)?)\b"
 
     def __init__(self, user_timezone: str = "UTC", default_duration: int = 60):
         self.user_timezone = user_timezone
@@ -61,10 +69,25 @@ class MeetingParser:
             return None
         title = title_match.group(1)
 
+        # Extract reminder (optional) - parse before emails to avoid confusion
+        reminder_match = re.search(self.REMINDER_PATTERN, text)
+        reminders = None
+        use_default_reminder = False
+        if reminder_match:
+            reminder_str = reminder_match.group(1).strip()
+            if reminder_str:
+                # Parse reminder values like "10m", "30m/60m", "1d"
+                reminders = self._parse_reminders(reminder_str)
+            else:
+                # Just "r" without values - use default
+                use_default_reminder = True
+
         # Extract emails (optional)
-        # Find all text after the title
+        # Find all text after the title, excluding the reminder part
         title_end = title_match.end()
         remaining_text = text[title_end:]
+        # Remove reminder pattern from remaining text before extracting emails
+        remaining_text = re.sub(self.REMINDER_PATTERN, "", remaining_text)
         attendees = re.findall(self.EMAIL_PATTERN, remaining_text)
 
         # Build datetime
@@ -81,7 +104,30 @@ class MeetingParser:
             attendees=attendees,
             start_datetime=start_datetime,
             end_datetime=end_datetime,
+            reminders=reminders,
+            use_default_reminder=use_default_reminder,
         )
+
+    def _parse_reminders(self, reminder_str: str) -> list[int]:
+        """Parse reminder string like '10m', '30m/60m', '1d' into minutes."""
+        reminders = []
+        parts = reminder_str.split("/")
+        for part in parts:
+            part = part.strip().lower()
+            if not part:
+                continue
+            # Extract number and unit
+            match = re.match(r"(\d+)([mhd])", part)
+            if match:
+                value = int(match.group(1))
+                unit = match.group(2)
+                if unit == "m":
+                    reminders.append(value)
+                elif unit == "h":
+                    reminders.append(value * 60)
+                elif unit == "d":
+                    reminders.append(value * 60 * 24)
+        return reminders if reminders else None
 
     def _build_datetime(self, time_str: str, date_str: str | None) -> datetime:
         """Build datetime from time and optional date."""
@@ -100,7 +146,7 @@ class MeetingParser:
 
         return dt
 
-    def format_preview(self, meeting: ParsedMeeting) -> str:
+    def format_preview(self, meeting: ParsedMeeting, default_reminder: str | None = None) -> str:
         """Format meeting for inline preview."""
         date_display = meeting.start_datetime.strftime("%d %b %Y")
         time_display = meeting.start_datetime.strftime("%H:%M")
@@ -109,12 +155,46 @@ class MeetingParser:
         text += f"🕐 {time_display} on {date_display}\n"
         text += f"⏱️ Duration: {self.default_duration} min\n"
 
+        # Show reminder info
+        reminder_text = self._format_reminder_preview(meeting, default_reminder)
+        if reminder_text:
+            text += f"🔔 {reminder_text}\n"
+
         if meeting.attendees:
             text += f"👥 Attendees: {', '.join(meeting.attendees)}"
         else:
             text += "👤 No attendees (private event)"
 
         return text
+
+    def _format_reminder_preview(self, meeting: ParsedMeeting, default_reminder: str | None) -> str:
+        """Format reminder for preview display."""
+        if meeting.reminders:
+            # Specific reminders requested
+            return f"Reminder: {self._format_minutes_list(meeting.reminders)}"
+        elif meeting.use_default_reminder:
+            # Use default reminder
+            if default_reminder:
+                mins = [int(x) for x in default_reminder.split(",")]
+                return f"Reminder: {self._format_minutes_list(mins)} (default)"
+            else:
+                return "Reminder: None (no default set)"
+        else:
+            return ""  # No reminder
+
+    def _format_minutes_list(self, minutes: list[int]) -> str:
+        """Format list of minutes into readable string."""
+        parts = []
+        for m in minutes:
+            if m >= 1440:  # 1 day or more
+                days = m // 1440
+                parts.append(f"{days} day{'s' if days > 1 else ''}")
+            elif m >= 60:
+                hours = m // 60
+                parts.append(f"{hours} hour{'s' if hours > 1 else ''}")
+            else:
+                parts.append(f"{m} min")
+        return ", ".join(parts) + " before"
 
     def validate_emails(self, emails: list[str]) -> tuple[list[str], list[str]]:
         """Validate email list. Returns (valid, invalid)."""

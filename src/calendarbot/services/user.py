@@ -32,6 +32,10 @@ class UserService:
         """Update default meeting duration."""
         return await self.user_repo.update_settings(user, default_duration=duration)
 
+    async def update_reminder(self, user: User, reminder: str | None) -> User:
+        """Update default reminder setting."""
+        return await self.user_repo.update_settings(user, default_reminder=reminder)
+
     async def is_calendar_connected(self, user: User, provider: str = "google") -> bool:
         """Check if user has connected their calendar."""
         token = await self.token_repo.get_token(user.id, provider)

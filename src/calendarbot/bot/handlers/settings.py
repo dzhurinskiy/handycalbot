@@ -24,6 +24,17 @@ logger = logging.getLogger(__name__)
 # Conversation states
 AWAITING_TIMEZONE = 1
 AWAITING_DURATION = 2
+AWAITING_REMINDER = 3
+
+# Reminder options in minutes
+REMINDER_OPTIONS = [
+    (None, "No reminder"),
+    (10, "10 minutes"),
+    (15, "15 minutes"),
+    (30, "30 minutes"),
+    (60, "1 hour"),
+    (1440, "1 day"),
+]
 
 
 async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -41,21 +52,44 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
         summary = await user_service.get_user_summary(user)
 
+        # Format reminder display
+        reminder_display = _format_reminder_setting(user.default_reminder)
+
     text = f"""
 **Your Settings** ⚙️
 
 📍 Timezone: `{summary['timezone']}`
 ⏱️ Default Duration: `{summary['default_duration']} minutes`
+🔔 Default Reminder: `{reminder_display}`
 📅 Google Calendar: {summary['google_calendar']}
 
 **Change Settings:**
 /timezone - Change timezone
 /duration - Change default duration
+/reminder - Change default reminder
 /connect - Connect Google Calendar
 /disconnect - Disconnect Google Calendar
 """
 
     await update.message.reply_text(text, parse_mode="Markdown")
+
+
+def _format_reminder_setting(reminder: str | None) -> str:
+    """Format reminder setting for display."""
+    if not reminder:
+        return "No reminder"
+    minutes_list = [int(x) for x in reminder.split(",")]
+    parts = []
+    for m in minutes_list:
+        if m >= 1440:
+            days = m // 1440
+            parts.append(f"{days} day{'s' if days > 1 else ''}")
+        elif m >= 60:
+            hours = m // 60
+            parts.append(f"{hours} hour{'s' if hours > 1 else ''}")
+        else:
+            parts.append(f"{m} min")
+    return ", ".join(parts) + " before"
 
 
 async def connect_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -268,6 +302,59 @@ async def duration_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return ConversationHandler.END
 
 
+async def reminder_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Handle /reminder command."""
+    if not update.message:
+        return ConversationHandler.END
+
+    buttons = []
+    for minutes, label in REMINDER_OPTIONS:
+        callback_data = f"rem_{minutes}" if minutes is not None else "rem_none"
+        buttons.append([InlineKeyboardButton(label, callback_data=callback_data)])
+
+    await update.message.reply_text(
+        "Select default reminder for new meetings:\n\n"
+        "_You can override this per-meeting using `r 10m` in your inline query._",
+        reply_markup=InlineKeyboardMarkup(buttons),
+        parse_mode="Markdown",
+    )
+
+    return AWAITING_REMINDER
+
+
+async def reminder_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Handle reminder button selection."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return ConversationHandler.END
+
+    await query.answer()
+
+    # Parse the reminder value
+    value = query.data.replace("rem_", "")
+    if value == "none":
+        reminder = None
+    else:
+        reminder = value  # Store as string
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if user:
+            await user_service.update_reminder(user, reminder)
+            await session.commit()
+
+    display = _format_reminder_setting(reminder)
+    await query.edit_message_text(
+        f"✅ Default reminder set to: {display}\n\n"
+        "_Use `r` in your inline query to apply this default, "
+        "or `r 10m` to override with a specific time._",
+        parse_mode="Markdown"
+    )
+    return ConversationHandler.END
+
+
 async def cancel_conversation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Cancel any conversation."""
     if update.message:
@@ -311,3 +398,15 @@ def setup_settings_handlers(app: Application) -> None:
         fallbacks=[CommandHandler("cancel", cancel_conversation)],
     )
     app.add_handler(dur_handler)
+
+    # Reminder conversation
+    rem_handler = ConversationHandler(
+        entry_points=[CommandHandler("reminder", reminder_command)],
+        states={
+            AWAITING_REMINDER: [
+                CallbackQueryHandler(reminder_callback, pattern=r"^rem_"),
+            ],
+        },
+        fallbacks=[CommandHandler("cancel", cancel_conversation)],
+    )
+    app.add_handler(rem_handler)

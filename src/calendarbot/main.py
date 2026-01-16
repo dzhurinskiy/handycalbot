@@ -31,6 +31,7 @@ BOT_COMMANDS = [
     BotCommand("settings", "View your current settings"),
     BotCommand("timezone", "Change your timezone"),
     BotCommand("duration", "Set default meeting duration"),
+    BotCommand("reminder", "Set default reminder"),
 ]
 
 # Configure logging

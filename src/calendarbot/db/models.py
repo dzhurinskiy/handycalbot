@@ -25,6 +25,9 @@ class User(Base):
     telegram_username: Mapped[str | None] = mapped_column(String(255), nullable=True)
     timezone: Mapped[str] = mapped_column(String(50), default="UTC")
     default_duration: Mapped[int] = mapped_column(Integer, default=60)
+    # Default reminder in minutes before meeting (None = no reminder)
+    # Can store multiple reminders as comma-separated: "10,30" means 10min and 30min before
+    default_reminder: Mapped[str | None] = mapped_column(String(100), nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
