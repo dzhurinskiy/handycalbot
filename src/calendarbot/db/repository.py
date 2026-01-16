@@ -16,9 +16,7 @@ class UserRepository:
 
     async def get_by_telegram_id(self, telegram_id: int) -> User | None:
         """Get user by Telegram ID."""
-        result = await self.session.execute(
-            select(User).where(User.telegram_id == telegram_id)
-        )
+        result = await self.session.execute(select(User).where(User.telegram_id == telegram_id))
         return result.scalar_one_or_none()
 
     async def get_or_create(
@@ -161,9 +159,7 @@ class MeetingRepository:
         await self.session.flush()
         return meeting
 
-    async def delete_by_external_id(
-        self, user_id: int, external_id: str, provider: str
-    ) -> bool:
+    async def delete_by_external_id(self, user_id: int, external_id: str, provider: str) -> bool:
         """Delete meeting by external ID."""
         result = await self.session.execute(
             select(Meeting).where(

@@ -90,7 +90,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 input_message_content=InputTextMessageContent(
                     "To create a meeting, type:\n"
                     '@handycalbot 14:30 "Meeting Title" email@example.com\n\n'
-                    "Format: TIME [DATE] \"TITLE\" [EMAILS]"
+                    'Format: TIME [DATE] "TITLE" [EMAILS]'
                 ),
             )
         ]
@@ -175,12 +175,14 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     }
 
     # Create inline keyboard for confirmation
-    keyboard = InlineKeyboardMarkup([
+    keyboard = InlineKeyboardMarkup(
         [
-            InlineKeyboardButton("✅ Create Meeting", callback_data=f"create_{result_id}"),
-            InlineKeyboardButton("❌ Cancel", callback_data=f"discard_{result_id}"),
+            [
+                InlineKeyboardButton("✅ Create Meeting", callback_data=f"create_{result_id}"),
+                InlineKeyboardButton("❌ Cancel", callback_data=f"discard_{result_id}"),
+            ]
         ]
-    ])
+    )
 
     results = [
         InlineQueryResultArticle(
@@ -198,9 +200,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await query.answer(results, cache_time=0, is_personal=True)
 
 
-async def create_meeting_callback(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle Create Meeting button press."""
     query = update.callback_query
     if not query or not query.data or not update.effective_user:
@@ -284,9 +284,9 @@ async def create_meeting_callback(
                 timezone=user.timezone,
             )
 
-            keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("📅 Add to My Calendar", url=add_to_cal_url)]
-            ])
+            keyboard = InlineKeyboardMarkup(
+                [[InlineKeyboardButton("📅 Add to My Calendar", url=add_to_cal_url)]]
+            )
 
             if result["attendees"]:
                 text += "\n_Not listed above? Click below to add to your calendar:_"
@@ -301,9 +301,7 @@ async def create_meeting_callback(
             await query.edit_message_text(f"❌ Error creating meeting: {str(e)}")
 
 
-async def discard_meeting_callback(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def discard_meeting_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle Cancel button press."""
     query = update.callback_query
     if not query or not query.data:

@@ -36,6 +36,7 @@ async def send_telegram_message(chat_id: int, text: str, reply_markup: dict | No
         logger.error(f"Failed to send Telegram message: {e}")
         return False
 
+
 router = APIRouter(tags=["oauth"])
 
 
@@ -227,6 +228,7 @@ async def google_oauth_callback(
 
         # Build inline keyboard with timezone options
         from calendarbot.utils.timezone import TimezoneHelper
+
         common_tzs = TimezoneHelper.get_common_timezones()[:8]  # Top 8 timezones
 
         keyboard_rows = []
@@ -241,7 +243,9 @@ async def google_oauth_callback(
             keyboard_rows.append(row)
 
         # Add "Keep current" button
-        keyboard_rows.append([{"text": f"✅ Keep {user_timezone}", "callback_data": f"tz_{user_timezone}"}])
+        keyboard_rows.append(
+            [{"text": f"✅ Keep {user_timezone}", "callback_data": f"tz_{user_timezone}"}]
+        )
 
         reply_markup = {"inline_keyboard": keyboard_rows}
 

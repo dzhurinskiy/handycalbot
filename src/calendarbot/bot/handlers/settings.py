@@ -108,8 +108,7 @@ async def connect_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # Check if already connected
         if await user_service.is_calendar_connected(user):
             await update.message.reply_text(
-                "Google Calendar is already connected!\n"
-                "Use /disconnect to unlink it first."
+                "Google Calendar is already connected!\n" "Use /disconnect to unlink it first."
             )
             return
 
@@ -155,8 +154,7 @@ async def disconnect_command(update: Update, _context: ContextTypes.DEFAULT_TYPE
         await session.commit()
 
     await update.message.reply_text(
-        "Google Calendar disconnected successfully.\n"
-        "Use /connect to link it again."
+        "Google Calendar disconnected successfully.\n" "Use /connect to link it again."
     )
 
 
@@ -220,8 +218,8 @@ async def _handle_timezone_selection(update: Update) -> None:
     await query.edit_message_text(
         f"✅ Timezone set to: `{tz}`\n\n"
         "You're all set! Create meetings using:\n"
-        "`@handycalbot 14:30 \"Meeting Title\"`",
-        parse_mode="Markdown"
+        '`@handycalbot 14:30 "Meeting Title"`',
+        parse_mode="Markdown",
     )
 
 
@@ -347,7 +345,7 @@ async def reminder_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE)
         f"✅ Default reminder set to: {display}\n\n"
         "_Use `r` in your inline query to apply this default, "
         "or `r 10m` to override with a specific time._",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
     return ConversationHandler.END
 

@@ -129,16 +129,11 @@ class GoogleCalendarClient:
                 # Specific reminders requested
                 event_body["reminders"] = {
                     "useDefault": False,
-                    "overrides": [
-                        {"method": "popup", "minutes": m} for m in reminders
-                    ]
+                    "overrides": [{"method": "popup", "minutes": m} for m in reminders],
                 }
             else:
                 # Empty list means no reminders
-                event_body["reminders"] = {
-                    "useDefault": False,
-                    "overrides": []
-                }
+                event_body["reminders"] = {"useDefault": False, "overrides": []}
         # If reminders is None, don't set it - use calendar default
 
         url = f"{GOOGLE_CALENDAR_API}/calendars/{calendar_id}/events"

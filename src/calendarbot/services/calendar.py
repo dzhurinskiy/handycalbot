@@ -38,6 +38,7 @@ class CalendarService:
 
         # Always try to refresh if token is expired or close to expiry (5 min buffer)
         from datetime import timedelta
+
         if datetime.utcnow() >= (token.expires_at - timedelta(minutes=5)):
             logger.info(f"Token expired or expiring soon for user {user.id}, refreshing...")
             client = GoogleCalendarClient(
@@ -59,12 +60,17 @@ class CalendarService:
                 logger.info(f"Token refreshed successfully for user {user.id}")
             else:
                 logger.error(f"Token refresh failed for user {user.id}")
-                return {"error": "Failed to refresh Google token. Please /disconnect and /connect again."}
+                return {
+                    "error": "Failed to refresh Google token. Please /disconnect and /connect again."
+                }
 
-        return GoogleCalendarClient(
-            access_token=access_token,
-            refresh_token=refresh_token,
-        ), token.calendar_id or "primary"
+        return (
+            GoogleCalendarClient(
+                access_token=access_token,
+                refresh_token=refresh_token,
+            ),
+            token.calendar_id or "primary",
+        )
 
     async def _handle_api_error(self, result: dict, user: User, retry_func) -> dict:
         """Handle API errors, refreshing token and retrying on 401."""
@@ -74,6 +80,7 @@ class CalendarService:
             token = await self.token_repo.get_token(user.id, "google")
             if token:
                 from datetime import timedelta
+
                 token.expires_at = datetime.utcnow() - timedelta(hours=1)
                 await self.session.flush()
 
@@ -81,9 +88,7 @@ class CalendarService:
             return await retry_func()
         return result
 
-    async def create_meeting(
-        self, user: User, meeting_data: ParsedMeeting
-    ) -> dict:
+    async def create_meeting(self, user: User, meeting_data: ParsedMeeting) -> dict:
         """Create a meeting on user's calendar.
 
         Returns dict with meeting details or error.
@@ -170,9 +175,7 @@ class CalendarService:
             # No 'r' in request - no reminders
             return []
 
-    async def get_upcoming_meetings(
-        self, user: User, limit: int = 10
-    ) -> list[dict]:
+    async def get_upcoming_meetings(self, user: User, limit: int = 10) -> list[dict]:
         """Get upcoming meetings from Google Calendar."""
         client_result = await self._get_valid_client(user)
         if isinstance(client_result, dict):
@@ -212,6 +215,7 @@ class CalendarService:
 
             # Parse datetime - Google returns ISO format with timezone
             from dateutil import parser as dateutil_parser
+
             start_time = dateutil_parser.isoparse(start_str)
             end_time = dateutil_parser.isoparse(end_str)
 
@@ -222,14 +226,16 @@ class CalendarService:
 
             attendees = [a.get("email", "") for a in event.get("attendees", [])]
 
-            meetings.append({
-                "id": event.get("id"),
-                "external_id": event.get("id"),
-                "title": event.get("summary", "(No title)"),
-                "start_time": start_time,
-                "end_time": end_time,
-                "attendees": attendees,
-            })
+            meetings.append(
+                {
+                    "id": event.get("id"),
+                    "external_id": event.get("id"),
+                    "title": event.get("summary", "(No title)"),
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "attendees": attendees,
+                }
+            )
 
         return meetings
 

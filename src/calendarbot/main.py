@@ -58,10 +58,7 @@ async def setup_bot_commands_and_menu(app: Application) -> None:
         logger.info(f"Registered {len(BOT_COMMANDS)} bot commands (default scope)")
 
         # Also set for private chats scope explicitly
-        await app.bot.set_my_commands(
-            BOT_COMMANDS,
-            scope=BotCommandScopeAllPrivateChats()
-        )
+        await app.bot.set_my_commands(BOT_COMMANDS, scope=BotCommandScopeAllPrivateChats())
         logger.info("Registered bot commands for private chats scope")
     except Exception as e:
         logger.error(f"Failed to set bot commands: {e}")

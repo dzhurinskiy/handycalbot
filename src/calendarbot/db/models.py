@@ -67,9 +67,7 @@ class OAuthToken(Base):
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="oauth_tokens")
 
-    __table_args__ = (
-        Index("idx_oauth_user_provider", "user_id", "provider", unique=True),
-    )
+    __table_args__ = (Index("idx_oauth_user_provider", "user_id", "provider", unique=True),)
 
     def __repr__(self) -> str:
         return f"<OAuthToken(id={self.id}, user_id={self.user_id}, provider={self.provider})>"

@@ -95,9 +95,7 @@ async def show_cancel_menu(
                 text, reply_markup=reply_markup, parse_mode="Markdown"
             )
         elif update.message:
-            await update.message.reply_text(
-                text, reply_markup=reply_markup, parse_mode="Markdown"
-            )
+            await update.message.reply_text(text, reply_markup=reply_markup, parse_mode="Markdown")
 
     try:
         async with async_session_factory() as session:
@@ -161,7 +159,9 @@ async def show_cancel_menu(
     # Navigation buttons
     nav_buttons = []
     if page > 0:
-        nav_buttons.append(InlineKeyboardButton("⬅️ Previous", callback_data=f"cp_{user_id}_{page - 1}"))
+        nav_buttons.append(
+            InlineKeyboardButton("⬅️ Previous", callback_data=f"cp_{user_id}_{page - 1}")
+        )
     if end_idx < total_meetings:
         nav_buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"cp_{user_id}_{page + 1}"))
     if nav_buttons:

@@ -19,9 +19,7 @@ class Settings(BaseSettings):
     telegram_bot_token: str
 
     # Database
-    database_url: str = (
-        "postgresql+asyncpg://calendarbot:calendarbot@localhost:5432/calendarbot"
-    )
+    database_url: str = "postgresql+asyncpg://calendarbot:calendarbot@localhost:5432/calendarbot"
     db_password: str = ""  # Used by docker-compose
 
     # Google OAuth
