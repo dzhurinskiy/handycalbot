@@ -28,7 +28,10 @@ I help you schedule meetings directly from Telegram.
 /connect - Connect Google Calendar
 /disconnect - Disconnect calendar
 /settings - View/change settings
+/timezone - Change your timezone
+/duration - Set default meeting duration
 /meetings - List upcoming meetings
+/cancel - Cancel a meeting
 /help - Show this message
 
 Need help? Just type /help anytime!
