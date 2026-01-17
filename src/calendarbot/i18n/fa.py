@@ -4,6 +4,7 @@ from calendarbot.i18n.base import (
     CommandTranslations,
     CommonTranslations,
     DonationTranslations,
+    FeedbackTranslations,
     InlineTranslations,
     MeetingsTranslations,
     ReminderTranslations,
@@ -16,6 +17,7 @@ translations = Translations(
     common=CommonTranslations(
         please_start_first="لطفا ابتدا /start را اجرا کنید.",
         cancelled="لغو شد.",
+        aborted="متوقف شد.",
         error_user_not_found="خطا: کاربر یافت نشد.",
     ),
     start=StartTranslations(
@@ -200,6 +202,13 @@ translations = Translations(
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *یادآوری جلسه*",
         starting_in="شروع در {time}",
+    ),
+    feedback=FeedbackTranslations(
+        feedback_title="📝 **بازخورد**",
+        feedback_prompt="لطفا بازخورد، گزارش خطا یا پیشنهاد خود را شرح دهید.",
+        feedback_abort_hint="برای لغو /abort را تایپ کنید.",
+        feedback_received="✅ از بازخورد شما متشکریم!",
+        feedback_thank_you="پیام شما دریافت شد و بررسی خواهد شد.",
     ),
     commands=CommandTranslations(
         start="شروع بات و پیام خوش‌آمدگویی",

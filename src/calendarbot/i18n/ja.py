@@ -4,6 +4,7 @@ from calendarbot.i18n.base import (
     CommandTranslations,
     CommonTranslations,
     DonationTranslations,
+    FeedbackTranslations,
     InlineTranslations,
     MeetingsTranslations,
     ReminderTranslations,
@@ -16,6 +17,7 @@ translations = Translations(
     common=CommonTranslations(
         please_start_first="まず /start を実行してください。",
         cancelled="キャンセルしました。",
+        aborted="中止しました。",
         error_user_not_found="エラー: ユーザーが見つかりません。",
     ),
     start=StartTranslations(
@@ -200,6 +202,13 @@ Telegramから直接ミーティングをスケジュールできます。
     reminder=ReminderTranslations(
         meeting_reminder="*ミーティングリマインダー*",
         starting_in="{time}後に開始",
+    ),
+    feedback=FeedbackTranslations(
+        feedback_title="📝 **フィードバック**",
+        feedback_prompt="フィードバック、バグ報告、または提案を入力してください。",
+        feedback_abort_hint="キャンセルするには /abort と入力してください。",
+        feedback_received="✅ フィードバックありがとうございます!",
+        feedback_thank_you="メッセージを受け取りました。確認させていただきます。",
     ),
     commands=CommandTranslations(
         start="ボットを起動してウェルカム表示",

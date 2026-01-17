@@ -35,9 +35,9 @@ async def feedback_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
         t = get_text(user.language if user else "en")
 
     await update.message.reply_text(
-        f"📝 **{t.common.cancelled.replace('Cancelled.', 'Feedback')}**\n\n"
-        "Please describe your feedback, bug report, or suggestion.\n"
-        "Type /cancel to abort.",
+        f"{t.feedback.feedback_title}\n\n"
+        f"{t.feedback.feedback_prompt}\n"
+        f"{t.feedback.feedback_abort_hint}",
         parse_mode="Markdown",
     )
 
@@ -85,17 +85,18 @@ async def receive_feedback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             logger.error(f"Failed to forward feedback to admin: {e}")
 
     # Thank the user
+    t = get_text(user_lang)
     await update.message.reply_text(
-        "✅ Thank you for your feedback!\n\n"
-        "Your message has been received and will be reviewed.",
+        f"{t.feedback.feedback_received}\n\n"
+        f"{t.feedback.feedback_thank_you}",
         parse_mode="Markdown",
     )
 
     return ConversationHandler.END
 
 
-async def cancel_feedback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Cancel feedback submission."""
+async def abort_feedback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Abort feedback submission."""
     if update.message:
         async with async_session_factory() as session:
             user_service = UserService(session)
@@ -105,7 +106,7 @@ async def cancel_feedback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -
                 else None
             )
             t = get_text(user.language if user else "en")
-        await update.message.reply_text(t.common.cancelled)
+        await update.message.reply_text(t.common.aborted)
     return ConversationHandler.END
 
 
@@ -119,8 +120,8 @@ def setup_feedback_handlers(app: Application) -> None:
             ],
         },
         fallbacks=[
-            CommandHandler("cancel", cancel_feedback),
-            MessageHandler(filters.COMMAND, cancel_feedback),
+            CommandHandler("abort", abort_feedback),
+            MessageHandler(filters.COMMAND, abort_feedback),
         ],
     )
     app.add_handler(feedback_handler)

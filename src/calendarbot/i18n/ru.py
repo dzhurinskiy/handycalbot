@@ -4,6 +4,7 @@ from calendarbot.i18n.base import (
     CommandTranslations,
     CommonTranslations,
     DonationTranslations,
+    FeedbackTranslations,
     InlineTranslations,
     MeetingsTranslations,
     ReminderTranslations,
@@ -16,6 +17,7 @@ translations = Translations(
     common=CommonTranslations(
         please_start_first="Pожалуйста, сначала выполните /start.",
         cancelled="Отменено.",
+        aborted="Прервано.",
         error_user_not_found="Ошибка: Пользователь не найден.",
     ),
     start=StartTranslations(
@@ -200,6 +202,13 @@ translations = Translations(
     reminder=ReminderTranslations(
         meeting_reminder="*Напоминание о встрече*",
         starting_in="Начало через {time}",
+    ),
+    feedback=FeedbackTranslations(
+        feedback_title="📝 **Обратная связь**",
+        feedback_prompt="Пожалуйста, опишите ваш отзыв, отчет об ошибке или предложение.",
+        feedback_abort_hint="Введите /abort для отмены.",
+        feedback_received="✅ Спасибо за ваш отзыв!",
+        feedback_thank_you="Ваше сообщение получено и будет рассмотрено.",
     ),
     commands=CommandTranslations(
         start="Запустить бота и приветствие",

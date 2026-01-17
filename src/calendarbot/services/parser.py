@@ -44,48 +44,68 @@ class MeetingParser:
 
     # Various quote characters to normalize (Russian, curly, single, guillemets, etc.)
     # iPhone and other devices may use any of these instead of standard double quotes
+    # Using explicit Unicode escapes to avoid encoding issues
     QUOTE_CHARS = [
         # Curly/smart double quotes (most common on iPhone)
-        '"',  # U+201C LEFT DOUBLE QUOTATION MARK
-        '"',  # U+201D RIGHT DOUBLE QUOTATION MARK
+        "\u201c",  # U+201C LEFT DOUBLE QUOTATION MARK "
+        "\u201d",  # U+201D RIGHT DOUBLE QUOTATION MARK "
         # Russian/French guillemets
-        "«",  # U+00AB LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
-        "»",  # U+00BB RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+        "\u00ab",  # U+00AB LEFT-POINTING DOUBLE ANGLE QUOTATION MARK «
+        "\u00bb",  # U+00BB RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK »
         # German-style quotes
-        "„",  # U+201E DOUBLE LOW-9 QUOTATION MARK
-        "‟",  # U+201F DOUBLE HIGH-REVERSED-9 QUOTATION MARK
+        "\u201e",  # U+201E DOUBLE LOW-9 QUOTATION MARK „
+        "\u201f",  # U+201F DOUBLE HIGH-REVERSED-9 QUOTATION MARK ‟
         # Curly single quotes (when used for titles)
-        "'",  # U+2018 LEFT SINGLE QUOTATION MARK
-        "'",  # U+2019 RIGHT SINGLE QUOTATION MARK
+        "\u2018",  # U+2018 LEFT SINGLE QUOTATION MARK '
+        "\u2019",  # U+2019 RIGHT SINGLE QUOTATION MARK '
         # Single guillemets
-        "‹",  # U+2039 SINGLE LEFT-POINTING ANGLE QUOTATION MARK
-        "›",  # U+203A SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
+        "\u2039",  # U+2039 SINGLE LEFT-POINTING ANGLE QUOTATION MARK ‹
+        "\u203a",  # U+203A SINGLE RIGHT-POINTING ANGLE QUOTATION MARK ›
         # CJK quotes
-        "「",  # U+300C LEFT CORNER BRACKET
-        "」",  # U+300D RIGHT CORNER BRACKET
-        "『",  # U+300E LEFT WHITE CORNER BRACKET
-        "』",  # U+300F RIGHT WHITE CORNER BRACKET
+        "\u300c",  # U+300C LEFT CORNER BRACKET 「
+        "\u300d",  # U+300D RIGHT CORNER BRACKET 」
+        "\u300e",  # U+300E LEFT WHITE CORNER BRACKET 『
+        "\u300f",  # U+300F RIGHT WHITE CORNER BRACKET 』
         # Low single quotes
-        "‚",  # U+201A SINGLE LOW-9 QUOTATION MARK
+        "\u201a",  # U+201A SINGLE LOW-9 QUOTATION MARK ‚
         # Straight single quote (ASCII)
         "'",  # U+0027 APOSTROPHE
         # Prime characters (often mistaken for quotes)
-        "′",  # U+2032 PRIME
-        "″",  # U+2033 DOUBLE PRIME
+        "\u2032",  # U+2032 PRIME ′
+        "\u2033",  # U+2033 DOUBLE PRIME ″
         # Fullwidth characters (CJK input methods)
-        "＂",  # U+FF02 FULLWIDTH QUOTATION MARK
-        "＇",  # U+FF07 FULLWIDTH APOSTROPHE
+        "\uff02",  # U+FF02 FULLWIDTH QUOTATION MARK ＂
+        "\uff07",  # U+FF07 FULLWIDTH APOSTROPHE ＇
         # Modifier letters sometimes used as quotes
-        "ˮ",  # U+02EE MODIFIER LETTER DOUBLE APOSTROPHE
+        "\u02ee",  # U+02EE MODIFIER LETTER DOUBLE APOSTROPHE ˮ
         # Grave accent (backtick) - sometimes used as quote
         "`",  # U+0060 GRAVE ACCENT
-        "ˋ",  # U+02CB MODIFIER LETTER GRAVE ACCENT
-        "｀",  # U+FF40 FULLWIDTH GRAVE ACCENT
+        "\u02cb",  # U+02CB MODIFIER LETTER GRAVE ACCENT ˋ
+        "\uff40",  # U+FF40 FULLWIDTH GRAVE ACCENT ｀
         # Heavy quotes
-        "❝",  # U+275D HEAVY DOUBLE TURNED COMMA QUOTATION MARK ORNAMENT
-        "❞",  # U+275E HEAVY DOUBLE COMMA QUOTATION MARK ORNAMENT
-        "❮",  # U+276E HEAVY LEFT-POINTING ANGLE QUOTATION MARK ORNAMENT
-        "❯",  # U+276F HEAVY RIGHT-POINTING ANGLE QUOTATION MARK ORNAMENT
+        "\u275d",  # U+275D HEAVY DOUBLE TURNED COMMA QUOTATION MARK ORNAMENT ❝
+        "\u275e",  # U+275E HEAVY DOUBLE COMMA QUOTATION MARK ORNAMENT ❞
+        "\u276e",  # U+276E HEAVY LEFT-POINTING ANGLE QUOTATION MARK ORNAMENT ❮
+        "\u276f",  # U+276F HEAVY RIGHT-POINTING ANGLE QUOTATION MARK ORNAMENT ❯
+        # Additional Unicode quotes (CJK and other)
+        "\u301d",  # U+301D REVERSED DOUBLE PRIME QUOTATION MARK 〝
+        "\u301e",  # U+301E DOUBLE PRIME QUOTATION MARK 〞
+        "\u301f",  # U+301F LOW DOUBLE PRIME QUOTATION MARK 〟
+        # Armenian quotes
+        "\u055d",  # U+055D ARMENIAN COMMA (sometimes used as quote)
+        "\u055e",  # U+055E ARMENIAN QUESTION MARK (sometimes used as quote)
+        # Angle brackets sometimes used as quotes
+        "\u2329",  # U+2329 LEFT-POINTING ANGLE BRACKET 〈
+        "\u232a",  # U+232A RIGHT-POINTING ANGLE BRACKET 〉
+        "\u3008",  # U+3008 LEFT ANGLE BRACKET 〈
+        "\u3009",  # U+3009 RIGHT ANGLE BRACKET 〉
+        "\u300a",  # U+300A LEFT DOUBLE ANGLE BRACKET 《
+        "\u300b",  # U+300B RIGHT DOUBLE ANGLE BRACKET 》
+        # Additional single quote variants
+        "\u02bc",  # U+02BC MODIFIER LETTER APOSTROPHE ʼ
+        "\u02bd",  # U+02BD MODIFIER LETTER REVERSED COMMA ʽ
+        "\u0060",  # U+0060 GRAVE ACCENT `
+        "\u00b4",  # U+00B4 ACUTE ACCENT ´
     ]
 
     def __init__(self, user_timezone: str = "UTC", default_duration: int = 60):

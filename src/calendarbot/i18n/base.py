@@ -9,6 +9,7 @@ class CommonTranslations:
 
     please_start_first: str
     cancelled: str
+    aborted: str
     error_user_not_found: str
 
 
@@ -181,6 +182,17 @@ class ReminderTranslations:
 
 
 @dataclass(frozen=True)
+class FeedbackTranslations:
+    """Translations for feedback.py handler."""
+
+    feedback_title: str
+    feedback_prompt: str
+    feedback_abort_hint: str
+    feedback_received: str
+    feedback_thank_you: str
+
+
+@dataclass(frozen=True)
 class CommandTranslations:
     """Translations for bot command descriptions shown in Telegram UI."""
 
@@ -211,4 +223,5 @@ class Translations:
     inline: InlineTranslations
     donation: DonationTranslations
     reminder: ReminderTranslations
+    feedback: FeedbackTranslations
     commands: CommandTranslations

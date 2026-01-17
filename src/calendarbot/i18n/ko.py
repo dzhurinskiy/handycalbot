@@ -4,6 +4,7 @@ from calendarbot.i18n.base import (
     CommandTranslations,
     CommonTranslations,
     DonationTranslations,
+    FeedbackTranslations,
     InlineTranslations,
     MeetingsTranslations,
     ReminderTranslations,
@@ -16,6 +17,7 @@ translations = Translations(
     common=CommonTranslations(
         please_start_first="먼저 /start를 실행해 주세요.",
         cancelled="취소되었습니다.",
+        aborted="중단되었습니다.",
         error_user_not_found="오류: 사용자를 찾을 수 없습니다.",
     ),
     start=StartTranslations(
@@ -200,6 +202,13 @@ translations = Translations(
     reminder=ReminderTranslations(
         meeting_reminder="*회의 알림*",
         starting_in="{time} 후 시작",
+    ),
+    feedback=FeedbackTranslations(
+        feedback_title="📝 **피드백**",
+        feedback_prompt="피드백, 버그 신고 또는 제안을 작성해 주세요.",
+        feedback_abort_hint="취소하려면 /abort를 입력하세요.",
+        feedback_received="✅ 피드백 감사합니다!",
+        feedback_thank_you="메시지가 접수되어 검토될 예정입니다.",
     ),
     commands=CommandTranslations(
         start="봇 시작 및 환영 메시지",

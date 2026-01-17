@@ -4,6 +4,7 @@ from calendarbot.i18n.base import (
     CommandTranslations,
     CommonTranslations,
     DonationTranslations,
+    FeedbackTranslations,
     InlineTranslations,
     MeetingsTranslations,
     ReminderTranslations,
@@ -16,6 +17,7 @@ translations = Translations(
     common=CommonTranslations(
         please_start_first="Bitte fuhre zuerst /start aus.",
         cancelled="Abgebrochen.",
+        aborted="Abgebrochen.",
         error_user_not_found="Fehler: Benutzer nicht gefunden.",
     ),
     start=StartTranslations(
@@ -200,6 +202,13 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
     reminder=ReminderTranslations(
         meeting_reminder="*Besprechungserinnerung*",
         starting_in="Beginnt in {time}",
+    ),
+    feedback=FeedbackTranslations(
+        feedback_title="📝 **Feedback**",
+        feedback_prompt="Bitte beschreibe dein Feedback, Fehlerbericht oder Vorschlag.",
+        feedback_abort_hint="Tippe /abort zum Abbrechen.",
+        feedback_received="✅ Danke fur dein Feedback!",
+        feedback_thank_you="Deine Nachricht wurde empfangen und wird uberpruft.",
     ),
     commands=CommandTranslations(
         start="Bot starten und Willkommen sehen",
