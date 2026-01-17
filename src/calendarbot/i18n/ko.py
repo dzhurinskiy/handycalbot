@@ -191,7 +191,7 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         reminder_label="알림: {reminder} 전",
         invitations_sent="초대장 발송:",
         attendees_will_receive="_이 참석자들은 자동으로 캘린더 초대를 받습니다._",
-        add_to_calendar_button="내 캘린더에 추가",
+        add_to_calendar_button="📅 내 캘린더에 추가",
         not_listed_add_calendar="_목록에 없으신가요? 아래를 클릭하여 캘린더에 추가:_",
         click_to_add_calendar="_아래를 클릭하여 캘린더에 추가:_",
         meeting_cancelled="✅ 회의가 취소되었습니다.",

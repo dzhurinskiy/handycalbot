@@ -191,7 +191,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         reminder_label="Erinnerung: {reminder} vorher",
         invitations_sent="Einladungen gesendet an:",
         attendees_will_receive="_Diese Teilnehmer erhalten automatisch eine Kalendereinladung._",
-        add_to_calendar_button="Zu meinem Kalender hinzufugen",
+        add_to_calendar_button="📅 Zu meinem Kalender hinzufugen",
         not_listed_add_calendar="_Nicht aufgelistet? Klicke unten, um zu deinem Kalender hinzuzufugen:_",
         click_to_add_calendar="_Klicke unten, um zu deinem Kalender hinzuzufugen:_",
         meeting_cancelled="✅ Besprechung abgesagt.",

@@ -191,7 +191,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         reminder_label="リマインダー: {reminder}前",
         invitations_sent="招待状を送信:",
         attendees_will_receive="_これらの参加者はカレンダー招待を自動的に受け取ります。_",
-        add_to_calendar_button="マイカレンダーに追加",
+        add_to_calendar_button="📅 マイカレンダーに追加",
         not_listed_add_calendar="_リストにない場合は下をクリックしてカレンダーに追加:_",
         click_to_add_calendar="_下をクリックしてカレンダーに追加:_",
         meeting_cancelled="✅ ミーティングがキャンセルされました。",

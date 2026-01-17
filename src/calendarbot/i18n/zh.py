@@ -191,7 +191,7 @@ _欢迎提交错误报告和UI改进建议！_
         reminder_label="提醒: {reminder}前",
         invitations_sent="邀请已发送给:",
         attendees_will_receive="_这些参与者将自动收到日历邀请。_",
-        add_to_calendar_button="添加到我的日历",
+        add_to_calendar_button="📅 添加到我的日历",
         not_listed_add_calendar="_不在列表中? 点击下方添加到您的日历:_",
         click_to_add_calendar="_点击下方添加到您的日历:_",
         meeting_cancelled="✅ 会议已取消。",

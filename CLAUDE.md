@@ -87,3 +87,12 @@ ssh -o ConnectTimeout=10 -o BatchMode=yes handycal "command1 && command2 && comm
 ```bash
 gh run list --limit 5
 ```
+
+## i18n / Translations
+
+- All translation files are in `src/calendarbot/i18n/`
+- English (`en.py`) is the reference - all other languages must match its structure
+- **Emoji consistency is CRITICAL**: When English uses emojis (📅, ⚙️, 🔔, 📧, etc.), ALL other language files must use the same emojis in the same positions
+- Example: If English has `add_to_calendar_button="📅 Add to My Calendar"`, then German must have `add_to_calendar_button="📅 Zu meinem Kalender hinzufugen"` - same emoji, localized text
+- When adding new translated strings, always copy emojis from English version
+- Supported languages: en, de, es, fr, ru, ja, ko, zh, id, fa (10 total)

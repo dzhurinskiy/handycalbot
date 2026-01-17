@@ -191,7 +191,7 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         reminder_label="Rappel: {reminder} avant",
         invitations_sent="Invitations envoyees a:",
         attendees_will_receive="_Ces participants recevront automatiquement une invitation de calendrier._",
-        add_to_calendar_button="Ajouter a Mon Calendrier",
+        add_to_calendar_button="📅 Ajouter a Mon Calendrier",
         not_listed_add_calendar="_Pas dans la liste? Cliquez ci-dessous pour ajouter a votre calendrier:_",
         click_to_add_calendar="_Cliquez ci-dessous pour ajouter a votre calendrier:_",
         meeting_cancelled="✅ Reunion annulee.",
