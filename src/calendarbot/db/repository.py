@@ -1,6 +1,6 @@
 """Data access layer."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import select
@@ -321,7 +321,7 @@ class UsernameLookupRepository:
             lookup = UsernameLookup(
                 requester_telegram_id=telegram_id,
                 lookup_count=0,
-                window_start=datetime.now(tz=datetime.timezone.utc),
+                window_start=datetime.now(tz=UTC),
             )
             self.session.add(lookup)
             await self.session.flush()
@@ -336,12 +336,12 @@ class UsernameLookupRepository:
         from datetime import timedelta
 
         lookup = await self.get_or_create(telegram_id)
-        now = datetime.now(tz=datetime.timezone.utc)
+        now = datetime.now(tz=UTC)
 
         # Make window_start timezone-aware if it isn't
         window_start = lookup.window_start
         if window_start.tzinfo is None:
-            window_start = window_start.replace(tzinfo=datetime.timezone.utc)
+            window_start = window_start.replace(tzinfo=UTC)
 
         # Reset window if expired
         if now - window_start > timedelta(hours=self.WINDOW_HOURS):
@@ -362,12 +362,12 @@ class UsernameLookupRepository:
         from datetime import timedelta
 
         lookup = await self.get_or_create(telegram_id)
-        now = datetime.now(tz=datetime.timezone.utc)
+        now = datetime.now(tz=UTC)
 
         # Make window_start timezone-aware if it isn't
         window_start = lookup.window_start
         if window_start.tzinfo is None:
-            window_start = window_start.replace(tzinfo=datetime.timezone.utc)
+            window_start = window_start.replace(tzinfo=UTC)
 
         # If window expired, full limit available
         if now - window_start > timedelta(hours=self.WINDOW_HOURS):
