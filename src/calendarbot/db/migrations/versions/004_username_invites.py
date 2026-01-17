@@ -20,65 +20,98 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     """Add username invite feature tables and columns."""
-    # Add privacy setting to users table
-    op.add_column(
-        "users",
-        sa.Column(
-            "allow_username_invites",
-            sa.Boolean(),
-            nullable=False,
-            server_default="true",
-        ),
+    conn = op.get_bind()
+
+    # Add privacy setting to users table (idempotent - check if column exists)
+    result = conn.execute(
+        sa.text(
+            """
+            SELECT column_name FROM information_schema.columns
+            WHERE table_name='users' AND column_name='allow_username_invites'
+            """
+        )
+    )
+    if result.fetchone() is None:
+        op.add_column(
+            "users",
+            sa.Column(
+                "allow_username_invites",
+                sa.Boolean(),
+                nullable=False,
+                server_default="true",
+            ),
+        )
+
+    # Create pending_invites table (idempotent - IF NOT EXISTS)
+    conn.execute(
+        sa.text(
+            """
+            CREATE TABLE IF NOT EXISTS pending_invites (
+                id SERIAL PRIMARY KEY,
+                inviter_telegram_id BIGINT NOT NULL,
+                invitee_username VARCHAR(255) NOT NULL,
+                meeting_id VARCHAR(255) NOT NULL,
+                meeting_title VARCHAR(255) NOT NULL,
+                meeting_time TIMESTAMP WITH TIME ZONE NOT NULL,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+            )
+            """
+        )
     )
 
-    # Create pending_invites table for unregistered users
-    op.create_table(
-        "pending_invites",
-        sa.Column("id", sa.Integer(), primary_key=True),
-        sa.Column("inviter_telegram_id", sa.BigInteger(), nullable=False),
-        sa.Column("invitee_username", sa.String(255), nullable=False),
-        sa.Column("meeting_id", sa.String(255), nullable=False),
-        sa.Column("meeting_title", sa.String(255), nullable=False),
-        sa.Column("meeting_time", sa.DateTime(timezone=True), nullable=False),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-        ),
+    # Create index for faster lookups by invitee username (idempotent)
+    conn.execute(
+        sa.text(
+            """
+            CREATE INDEX IF NOT EXISTS idx_pending_invites_username
+            ON pending_invites (invitee_username)
+            """
+        )
     )
 
-    # Create index for faster lookups by invitee username
-    op.create_index(
-        "idx_pending_invites_username",
-        "pending_invites",
-        ["invitee_username"],
+    # Create rate_limit_cache table for username lookups (idempotent)
+    conn.execute(
+        sa.text(
+            """
+            CREATE TABLE IF NOT EXISTS username_lookups (
+                id SERIAL PRIMARY KEY,
+                requester_telegram_id BIGINT NOT NULL UNIQUE,
+                lookup_count INTEGER NOT NULL DEFAULT 0,
+                window_start TIMESTAMP WITH TIME ZONE DEFAULT now()
+            )
+            """
+        )
     )
 
-    # Create rate_limit_cache table for username lookups
-    op.create_table(
-        "username_lookups",
-        sa.Column("id", sa.Integer(), primary_key=True),
-        sa.Column("requester_telegram_id", sa.BigInteger(), nullable=False, unique=True),
-        sa.Column("lookup_count", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column(
-            "window_start",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-        ),
-    )
-
-    # Create index for faster lookups by requester
-    op.create_index(
-        "idx_username_lookups_requester",
-        "username_lookups",
-        ["requester_telegram_id"],
+    # Create index for faster lookups by requester (idempotent)
+    conn.execute(
+        sa.text(
+            """
+            CREATE INDEX IF NOT EXISTS idx_username_lookups_requester
+            ON username_lookups (requester_telegram_id)
+            """
+        )
     )
 
 
 def downgrade() -> None:
     """Remove username invite feature tables and columns."""
-    op.drop_index("idx_username_lookups_requester", table_name="username_lookups")
-    op.drop_table("username_lookups")
-    op.drop_index("idx_pending_invites_username", table_name="pending_invites")
-    op.drop_table("pending_invites")
-    op.drop_column("users", "allow_username_invites")
+    conn = op.get_bind()
+
+    # Drop indexes and tables (idempotent with IF EXISTS)
+    conn.execute(sa.text("DROP INDEX IF EXISTS idx_username_lookups_requester"))
+    conn.execute(sa.text("DROP TABLE IF EXISTS username_lookups"))
+    conn.execute(sa.text("DROP INDEX IF EXISTS idx_pending_invites_username"))
+    conn.execute(sa.text("DROP TABLE IF EXISTS pending_invites"))
+
+    # Drop column if it exists
+    result = conn.execute(
+        sa.text(
+            """
+            SELECT column_name FROM information_schema.columns
+            WHERE table_name='users' AND column_name='allow_username_invites'
+            """
+        )
+    )
+    if result.fetchone() is not None:
+        op.drop_column("users", "allow_username_invites")
