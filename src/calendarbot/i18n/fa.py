@@ -48,7 +48,10 @@ translations = Translations(
 /reminder - تنظیم یادآوری پیش‌فرض
 /notifications - فعال/غیرفعال کردن یادآوری
 /language - تغییر زبان
+/feedback - ارسال بازخورد یا گزارش خطا
 /donate - حمایت از بات ⭐
+
+_گزارش خطاها و پیشنهادات بهبود رابط کاربری استقبال می‌شود!_
 """,
         help_message="""
 *راهنمای HandyCalBot* 📅
@@ -88,6 +91,7 @@ translations = Translations(
 /reminder - تنظیم یادآوری پیش‌فرض
 /notifications - فعال/غیرفعال کردن اعلان
 /language - تغییر زبان
+/feedback - ارسال بازخورد یا گزارش خطا
 /donate - حمایت از بات با Stars ⭐
 """,
         timezone_detected="منطقه زمانی شما به `{timezone}` تنظیم شد بر اساس زبان تلگرام. از /timezone برای تغییر استفاده کنید.",

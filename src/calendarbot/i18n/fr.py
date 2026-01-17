@@ -48,7 +48,10 @@ Je vous aide a planifier des reunions directement depuis Telegram.
 /reminder - Definir le rappel par defaut
 /notifications - Activer/desactiver les rappels
 /language - Changer la langue
+/feedback - Envoyer des commentaires ou signaler des bugs
 /donate - Soutenir le bot
+
+_Les rapports de bugs et suggestions d'amelioration sont les bienvenus!_
 """,
         help_message="""
 *Aide HandyCalBot*
@@ -88,6 +91,7 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
 /reminder - Definir le rappel par defaut
 /notifications - Activer/desactiver les notifications
 /language - Changer la langue
+/feedback - Envoyer des commentaires ou signaler des bugs
 /donate - Soutenir le bot avec des Stars
 """,
         timezone_detected="J'ai defini votre fuseau horaire sur `{timezone}` en fonction de votre langue Telegram. Utilisez /timezone pour le modifier si necessaire.",

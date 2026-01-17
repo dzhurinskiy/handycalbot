@@ -48,7 +48,10 @@ translations = Translations(
 /reminder - Установить напоминание по умолчанию
 /notifications - Включить/выключить напоминания
 /language - Изменить язык
+/feedback - Отправить отзыв или сообщить об ошибке
 /donate - Поддержать бота
+
+_Сообщения об ошибках и предложения по улучшению приветствуются!_
 """,
         help_message="""
 *Справка HandyCalBot*
@@ -88,6 +91,7 @@ translations = Translations(
 /reminder - Установить напоминание по умолчанию
 /notifications - Переключить уведомления
 /language - Изменить язык
+/feedback - Отправить отзыв или сообщить об ошибке
 /donate - Поддержать бота Stars
 """,
         timezone_detected="Я установил ваш часовой пояс как `{timezone}` на основе языка Telegram. Используйте /timezone для изменения.",

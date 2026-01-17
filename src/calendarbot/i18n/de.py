@@ -48,7 +48,10 @@ Ich helfe dir, Besprechungen direkt von Telegram aus zu planen.
 /reminder - Standard-Erinnerung festlegen
 /notifications - Erinnerungen ein/ausschalten
 /language - Sprache andern
+/feedback - Feedback senden oder Fehler melden
 /donate - Den Bot unterstutzen
+
+_Fehlerberichte und Verbesserungsvorschlage sind willkommen!_
 """,
         help_message="""
 *HandyCalBot Hilfe*
@@ -88,6 +91,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
 /reminder - Standard-Erinnerung festlegen
 /notifications - Erinnerungsbenachrichtigungen ein/ausschalten
 /language - Sprache andern
+/feedback - Feedback senden oder Fehler melden
 /donate - Den Bot mit Stars unterstutzen
 """,
         timezone_detected="Ich habe deine Zeitzone basierend auf deiner Telegram-Sprache auf `{timezone}` gesetzt. Benutze /timezone, um sie bei Bedarf zu andern.",

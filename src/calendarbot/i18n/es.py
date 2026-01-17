@@ -48,7 +48,10 @@ Te ayudo a programar reuniones directamente desde Telegram.
 /reminder - Establecer recordatorio predeterminado
 /notifications - Alternar recordatorios
 /language - Cambiar idioma
+/feedback - Enviar comentarios o reportar errores
 /donate - Apoyar al bot
+
+_¡Los reportes de errores y sugerencias de mejora son bienvenidos!_
 """,
         help_message="""
 *Ayuda de HandyCalBot*
@@ -88,6 +91,7 @@ Escribe `@handycalbot` en cualquier chat seguido de:
 /reminder - Establecer recordatorio predeterminado
 /notifications - Alternar notificaciones
 /language - Cambiar idioma
+/feedback - Enviar comentarios o reportar errores
 /donate - Apoyar al bot con Stars
 """,
         timezone_detected="He configurado tu zona horaria como `{timezone}` basandome en tu idioma de Telegram. Usa /timezone para cambiarlo si es necesario.",

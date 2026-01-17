@@ -48,7 +48,10 @@ translations = Translations(
 /reminder - 设置默认提醒
 /notifications - 开关提醒
 /language - 更改语言
+/feedback - 发送反馈或报告错误
 /donate - 支持机器人
+
+_欢迎提交错误报告和UI改进建议！_
 """,
         help_message="""
 *HandyCalBot 帮助*
@@ -88,6 +91,7 @@ translations = Translations(
 /reminder - 设置默认提醒
 /notifications - 开关提醒通知
 /language - 更改语言
+/feedback - 发送反馈或报告错误
 /donate - 用 Stars 支持机器人
 """,
         timezone_detected="根据您的 Telegram 语言设置，已将时区设置为 `{timezone}`。如需更改请使用 /timezone。",

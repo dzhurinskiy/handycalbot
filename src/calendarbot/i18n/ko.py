@@ -48,7 +48,10 @@ translations = Translations(
 /reminder - 기본 알림 설정
 /notifications - 알림 켜기/끄기
 /language - 언어 변경
+/feedback - 피드백 보내기 또는 버그 신고
 /donate - 봇 후원하기
+
+_버그 신고 및 UI 개선 제안을 환영합니다!_
 """,
         help_message="""
 *HandyCalBot 도움말*
@@ -88,6 +91,7 @@ translations = Translations(
 /reminder - 기본 알림 설정
 /notifications - 알림 켜기/끄기
 /language - 언어 변경
+/feedback - 피드백 보내기 또는 버그 신고
 /donate - Stars로 봇 후원
 """,
         timezone_detected="텔레그램 언어 설정을 기반으로 시간대를 `{timezone}`로 설정했습니다. 변경하려면 /timezone을 사용하세요.",

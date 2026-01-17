@@ -48,7 +48,10 @@ Saya membantu Anda menjadwalkan rapat langsung dari Telegram.
 /reminder - Atur pengingat default
 /notifications - Aktifkan/nonaktifkan pengingat
 /language - Ubah bahasa
+/feedback - Kirim masukan atau laporkan bug
 /donate - Dukung bot ⭐
+
+_Laporan bug dan saran perbaikan UI sangat diterima!_
 """,
         help_message="""
 *Bantuan HandyCalBot* 📅
@@ -88,6 +91,7 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
 /reminder - Atur pengingat default
 /notifications - Aktifkan/nonaktifkan notifikasi
 /language - Ubah bahasa
+/feedback - Kirim masukan atau laporkan bug
 /donate - Dukung bot dengan Stars ⭐
 """,
         timezone_detected="Saya telah mengatur zona waktu Anda ke `{timezone}` berdasarkan bahasa Telegram Anda. Gunakan /timezone untuk mengubahnya jika perlu.",

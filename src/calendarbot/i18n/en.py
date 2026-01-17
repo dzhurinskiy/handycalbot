@@ -48,7 +48,10 @@ I help you schedule meetings directly from Telegram.
 /reminder - Set default reminder
 /notifications - Toggle reminders
 /language - Change language
+/feedback - Send feedback or report bugs
 /donate - Support the bot ⭐
+
+_Bug reports and UI improvement suggestions are welcome!_
 """,
         help_message="""
 *HandyCalBot Help* 📅
@@ -88,6 +91,7 @@ Type `@handycalbot` in any chat followed by:
 /reminder - Set default reminder
 /notifications - Toggle reminder notifications
 /language - Change language
+/feedback - Send feedback or report bugs
 /donate - Support the bot with Stars ⭐
 """,
         timezone_detected="I've set your timezone to `{timezone}` based on your Telegram language. Use /timezone to change it if needed.",

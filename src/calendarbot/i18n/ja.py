@@ -48,7 +48,10 @@ Telegramから直接ミーティングをスケジュールできます。
 /reminder - デフォルトリマインダーを設定
 /notifications - リマインダーのオン/オフ
 /language - 言語を変更
+/feedback - フィードバックまたはバグ報告
 /donate - ボットをサポート
+
+_バグ報告やUI改善のご提案をお待ちしております！_
 """,
         help_message="""
 *HandyCalBot ヘルプ*
@@ -88,6 +91,7 @@ Telegramから直接ミーティングをスケジュールできます。
 /reminder - デフォルトリマインダーを設定
 /notifications - リマインダー通知のオン/オフ
 /language - 言語を変更
+/feedback - フィードバックまたはバグ報告
 /donate - Starsでボットをサポート
 """,
         timezone_detected="Telegramの言語設定に基づいてタイムゾーンを`{timezone}`に設定しました。変更するには /timezone を使用してください。",
