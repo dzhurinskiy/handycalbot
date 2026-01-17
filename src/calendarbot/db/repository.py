@@ -321,7 +321,7 @@ class UsernameLookupRepository:
             lookup = UsernameLookup(
                 requester_telegram_id=telegram_id,
                 lookup_count=0,
-                window_start=datetime.now(datetime.UTC),
+                window_start=datetime.now(tz=datetime.timezone.utc),
             )
             self.session.add(lookup)
             await self.session.flush()
@@ -336,12 +336,12 @@ class UsernameLookupRepository:
         from datetime import timedelta
 
         lookup = await self.get_or_create(telegram_id)
-        now = datetime.now(datetime.UTC)
+        now = datetime.now(tz=datetime.timezone.utc)
 
         # Make window_start timezone-aware if it isn't
         window_start = lookup.window_start
         if window_start.tzinfo is None:
-            window_start = window_start.replace(tzinfo=datetime.UTC)
+            window_start = window_start.replace(tzinfo=datetime.timezone.utc)
 
         # Reset window if expired
         if now - window_start > timedelta(hours=self.WINDOW_HOURS):
@@ -362,12 +362,12 @@ class UsernameLookupRepository:
         from datetime import timedelta
 
         lookup = await self.get_or_create(telegram_id)
-        now = datetime.now(datetime.UTC)
+        now = datetime.now(tz=datetime.timezone.utc)
 
         # Make window_start timezone-aware if it isn't
         window_start = lookup.window_start
         if window_start.tzinfo is None:
-            window_start = window_start.replace(tzinfo=datetime.UTC)
+            window_start = window_start.replace(tzinfo=datetime.timezone.utc)
 
         # If window expired, full limit available
         if now - window_start > timedelta(hours=self.WINDOW_HOURS):

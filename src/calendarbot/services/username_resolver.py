@@ -106,7 +106,7 @@ class UsernameResolverService:
         results = {}
         for username in usernames:
             username_lower = username.lower()
-            user = user_map.get(username_lower)
+            user = user_map.get(username_lower)  # type: ignore[assignment]
 
             if not user:
                 results[username] = ResolvedUser(
@@ -165,7 +165,7 @@ class UsernameResolverService:
 
         for username in usernames:
             username_lower = username.lower()
-            user = user_map.get(username_lower)
+            user = user_map.get(username_lower)  # type: ignore[assignment]
 
             if not user or not user.allow_username_invites:
                 unresolved_usernames.append(username)
