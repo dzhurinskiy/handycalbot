@@ -1,6 +1,7 @@
 """Russian translations for CalendarBot."""
 
 from calendarbot.i18n.base import (
+    CommandTranslations,
     CommonTranslations,
     DonationTranslations,
     InlineTranslations,
@@ -88,7 +89,7 @@ translations = Translations(
 /donate - Поддержать бота Stars
 """,
         timezone_detected="Я установил ваш часовой пояс как `{timezone}` на основе языка Telegram. Используйте /timezone для изменения.",
-        support_button="Поддержать HandyCalBot",
+        support_button="⭐ Поддержать HandyCalBot",
     ),
     settings=SettingsTranslations(
         your_settings="**Ваши настройки**",
@@ -199,5 +200,21 @@ translations = Translations(
     reminder=ReminderTranslations(
         meeting_reminder="*Напоминание о встрече*",
         starting_in="Начало через {time}",
+    ),
+    commands=CommandTranslations(
+        start="Запустить бота и приветствие",
+        help="Показать справку и инструкции",
+        meetings="Список предстоящих встреч",
+        cancel="Отменить встречу",
+        connect="Подключить Google Календарь",
+        disconnect="Отключить Google Календарь",
+        settings="Посмотреть настройки",
+        timezone="Изменить часовой пояс",
+        duration="Установить длительность по умолчанию",
+        reminder="Установить напоминание по умолчанию",
+        notifications="Вкл/выкл уведомления",
+        language="Изменить язык",
+        donate="Поддержать бота Stars",
+        feedback="Отправить отзыв или сообщить об ошибке",
     ),
 )

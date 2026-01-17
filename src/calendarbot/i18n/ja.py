@@ -1,6 +1,7 @@
 """Japanese translations for CalendarBot."""
 
 from calendarbot.i18n.base import (
+    CommandTranslations,
     CommonTranslations,
     DonationTranslations,
     InlineTranslations,
@@ -88,7 +89,7 @@ Telegramから直接ミーティングをスケジュールできます。
 /donate - Starsでボットをサポート
 """,
         timezone_detected="Telegramの言語設定に基づいてタイムゾーンを`{timezone}`に設定しました。変更するには /timezone を使用してください。",
-        support_button="HandyCalBotをサポート",
+        support_button="⭐ HandyCalBotをサポート",
     ),
     settings=SettingsTranslations(
         your_settings="**設定**",
@@ -199,5 +200,21 @@ Telegramから直接ミーティングをスケジュールできます。
     reminder=ReminderTranslations(
         meeting_reminder="*ミーティングリマインダー*",
         starting_in="{time}後に開始",
+    ),
+    commands=CommandTranslations(
+        start="ボットを起動してウェルカム表示",
+        help="ヘルプと使い方を表示",
+        meetings="今後のミーティング一覧",
+        cancel="ミーティングをキャンセル",
+        connect="Googleカレンダーを接続",
+        disconnect="Googleカレンダーを切断",
+        settings="設定を表示",
+        timezone="タイムゾーンを変更",
+        duration="デフォルト時間を設定",
+        reminder="デフォルトリマインダーを設定",
+        notifications="通知のオン/オフ",
+        language="言語を変更",
+        donate="Starsでボットをサポート",
+        feedback="フィードバックまたはバグ報告",
     ),
 )

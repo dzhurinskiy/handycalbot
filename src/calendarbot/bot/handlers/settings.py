@@ -14,6 +14,7 @@ from telegram.ext import (
     filters,
 )
 
+from calendarbot.bot.commands import set_user_commands
 from calendarbot.db.session import async_session_factory
 from calendarbot.i18n import LANGUAGE_NAMES, get_text
 from calendarbot.integrations.google import GoogleOAuthFlow
@@ -432,7 +433,7 @@ async def reminder_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE)
 
 
 async def cancel_conversation(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Cancel any conversation."""
+    """Cancel any conversation with message."""
     if update.message:
         # Get user's language
         async with async_session_factory() as session:
@@ -445,6 +446,11 @@ async def cancel_conversation(update: Update, _context: ContextTypes.DEFAULT_TYP
             user_lang = user.language if user else "en"
         t = get_text(user_lang)
         await update.message.reply_text(t.common.cancelled)
+    return ConversationHandler.END
+
+
+async def silent_cancel(_update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Silently exit conversation without message (for when user enters another command)."""
     return ConversationHandler.END
 
 
@@ -570,7 +576,7 @@ async def language_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     )
 
 
-async def language_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+async def language_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle language selection button press."""
     query = update.callback_query
     if not query or not query.data or not update.effective_user:
@@ -591,6 +597,9 @@ async def language_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE)
 
         await user_service.update_language(user, lang_code)
         await session.commit()
+
+    # Set localized commands for this user
+    await set_user_commands(context.bot, update.effective_user.id, lang_code)
 
     # Get translations in the NEW language
     t = get_text(lang_code)
@@ -618,6 +627,7 @@ def setup_settings_handlers(app: Application) -> None:
     app.add_handler(CallbackQueryHandler(timezone_callback_standalone, pattern=r"^tz_"))
 
     # Timezone conversation (for /timezone command flow)
+    # Use MessageHandler(filters.COMMAND) as fallback to silently exit on any command
     tz_handler = ConversationHandler(
         entry_points=[CommandHandler("timezone", timezone_command)],
         states={
@@ -626,7 +636,11 @@ def setup_settings_handlers(app: Application) -> None:
                 MessageHandler(filters.TEXT & ~filters.COMMAND, timezone_text),
             ],
         },
-        fallbacks=[CommandHandler("cancel", cancel_conversation)],
+        fallbacks=[
+            CommandHandler("cancel", cancel_conversation),
+            MessageHandler(filters.COMMAND, silent_cancel),
+        ],
+        allow_reentry=True,  # Allow /timezone to restart the conversation
     )
     app.add_handler(tz_handler)
 
@@ -638,7 +652,11 @@ def setup_settings_handlers(app: Application) -> None:
                 CallbackQueryHandler(duration_callback, pattern=r"^dur_"),
             ],
         },
-        fallbacks=[CommandHandler("cancel", cancel_conversation)],
+        fallbacks=[
+            CommandHandler("cancel", cancel_conversation),
+            MessageHandler(filters.COMMAND, silent_cancel),
+        ],
+        allow_reentry=True,
     )
     app.add_handler(dur_handler)
 
@@ -650,6 +668,10 @@ def setup_settings_handlers(app: Application) -> None:
                 CallbackQueryHandler(reminder_callback, pattern=r"^rem_"),
             ],
         },
-        fallbacks=[CommandHandler("cancel", cancel_conversation)],
+        fallbacks=[
+            CommandHandler("cancel", cancel_conversation),
+            MessageHandler(filters.COMMAND, silent_cancel),
+        ],
+        allow_reentry=True,
     )
     app.add_handler(rem_handler)

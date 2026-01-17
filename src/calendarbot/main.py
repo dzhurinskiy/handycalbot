@@ -5,12 +5,14 @@ import logging
 
 import uvicorn
 from starlette.requests import Request
-from telegram import BotCommand, BotCommandScopeAllPrivateChats, MenuButtonCommands
+from telegram import BotCommandScopeAllPrivateChats, MenuButtonCommands
 from telegram.ext import Application
 
 from calendarbot.api.app import create_app
+from calendarbot.bot.commands import get_bot_commands
 from calendarbot.bot.handlers import (
     setup_donation_handlers,
+    setup_feedback_handlers,
     setup_inline_handlers,
     setup_meeting_handlers,
     setup_settings_handlers,
@@ -19,23 +21,6 @@ from calendarbot.bot.handlers import (
 from calendarbot.config import get_settings
 from calendarbot.db.session import init_db
 from calendarbot.services.reminder import reminder_service
-
-# Bot commands to show in Telegram UI
-BOT_COMMANDS = [
-    BotCommand("start", "Start the bot and see welcome message"),
-    BotCommand("help", "Show help and usage instructions"),
-    BotCommand("meetings", "List your upcoming meetings"),
-    BotCommand("cancel", "Cancel a meeting"),
-    BotCommand("connect", "Connect Google Calendar"),
-    BotCommand("disconnect", "Disconnect Google Calendar"),
-    BotCommand("settings", "View your current settings"),
-    BotCommand("timezone", "Change your timezone"),
-    BotCommand("duration", "Set default meeting duration"),
-    BotCommand("reminder", "Set default reminder"),
-    BotCommand("notifications", "Toggle meeting notifications"),
-    BotCommand("language", "Change language"),
-    BotCommand("donate", "Support the bot with Telegram Stars"),
-]
 
 # Configure logging
 logging.basicConfig(
@@ -50,6 +35,9 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 async def setup_bot_commands_and_menu(app: Application) -> None:
     """Set up bot commands and menu button for Telegram UI."""
+    # Use English as default for global commands
+    default_commands = get_bot_commands("en")
+
     try:
         # First, delete any existing commands to ensure clean state
         await app.bot.delete_my_commands()
@@ -58,12 +46,12 @@ async def setup_bot_commands_and_menu(app: Application) -> None:
         logger.warning(f"Could not clear existing commands: {e}")
 
     try:
-        # Set commands for all private chats (default scope)
-        await app.bot.set_my_commands(BOT_COMMANDS)
-        logger.info(f"Registered {len(BOT_COMMANDS)} bot commands (default scope)")
+        # Set commands for all private chats (default scope) - English as fallback
+        await app.bot.set_my_commands(default_commands)
+        logger.info(f"Registered {len(default_commands)} bot commands (default scope)")
 
         # Also set for private chats scope explicitly
-        await app.bot.set_my_commands(BOT_COMMANDS, scope=BotCommandScopeAllPrivateChats())
+        await app.bot.set_my_commands(default_commands, scope=BotCommandScopeAllPrivateChats())
         logger.info("Registered bot commands for private chats scope")
     except Exception as e:
         logger.error(f"Failed to set bot commands: {e}")
@@ -96,6 +84,7 @@ def create_bot_application() -> Application:
     setup_meeting_handlers(app)
     setup_inline_handlers(app)
     setup_donation_handlers(app)
+    setup_feedback_handlers(app)
 
     return app
 

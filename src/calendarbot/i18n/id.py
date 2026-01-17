@@ -1,6 +1,7 @@
 """Indonesian translations for CalendarBot."""
 
 from calendarbot.i18n.base import (
+    CommandTranslations,
     CommonTranslations,
     DonationTranslations,
     InlineTranslations,
@@ -199,5 +200,21 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *Pengingat Rapat*",
         starting_in="Dimulai dalam {time}",
+    ),
+    commands=CommandTranslations(
+        start="Mulai bot dan lihat sambutan",
+        help="Tampilkan bantuan dan instruksi",
+        meetings="Daftar rapat mendatang",
+        cancel="Batalkan rapat",
+        connect="Hubungkan Google Calendar",
+        disconnect="Putuskan Google Calendar",
+        settings="Lihat pengaturan Anda",
+        timezone="Ubah zona waktu",
+        duration="Atur durasi default",
+        reminder="Atur pengingat default",
+        notifications="Aktifkan/nonaktifkan notifikasi",
+        language="Ubah bahasa",
+        donate="Dukung bot dengan Stars",
+        feedback="Kirim masukan atau laporkan bug",
     ),
 )

@@ -1,6 +1,7 @@
 """Persian (Farsi) translations for CalendarBot."""
 
 from calendarbot.i18n.base import (
+    CommandTranslations,
     CommonTranslations,
     DonationTranslations,
     InlineTranslations,
@@ -199,5 +200,21 @@ translations = Translations(
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *یادآوری جلسه*",
         starting_in="شروع در {time}",
+    ),
+    commands=CommandTranslations(
+        start="شروع بات و پیام خوش‌آمدگویی",
+        help="نمایش راهنما و دستورالعمل‌ها",
+        meetings="لیست جلسات آینده",
+        cancel="لغو جلسه",
+        connect="اتصال تقویم گوگل",
+        disconnect="قطع تقویم گوگل",
+        settings="مشاهده تنظیمات",
+        timezone="تغییر منطقه زمانی",
+        duration="تنظیم مدت پیش‌فرض",
+        reminder="تنظیم یادآوری پیش‌فرض",
+        notifications="فعال/غیرفعال کردن اعلان",
+        language="تغییر زبان",
+        donate="حمایت از بات با Stars",
+        feedback="ارسال بازخورد یا گزارش خطا",
     ),
 )

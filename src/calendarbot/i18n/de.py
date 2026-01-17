@@ -1,6 +1,7 @@
 """German translations for CalendarBot."""
 
 from calendarbot.i18n.base import (
+    CommandTranslations,
     CommonTranslations,
     DonationTranslations,
     InlineTranslations,
@@ -88,7 +89,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
 /donate - Den Bot mit Stars unterstutzen
 """,
         timezone_detected="Ich habe deine Zeitzone basierend auf deiner Telegram-Sprache auf `{timezone}` gesetzt. Benutze /timezone, um sie bei Bedarf zu andern.",
-        support_button="HandyCalBot unterstutzen",
+        support_button="⭐ HandyCalBot unterstützen",
     ),
     settings=SettingsTranslations(
         your_settings="**Deine Einstellungen**",
@@ -199,5 +200,21 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
     reminder=ReminderTranslations(
         meeting_reminder="*Besprechungserinnerung*",
         starting_in="Beginnt in {time}",
+    ),
+    commands=CommandTranslations(
+        start="Bot starten und Willkommen sehen",
+        help="Hilfe und Anleitung anzeigen",
+        meetings="Kommende Besprechungen auflisten",
+        cancel="Eine Besprechung absagen",
+        connect="Google Kalender verbinden",
+        disconnect="Google Kalender trennen",
+        settings="Deine Einstellungen ansehen",
+        timezone="Zeitzone andern",
+        duration="Standarddauer festlegen",
+        reminder="Standarderinnerung festlegen",
+        notifications="Benachrichtigungen ein/aus",
+        language="Sprache andern",
+        donate="Bot mit Stars unterstutzen",
+        feedback="Feedback senden oder Bug melden",
     ),
 )

@@ -1,6 +1,7 @@
 """Chinese translations for CalendarBot."""
 
 from calendarbot.i18n.base import (
+    CommandTranslations,
     CommonTranslations,
     DonationTranslations,
     InlineTranslations,
@@ -88,7 +89,7 @@ translations = Translations(
 /donate - 用 Stars 支持机器人
 """,
         timezone_detected="根据您的 Telegram 语言设置，已将时区设置为 `{timezone}`。如需更改请使用 /timezone。",
-        support_button="支持 HandyCalBot",
+        support_button="⭐ 支持 HandyCalBot",
     ),
     settings=SettingsTranslations(
         your_settings="**您的设置**",
@@ -199,5 +200,21 @@ translations = Translations(
     reminder=ReminderTranslations(
         meeting_reminder="*会议提醒*",
         starting_in="{time}后开始",
+    ),
+    commands=CommandTranslations(
+        start="启动机器人并查看欢迎消息",
+        help="显示帮助和使用说明",
+        meetings="列出即将到来的会议",
+        cancel="取消会议",
+        connect="连接 Google 日历",
+        disconnect="断开 Google 日历",
+        settings="查看设置",
+        timezone="更改时区",
+        duration="设置默认时长",
+        reminder="设置默认提醒",
+        notifications="开关通知",
+        language="更改语言",
+        donate="用 Stars 支持机器人",
+        feedback="发送反馈或报告错误",
     ),
 )

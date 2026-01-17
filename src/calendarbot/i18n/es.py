@@ -1,6 +1,7 @@
 """Spanish translations for CalendarBot."""
 
 from calendarbot.i18n.base import (
+    CommandTranslations,
     CommonTranslations,
     DonationTranslations,
     InlineTranslations,
@@ -88,7 +89,7 @@ Escribe `@handycalbot` en cualquier chat seguido de:
 /donate - Apoyar al bot con Stars
 """,
         timezone_detected="He configurado tu zona horaria como `{timezone}` basandome en tu idioma de Telegram. Usa /timezone para cambiarlo si es necesario.",
-        support_button="Apoyar HandyCalBot",
+        support_button="⭐ Apoyar HandyCalBot",
     ),
     settings=SettingsTranslations(
         your_settings="**Tu Configuracion**",
@@ -199,5 +200,21 @@ Escribe `@handycalbot` en cualquier chat seguido de:
     reminder=ReminderTranslations(
         meeting_reminder="*Recordatorio de Reunion*",
         starting_in="Comienza en {time}",
+    ),
+    commands=CommandTranslations(
+        start="Iniciar el bot y ver bienvenida",
+        help="Mostrar ayuda e instrucciones",
+        meetings="Listar proximas reuniones",
+        cancel="Cancelar una reunion",
+        connect="Conectar Google Calendar",
+        disconnect="Desconectar Google Calendar",
+        settings="Ver tu configuracion",
+        timezone="Cambiar zona horaria",
+        duration="Establecer duracion predeterminada",
+        reminder="Establecer recordatorio predeterminado",
+        notifications="Alternar notificaciones",
+        language="Cambiar idioma",
+        donate="Apoyar al bot con Stars",
+        feedback="Enviar comentarios o reportar error",
     ),
 )

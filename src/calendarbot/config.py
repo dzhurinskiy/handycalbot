@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     default_meeting_duration: int = 60  # minutes
     log_level: str = "INFO"
 
+    # Admin settings (for feedback forwarding)
+    admin_chat_id: int | None = None
+
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"

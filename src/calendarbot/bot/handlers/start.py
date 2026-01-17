@@ -5,6 +5,7 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
+from calendarbot.bot.commands import set_user_commands
 from calendarbot.db.session import async_session_factory
 from calendarbot.i18n import detect_language, get_text
 from calendarbot.services.user import UserService
@@ -13,7 +14,7 @@ from calendarbot.utils.timezone import guess_timezone_from_language
 logger = logging.getLogger(__name__)
 
 
-async def start_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /start command."""
     if not update.effective_user or not update.message:
         return
@@ -47,9 +48,12 @@ async def start_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> 
         else:
             timezone_msg = ""
 
+    # Set localized commands for this user
+    await set_user_commands(context.bot, update.effective_user.id, user_lang)
+
     # Add Donate button
     keyboard = InlineKeyboardMarkup(
-        [[InlineKeyboardButton(f"* {t.start.support_button}", callback_data="donate_menu")]]
+        [[InlineKeyboardButton(t.start.support_button, callback_data="donate_menu")]]
     )
 
     await update.message.reply_text(

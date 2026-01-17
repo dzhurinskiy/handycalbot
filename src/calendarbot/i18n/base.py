@@ -181,6 +181,26 @@ class ReminderTranslations:
 
 
 @dataclass(frozen=True)
+class CommandTranslations:
+    """Translations for bot command descriptions shown in Telegram UI."""
+
+    start: str
+    help: str
+    meetings: str
+    cancel: str
+    connect: str
+    disconnect: str
+    settings: str
+    timezone: str
+    duration: str
+    reminder: str
+    notifications: str
+    language: str
+    donate: str
+    feedback: str
+
+
+@dataclass(frozen=True)
 class Translations:
     """Root translations container."""
 
@@ -191,3 +211,4 @@ class Translations:
     inline: InlineTranslations
     donation: DonationTranslations
     reminder: ReminderTranslations
+    commands: CommandTranslations

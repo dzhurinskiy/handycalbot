@@ -1,6 +1,7 @@
 """Korean translations for CalendarBot."""
 
 from calendarbot.i18n.base import (
+    CommandTranslations,
     CommonTranslations,
     DonationTranslations,
     InlineTranslations,
@@ -88,7 +89,7 @@ translations = Translations(
 /donate - Stars로 봇 후원
 """,
         timezone_detected="텔레그램 언어 설정을 기반으로 시간대를 `{timezone}`로 설정했습니다. 변경하려면 /timezone을 사용하세요.",
-        support_button="HandyCalBot 후원하기",
+        support_button="⭐ HandyCalBot 후원하기",
     ),
     settings=SettingsTranslations(
         your_settings="**설정**",
@@ -199,5 +200,21 @@ translations = Translations(
     reminder=ReminderTranslations(
         meeting_reminder="*회의 알림*",
         starting_in="{time} 후 시작",
+    ),
+    commands=CommandTranslations(
+        start="봇 시작 및 환영 메시지",
+        help="도움말 및 사용법",
+        meetings="예정된 회의 목록",
+        cancel="회의 취소",
+        connect="Google 캘린더 연결",
+        disconnect="Google 캘린더 연결 해제",
+        settings="설정 보기",
+        timezone="시간대 변경",
+        duration="기본 시간 설정",
+        reminder="기본 알림 설정",
+        notifications="알림 켜기/끄기",
+        language="언어 변경",
+        donate="Stars로 봇 후원",
+        feedback="피드백 보내기 또는 버그 신고",
     ),
 )

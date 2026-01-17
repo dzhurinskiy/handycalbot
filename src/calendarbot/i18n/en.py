@@ -1,6 +1,7 @@
 """English translations for CalendarBot."""
 
 from calendarbot.i18n.base import (
+    CommandTranslations,
     CommonTranslations,
     DonationTranslations,
     InlineTranslations,
@@ -214,5 +215,21 @@ Type `@handycalbot` in any chat followed by:
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *Meeting Reminder*",
         starting_in="Starting in {time}",
+    ),
+    commands=CommandTranslations(
+        start="Start the bot and see welcome message",
+        help="Show help and usage instructions",
+        meetings="List your upcoming meetings",
+        cancel="Cancel a meeting",
+        connect="Connect Google Calendar",
+        disconnect="Disconnect Google Calendar",
+        settings="View your current settings",
+        timezone="Change your timezone",
+        duration="Set default meeting duration",
+        reminder="Set default reminder",
+        notifications="Toggle meeting notifications",
+        language="Change language",
+        donate="Support the bot with Telegram Stars",
+        feedback="Send feedback or report a bug",
     ),
 )
