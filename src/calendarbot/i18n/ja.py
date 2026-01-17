@@ -198,8 +198,11 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         username_registered="登録済み",
         username_privacy_disabled="プライバシー無効",
         username_not_found="見つかりません",
-        pending_invites_note="⏳ 保留中（登録時に招待されます）:",
+        pending_invites_note="⏳ 未登録:",
         rate_limit_warning="⚠️ ユーザー検索が多すぎます。後でもう一度お試しください。",
+        no_calendar_users_note="⚠️ 登録済みですがカレンダー未接続:",
+        privacy_disabled_users_note="🔒 プライバシー無効（招待未送信）:",
+        register_link_text="登録する",
     ),
     donation=DonationTranslations(
         support_title="**HandyCalBotをサポート**",

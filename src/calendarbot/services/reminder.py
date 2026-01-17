@@ -45,6 +45,14 @@ class ReminderService:
             logger.error(f"Error sending reminder: {e}")
             return False
 
+    def _escape_markdown(self, text: str) -> str:
+        """Escape special Markdown characters in text."""
+        # Escape characters that have special meaning in Telegram Markdown
+        special_chars = ["*", "_", "`", "["]
+        for char in special_chars:
+            text = text.replace(char, f"\\{char}")
+        return text
+
     def _format_reminder_message(
         self, meeting: Meeting, minutes_before: int, user_timezone: str, user_language: str
     ) -> str:
@@ -75,16 +83,19 @@ class ReminderService:
         else:
             time_until = f"{minutes_before} {t.settings.minutes}"
 
-        text = f"* {t.reminder.meeting_reminder}\n\n"
-        text += f"* *{meeting.title}*\n"
-        text += f"* {time_str} on {date_str}\n"
-        text += f"* {t.reminder.starting_in.format(time=time_until)}\n"
+        # Escape special characters in meeting title to avoid Markdown parsing errors
+        safe_title = self._escape_markdown(meeting.title)
+
+        text = f"{t.reminder.meeting_reminder}\n\n"
+        text += f"*{safe_title}*\n"
+        text += f"🕐 {time_str} on {date_str}\n"
+        text += f"⏰ {t.reminder.starting_in.format(time=time_until)}"
 
         # Add attendees if any
         if meeting.attendees and meeting.attendees.get("emails"):
             emails = meeting.attendees["emails"]
             if emails:
-                text += f"\n* Attendees: {', '.join(emails)}"
+                text += f"\n\n👥 {', '.join(emails)}"
 
         return text
 

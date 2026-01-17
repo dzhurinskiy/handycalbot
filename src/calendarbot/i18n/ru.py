@@ -198,8 +198,11 @@ _Сообщения об ошибках и предложения по улуч�
         username_registered="зарегистрирован",
         username_privacy_disabled="конфиденциальность отключена",
         username_not_found="не найден",
-        pending_invites_note="⏳ Ожидание (будет приглашен при регистрации):",
+        pending_invites_note="⏳ Ещё не зарегистрированы:",
         rate_limit_warning="⚠️ Слишком много поисков пользователей. Попробуйте позже.",
+        no_calendar_users_note="⚠️ Зарегистрированы, но календарь не подключён:",
+        privacy_disabled_users_note="🔒 Конфиденциальность отключена (приглашение не отправлено):",
+        register_link_text="Зарегистрироваться",
     ),
     donation=DonationTranslations(
         support_title="**Поддержите HandyCalBot**",

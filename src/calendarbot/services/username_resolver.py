@@ -21,6 +21,7 @@ class UsernameStatus(Enum):
 
     REGISTERED = "registered"  # User is registered and allows invites
     PRIVACY_DISABLED = "privacy_disabled"  # User is registered but disabled invites
+    NO_CALENDAR = "no_calendar"  # User is registered but hasn't connected calendar
     NOT_FOUND = "not_found"  # Username not found in our system
 
 
@@ -32,6 +33,22 @@ class ResolvedUser:
     status: UsernameStatus
     can_invite: bool
     # Note: NO email field - email is never exposed to protect privacy
+
+
+@dataclass
+class MeetingInviteResult:
+    """Result of resolving usernames for a meeting invite."""
+
+    # Usernames that were successfully resolved and invited (email sent)
+    invited: list[str]
+    # Usernames that are registered but have no calendar connected
+    no_calendar: list[str]
+    # Usernames that are registered but have privacy disabled
+    privacy_disabled: list[str]
+    # Usernames that are not registered at all
+    not_found: list[str]
+    # The actual emails to send invites to
+    emails: list[str]
 
 
 class UsernameResolverService:
@@ -133,26 +150,33 @@ class UsernameResolverService:
         self,
         usernames: list[str],
         _requester_id: int,
-    ) -> tuple[list[str], list[str]]:
+    ) -> MeetingInviteResult:
         """Get actual emails for meeting creation (after user confirms).
 
         This is called during actual meeting creation, not preview.
-        Returns emails for users who have:
-        1. Connected their calendar (so we have their email)
-        2. Enabled allow_username_invites
+        Returns detailed results showing which users:
+        1. Were invited (email sent)
+        2. Are registered but have no calendar
+        3. Have privacy disabled
+        4. Are not found (unregistered)
 
         Args:
             usernames: List of usernames (without @ prefix)
             requester_id: Telegram ID of the user making the request
 
         Returns:
-            Tuple of (resolved_emails, unresolved_usernames)
+            MeetingInviteResult with detailed breakdown
         """
         if not usernames:
-            return [], []
+            return MeetingInviteResult(
+                invited=[], no_calendar=[], privacy_disabled=[], not_found=[], emails=[]
+            )
 
-        resolved_emails = []
-        unresolved_usernames = []
+        invited: list[str] = []
+        no_calendar: list[str] = []
+        privacy_disabled: list[str] = []
+        not_found: list[str] = []
+        emails: list[str] = []
 
         # Fetch users by usernames
         users = await self.user_repo.get_users_by_usernames(usernames)
@@ -167,19 +191,32 @@ class UsernameResolverService:
             username_lower = username.lower()
             user = user_map.get(username_lower)  # type: ignore[assignment]
 
-            if not user or not user.allow_username_invites:
-                unresolved_usernames.append(username)
+            if not user:
+                # User not found in our system
+                not_found.append(username)
+                continue
+
+            if not user.allow_username_invites:
+                # User has privacy disabled
+                privacy_disabled.append(username)
                 continue
 
             # Get user's email from OAuth token
             email = await self._get_user_email(user.id)
             if email:
-                resolved_emails.append(email)
+                emails.append(email)
+                invited.append(username)
             else:
-                # User hasn't connected calendar, treat as unresolved
-                unresolved_usernames.append(username)
+                # User hasn't connected calendar
+                no_calendar.append(username)
 
-        return resolved_emails, unresolved_usernames
+        return MeetingInviteResult(
+            invited=invited,
+            no_calendar=no_calendar,
+            privacy_disabled=privacy_disabled,
+            not_found=not_found,
+            emails=emails,
+        )
 
     async def _get_user_email(self, user_id: int) -> str | None:
         """Get user's email from their OAuth token.
@@ -212,6 +249,7 @@ class UsernameResolverService:
         """Get display icon for a username status."""
         icons = {
             UsernameStatus.REGISTERED: "✓",
+            UsernameStatus.NO_CALENDAR: "⚠️",
             UsernameStatus.PRIVACY_DISABLED: "🔒",
             UsernameStatus.NOT_FOUND: "❓",
         }

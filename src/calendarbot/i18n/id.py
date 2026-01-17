@@ -198,8 +198,11 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         username_registered="terdaftar",
         username_privacy_disabled="privasi dinonaktifkan",
         username_not_found="tidak ditemukan",
-        pending_invites_note="⏳ Tertunda (akan diundang saat mendaftar):",
+        pending_invites_note="⏳ Belum terdaftar:",
         rate_limit_warning="⚠️ Terlalu banyak pencarian pengguna. Coba lagi nanti.",
+        no_calendar_users_note="⚠️ Terdaftar tapi kalender belum terhubung:",
+        privacy_disabled_users_note="🔒 Privasi dinonaktifkan (undangan tidak terkirim):",
+        register_link_text="Daftar",
     ),
     donation=DonationTranslations(
         support_title="**Dukung HandyCalBot** ⭐",

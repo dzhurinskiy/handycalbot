@@ -198,8 +198,11 @@ _欢迎提交错误报告和UI改进建议！_
         username_registered="已注册",
         username_privacy_disabled="隐私已禁用",
         username_not_found="未找到",
-        pending_invites_note="⏳ 待处理（注册时将被邀请）:",
+        pending_invites_note="⏳ 尚未注册:",
         rate_limit_warning="⚠️ 用户搜索次数过多。请稍后再试。",
+        no_calendar_users_note="⚠️ 已注册但未连接日历:",
+        privacy_disabled_users_note="🔒 隐私已禁用（未发送邀请）:",
+        register_link_text="注册",
     ),
     donation=DonationTranslations(
         support_title="**支持 HandyCalBot**",

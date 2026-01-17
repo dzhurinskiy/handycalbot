@@ -198,8 +198,11 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         username_registered="등록됨",
         username_privacy_disabled="개인정보 비활성화",
         username_not_found="찾을 수 없음",
-        pending_invites_note="⏳ 대기 중 (등록 시 초대됨):",
+        pending_invites_note="⏳ 아직 미등록:",
         rate_limit_warning="⚠️ 사용자 검색이 너무 많습니다. 나중에 다시 시도하세요.",
+        no_calendar_users_note="⚠️ 등록됨, 캘린더 미연결:",
+        privacy_disabled_users_note="🔒 개인정보 비활성화 (초대 미발송):",
+        register_link_text="등록하기",
     ),
     donation=DonationTranslations(
         support_title="**HandyCalBot 후원하기**",

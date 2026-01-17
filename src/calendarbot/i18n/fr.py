@@ -198,8 +198,11 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         username_registered="enregistré",
         username_privacy_disabled="confidentialité désactivée",
         username_not_found="non trouvé",
-        pending_invites_note="⏳ En attente (sera invité lors de l'inscription):",
+        pending_invites_note="⏳ Pas encore inscrit:",
         rate_limit_warning="⚠️ Trop de recherches de nom d'utilisateur. Réessayez plus tard.",
+        no_calendar_users_note="⚠️ Inscrit mais calendrier non connecté:",
+        privacy_disabled_users_note="🔒 Confidentialité désactivée (invitation non envoyée):",
+        register_link_text="S'inscrire",
     ),
     donation=DonationTranslations(
         support_title="**Soutenez HandyCalBot**",

@@ -170,6 +170,9 @@ class InlineTranslations:
     username_not_found: str
     pending_invites_note: str
     rate_limit_warning: str
+    no_calendar_users_note: str
+    privacy_disabled_users_note: str
+    register_link_text: str
 
 
 @dataclass(frozen=True)

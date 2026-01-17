@@ -198,8 +198,11 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         username_registered="registrado",
         username_privacy_disabled="privacidad deshabilitada",
         username_not_found="no encontrado",
-        pending_invites_note="⏳ Pendiente (seran invitados cuando se registren):",
+        pending_invites_note="⏳ Aun no registrado:",
         rate_limit_warning="⚠️ Demasiadas busquedas de usuario. Intenta mas tarde.",
+        no_calendar_users_note="⚠️ Registrado pero sin calendario conectado:",
+        privacy_disabled_users_note="🔒 Privacidad deshabilitada (invitacion no enviada):",
+        register_link_text="Registrarse",
     ),
     donation=DonationTranslations(
         support_title="**Apoya a HandyCalBot**",

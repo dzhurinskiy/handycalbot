@@ -218,8 +218,11 @@ Type `@handycalbot` in any chat followed by:
         username_registered="registered",
         username_privacy_disabled="privacy disabled",
         username_not_found="not found",
-        pending_invites_note="⏳ Pending (will be invited when they register):",
+        pending_invites_note="⏳ Not registered yet:",
         rate_limit_warning="⚠️ Too many username lookups. Try again later.",
+        no_calendar_users_note="⚠️ Registered but no calendar connected:",
+        privacy_disabled_users_note="🔒 Privacy disabled (no invite sent):",
+        register_link_text="Register",
     ),
     donation=DonationTranslations(
         support_title="**Support HandyCalBot** ⭐",

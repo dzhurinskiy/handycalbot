@@ -198,8 +198,11 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         username_registered="registriert",
         username_privacy_disabled="Datenschutz deaktiviert",
         username_not_found="nicht gefunden",
-        pending_invites_note="⏳ Ausstehend (wird bei Registrierung eingeladen):",
+        pending_invites_note="⏳ Noch nicht registriert:",
         rate_limit_warning="⚠️ Zu viele Benutzersuchen. Versuchen Sie es später erneut.",
+        no_calendar_users_note="⚠️ Registriert aber kein Kalender verbunden:",
+        privacy_disabled_users_note="🔒 Datenschutz deaktiviert (keine Einladung gesendet):",
+        register_link_text="Registrieren",
     ),
     donation=DonationTranslations(
         support_title="**Unterstutze HandyCalBot**",

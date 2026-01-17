@@ -198,8 +198,11 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         username_registered="ثبت‌شده",
         username_privacy_disabled="حریم خصوصی غیرفعال",
         username_not_found="یافت نشد",
-        pending_invites_note="⏳ در انتظار (هنگام ثبت‌نام دعوت خواهد شد):",
+        pending_invites_note="⏳ هنوز ثبت‌نام نشده:",
         rate_limit_warning="⚠️ جستجوی کاربران زیاد است. بعداً امتحان کنید.",
+        no_calendar_users_note="⚠️ ثبت‌نام شده اما تقویم متصل نیست:",
+        privacy_disabled_users_note="🔒 حریم خصوصی غیرفعال (دعوتنامه ارسال نشد):",
+        register_link_text="ثبت‌نام",
     ),
     donation=DonationTranslations(
         support_title="**حمایت از HandyCalBot** ⭐",

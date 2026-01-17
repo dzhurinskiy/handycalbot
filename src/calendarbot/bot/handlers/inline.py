@@ -285,15 +285,17 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             usernames = m.get("usernames", [])
 
             # Resolve usernames to emails
-            resolved_emails: list[str] = []
-            unresolved_usernames: list[str] = []
+            from calendarbot.services.username_resolver import MeetingInviteResult
+
+            resolve_result: MeetingInviteResult | None = None
             if usernames:
                 resolver = UsernameResolverService(session)
-                resolved_emails, unresolved_usernames = await resolver.get_emails_for_meeting(
+                resolve_result = await resolver.get_emails_for_meeting(
                     usernames, update.effective_user.id
                 )
 
             # Combine manual emails with resolved username emails
+            resolved_emails = resolve_result.emails if resolve_result else []
             all_attendees = m["attendees"] + resolved_emails
 
             parsed = ParsedMeeting(
@@ -311,11 +313,13 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             calendar_service = CalendarService(session)
             result = await calendar_service.create_meeting(user, parsed)
 
-            # Create pending invites for unresolved usernames
+            # Create pending invites for unregistered usernames only
+            # (not for those with no_calendar or privacy_disabled - they're registered)
             pending_invites_created: list[str] = []
-            if unresolved_usernames and "event_id" in result:
+            not_found_usernames = resolve_result.not_found if resolve_result else []
+            if not_found_usernames and "event_id" in result:
                 pending_repo = PendingInviteRepository(session)
-                for username in unresolved_usernames:
+                for username in not_found_usernames:
                     await pending_repo.create(
                         inviter_telegram_id=update.effective_user.id,
                         invitee_username=username,
@@ -345,24 +349,39 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 text += f"{t.inline.reminder_label.format(reminder=reminder_text)}\n"
 
             # Show invitations sent (both email and resolved usernames)
-            original_usernames = m.get("usernames", [])
-            resolved_usernames = [u for u in original_usernames if u not in unresolved_usernames]
+            invited_usernames = resolve_result.invited if resolve_result else []
+            no_calendar_usernames = resolve_result.no_calendar if resolve_result else []
+            privacy_disabled_usernames = resolve_result.privacy_disabled if resolve_result else []
 
-            if result["attendees"] or resolved_usernames:
+            if result["attendees"] or invited_usernames:
                 text += f"\n{t.inline.invitations_sent}\n"
-                # Show resolved usernames
-                for username in resolved_usernames:
-                    text += f"  • @{username} ({t.inline.username_registered})\n"
+                # Show invited usernames
+                for username in invited_usernames:
+                    text += f"  • @{username} ✅\n"
                 # Show manual email addresses
                 for email in m["attendees"]:  # Original emails only
                     text += f"  • {email}\n"
-                text += f"\n{t.inline.attendees_will_receive}\n"
 
-            # Show pending invites for unresolved usernames
+            # Show users with no calendar connected
+            if no_calendar_usernames:
+                text += f"\n{t.inline.no_calendar_users_note}\n"
+                for username in no_calendar_usernames:
+                    text += f"  • @{username}\n"
+
+            # Show users with privacy disabled
+            if privacy_disabled_usernames:
+                text += f"\n{t.inline.privacy_disabled_users_note}\n"
+                for username in privacy_disabled_usernames:
+                    text += f"  • @{username}\n"
+
+            # Show pending invites for unregistered usernames with deep link
             if pending_invites_created:
+                bot_username = (await context.bot.get_me()).username
                 text += f"\n{t.inline.pending_invites_note}\n"
                 for username in pending_invites_created:
-                    text += f"  • @{username}\n"
+                    # Deep link to start the bot
+                    deep_link = f"https://t.me/{bot_username}?start=invite"
+                    text += f"  • @{username} ([{t.inline.register_link_text}]({deep_link}))\n"
 
             # Build universal "Add to Calendar" link that works for anyone
             add_to_cal_url = build_add_to_calendar_url(
@@ -376,7 +395,14 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 [[InlineKeyboardButton(t.inline.add_to_calendar_button, url=add_to_cal_url)]]
             )
 
-            if result["attendees"] or resolved_usernames:
+            has_any_attendees = (
+                result["attendees"]
+                or invited_usernames
+                or no_calendar_usernames
+                or privacy_disabled_usernames
+                or pending_invites_created
+            )
+            if has_any_attendees:
                 text += f"\n{t.inline.not_listed_add_calendar}"
             else:
                 text += f"\n{t.inline.click_to_add_calendar}"
