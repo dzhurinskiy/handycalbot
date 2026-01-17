@@ -43,21 +43,49 @@ class MeetingParser:
     REMINDER_PATTERN = r"\br\s*((?:\d+[mhd](?:/\d+[mhd])*)?)\b"
 
     # Various quote characters to normalize (Russian, curly, single, guillemets, etc.)
+    # iPhone and other devices may use any of these instead of standard double quotes
     QUOTE_CHARS = [
-        '"',
-        '"',  # Curly double quotes
-        "«",
-        "»",  # Russian/French guillemets
-        "„",
-        '"',  # German-style quotes
-        "'",
-        "'",  # Curly single quotes
-        "‹",
-        "›",  # Single guillemets
-        "「",
-        "」",  # CJK quotes
-        "'",  # Straight single quote
-        "′",  # Prime (often used as quote)
+        # Curly/smart double quotes (most common on iPhone)
+        '"',  # U+201C LEFT DOUBLE QUOTATION MARK
+        '"',  # U+201D RIGHT DOUBLE QUOTATION MARK
+        # Russian/French guillemets
+        "«",  # U+00AB LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+        "»",  # U+00BB RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+        # German-style quotes
+        "„",  # U+201E DOUBLE LOW-9 QUOTATION MARK
+        "‟",  # U+201F DOUBLE HIGH-REVERSED-9 QUOTATION MARK
+        # Curly single quotes (when used for titles)
+        "'",  # U+2018 LEFT SINGLE QUOTATION MARK
+        "'",  # U+2019 RIGHT SINGLE QUOTATION MARK
+        # Single guillemets
+        "‹",  # U+2039 SINGLE LEFT-POINTING ANGLE QUOTATION MARK
+        "›",  # U+203A SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
+        # CJK quotes
+        "「",  # U+300C LEFT CORNER BRACKET
+        "」",  # U+300D RIGHT CORNER BRACKET
+        "『",  # U+300E LEFT WHITE CORNER BRACKET
+        "』",  # U+300F RIGHT WHITE CORNER BRACKET
+        # Low single quotes
+        "‚",  # U+201A SINGLE LOW-9 QUOTATION MARK
+        # Straight single quote (ASCII)
+        "'",  # U+0027 APOSTROPHE
+        # Prime characters (often mistaken for quotes)
+        "′",  # U+2032 PRIME
+        "″",  # U+2033 DOUBLE PRIME
+        # Fullwidth characters (CJK input methods)
+        "＂",  # U+FF02 FULLWIDTH QUOTATION MARK
+        "＇",  # U+FF07 FULLWIDTH APOSTROPHE
+        # Modifier letters sometimes used as quotes
+        "ˮ",  # U+02EE MODIFIER LETTER DOUBLE APOSTROPHE
+        # Grave accent (backtick) - sometimes used as quote
+        "`",  # U+0060 GRAVE ACCENT
+        "ˋ",  # U+02CB MODIFIER LETTER GRAVE ACCENT
+        "｀",  # U+FF40 FULLWIDTH GRAVE ACCENT
+        # Heavy quotes
+        "❝",  # U+275D HEAVY DOUBLE TURNED COMMA QUOTATION MARK ORNAMENT
+        "❞",  # U+275E HEAVY DOUBLE COMMA QUOTATION MARK ORNAMENT
+        "❮",  # U+276E HEAVY LEFT-POINTING ANGLE QUOTATION MARK ORNAMENT
+        "❯",  # U+276F HEAVY RIGHT-POINTING ANGLE QUOTATION MARK ORNAMENT
     ]
 
     def __init__(self, user_timezone: str = "UTC", default_duration: int = 60):

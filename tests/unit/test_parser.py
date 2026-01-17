@@ -1,8 +1,5 @@
 """Tests for meeting parser."""
 
-import pytest
-from datetime import datetime
-
 from calendarbot.services.parser import MeetingParser
 
 
@@ -106,3 +103,89 @@ class TestMeetingParser:
         assert "14:30" in preview
         assert "01 Jan 2026" in preview
         assert "test@example.com" in preview
+
+    def test_parse_curly_quotes(self):
+        """Test parsing with curly/smart quotes (common on iPhone)."""
+        parser = MeetingParser(user_timezone="UTC", default_duration=60)
+        result = parser.parse('14:30 "Team Meeting"')
+
+        assert result is not None
+        assert result.title == "Team Meeting"
+        assert result.time == "14:30"
+
+    def test_parse_russian_guillemets(self):
+        """Test parsing with Russian/French guillemets."""
+        parser = MeetingParser(user_timezone="UTC", default_duration=60)
+        result = parser.parse('15:00 «Встреча команды»')
+
+        assert result is not None
+        assert result.title == "Встреча команды"
+        assert result.time == "15:00"
+
+    def test_parse_german_quotes(self):
+        """Test parsing with German-style low quotes."""
+        parser = MeetingParser(user_timezone="UTC", default_duration=60)
+        result = parser.parse('16:00 „German Meeting"')
+
+        assert result is not None
+        assert result.title == "German Meeting"
+        assert result.time == "16:00"
+
+    def test_parse_single_curly_quotes(self):
+        """Test parsing with single curly quotes."""
+        parser = MeetingParser(user_timezone="UTC", default_duration=60)
+        result = parser.parse("14:30 'Quick Call'")
+
+        assert result is not None
+        assert result.title == "Quick Call"
+
+    def test_parse_cjk_quotes(self):
+        """Test parsing with CJK corner brackets."""
+        parser = MeetingParser(user_timezone="UTC", default_duration=60)
+        result = parser.parse('10:00 「会議」')
+
+        assert result is not None
+        assert result.title == "会議"
+
+    def test_parse_mixed_quote_styles(self):
+        """Test parsing with mismatched quote styles (opening/closing from different sets)."""
+        parser = MeetingParser(user_timezone="UTC", default_duration=60)
+        # Opening curly, closing straight
+        result = parser.parse('14:30 "Meeting Title"')
+
+        assert result is not None
+        assert result.title == "Meeting Title"
+
+    def test_parse_fullwidth_quotes(self):
+        """Test parsing with fullwidth quotes (common in CJK input)."""
+        parser = MeetingParser(user_timezone="UTC", default_duration=60)
+        result = parser.parse('14:30 ＂Full Width＂')
+
+        assert result is not None
+        assert result.title == "Full Width"
+
+    def test_parse_heavy_quotes(self):
+        """Test parsing with heavy ornamental quotes."""
+        parser = MeetingParser(user_timezone="UTC", default_duration=60)
+        result = parser.parse('14:30 ❝Fancy Meeting❞')
+
+        assert result is not None
+        assert result.title == "Fancy Meeting"
+
+    def test_normalize_quotes_method(self):
+        """Test the _normalize_quotes method directly."""
+        parser = MeetingParser()
+
+        # Test various quote types are normalized to standard double quote
+        test_cases = [
+            ('"curly"', '"curly"'),
+            ('«guillemets»', '"guillemets"'),
+            ('„german"', '"german"'),
+            ("'single'", '"single"'),
+            ('「cjk」', '"cjk"'),
+            ('＂fullwidth＂', '"fullwidth"'),
+            ('❝heavy❞', '"heavy"'),
+        ]
+
+        for input_text, expected in test_cases:
+            assert parser._normalize_quotes(input_text) == expected, f"Failed for: {input_text}"
