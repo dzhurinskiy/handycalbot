@@ -32,6 +32,15 @@ from calendarbot.utils.timezone import TimezoneHelper
 logger = logging.getLogger(__name__)
 
 
+def _escape_markdown(text: str) -> str:
+    """Escape special Markdown characters in text."""
+    # Escape characters that have special meaning in Telegram Markdown
+    special_chars = ["_", "*", "`", "["]
+    for char in special_chars:
+        text = text.replace(char, f"\\{char}")
+    return text
+
+
 def _format_reminders(reminders: list[int], t) -> str:
     """Format reminder list for display."""
     parts = []
@@ -338,8 +347,10 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             await query.edit_message_text(f"❌ Error: {result['error']}")
         else:
             start_str = result["start"].strftime("%H:%M on %d %b %Y")
+            # Escape special Markdown characters in title
+            safe_title = _escape_markdown(result["title"])
             text = f"✅ {t.inline.meeting_created}\n\n"
-            text += f"**{result['title']}**\n"
+            text += f"*{safe_title}*\n"
             text += f"🕐 {start_str}\n"
 
             # Show reminder info
@@ -355,9 +366,10 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
 
             if result["attendees"] or invited_usernames:
                 text += f"\n{t.inline.invitations_sent}\n"
-                # Show invited usernames
+                # Show invited usernames (escape underscores in usernames)
                 for username in invited_usernames:
-                    text += f"  • @{username} ✅\n"
+                    safe_username = _escape_markdown(username)
+                    text += f"  • @{safe_username} ✅\n"
                 # Show manual email addresses
                 for email in m["attendees"]:  # Original emails only
                     text += f"  • {email}\n"
@@ -366,22 +378,27 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             if no_calendar_usernames:
                 text += f"\n{t.inline.no_calendar_users_note}\n"
                 for username in no_calendar_usernames:
-                    text += f"  • @{username}\n"
+                    safe_username = _escape_markdown(username)
+                    text += f"  • @{safe_username}\n"
 
             # Show users with privacy disabled
             if privacy_disabled_usernames:
                 text += f"\n{t.inline.privacy_disabled_users_note}\n"
                 for username in privacy_disabled_usernames:
-                    text += f"  • @{username}\n"
+                    safe_username = _escape_markdown(username)
+                    text += f"  • @{safe_username}\n"
 
             # Show pending invites for unregistered usernames with deep link
             if pending_invites_created:
                 bot_username = (await context.bot.get_me()).username
                 text += f"\n{t.inline.pending_invites_note}\n"
                 for username in pending_invites_created:
-                    # Deep link to start the bot
-                    deep_link = f"https://t.me/{bot_username}?start=invite"
-                    text += f"  • @{username} ([{t.inline.register_link_text}]({deep_link}))\n"
+                    safe_username = _escape_markdown(username)
+                    # Deep link to start the bot - use simple text, link via button
+                    text += f"  • @{safe_username}\n"
+                # Add a note about the register link
+                register_url = f"https://t.me/{bot_username}?start=invite"
+                text += f"\n👆 {t.inline.register_link_text}: {register_url}\n"
 
             # Build universal "Add to Calendar" link that works for anyone
             add_to_cal_url = build_add_to_calendar_url(
@@ -403,9 +420,12 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 or pending_invites_created
             )
             if has_any_attendees:
-                text += f"\n{t.inline.not_listed_add_calendar}"
+                # Remove italic underscores from translation to avoid Markdown issues
+                add_calendar_text = t.inline.not_listed_add_calendar.replace("_", "")
+                text += f"\n{add_calendar_text}"
             else:
-                text += f"\n{t.inline.click_to_add_calendar}"
+                add_calendar_text = t.inline.click_to_add_calendar.replace("_", "")
+                text += f"\n{add_calendar_text}"
 
             await query.edit_message_text(text, parse_mode="Markdown", reply_markup=keyboard)
 
