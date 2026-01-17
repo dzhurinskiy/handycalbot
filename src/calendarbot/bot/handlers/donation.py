@@ -13,6 +13,10 @@ from telegram.ext import (
     filters,
 )
 
+from calendarbot.db.session import async_session_factory
+from calendarbot.i18n import get_text
+from calendarbot.services.user import UserService
+
 logger = logging.getLogger(__name__)
 
 # Donation amounts in Telegram Stars
@@ -29,11 +33,17 @@ async def donate_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) ->
     if not update.effective_user or not update.message:
         return
 
+    # Get user's language
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+        t = get_text(user.language if user else "en")
+
     # Create buttons for each donation amount
     buttons = []
     row = []
     for amount, label in DONATION_OPTIONS:
-        row.append(InlineKeyboardButton(f"⭐ {label}", callback_data=f"donate_{amount}"))
+        row.append(InlineKeyboardButton(f"* {label}", callback_data=f"donate_{amount}"))
         if len(row) == 2:
             buttons.append(row)
             row = []
@@ -41,16 +51,15 @@ async def donate_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) ->
         buttons.append(row)
 
     # Add custom amount button
-    buttons.append([InlineKeyboardButton("💫 Custom Amount", callback_data="donate_custom")])
+    buttons.append([InlineKeyboardButton(f"* {t.donation.custom_amount_button}", callback_data="donate_custom")])
 
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.message.reply_text(
-        "**Support HandyCalBot** ⭐\n\n"
-        "If you find this bot useful, consider supporting its development "
-        "with Telegram Stars!\n\n"
-        "Your support helps keep the bot running and enables new features.\n\n"
-        "Select an amount:",
+        f"{t.donation.support_title} *\n\n"
+        f"{t.donation.support_description}\n\n"
+        f"{t.donation.support_helps}\n\n"
+        f"{t.donation.select_amount}",
         reply_markup=keyboard,
         parse_mode="Markdown",
     )
@@ -64,26 +73,31 @@ async def donate_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     await query.answer()
 
+    # Get user's language
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+        t = get_text(user.language if user else "en")
+
     # Handle donate_menu from welcome message button
     if query.data == "donate_menu":
         buttons = []
         row = []
         for amount, label in DONATION_OPTIONS:
-            row.append(InlineKeyboardButton(f"⭐ {label}", callback_data=f"donate_{amount}"))
+            row.append(InlineKeyboardButton(f"* {label}", callback_data=f"donate_{amount}"))
             if len(row) == 2:
                 buttons.append(row)
                 row = []
         if row:
             buttons.append(row)
-        buttons.append([InlineKeyboardButton("💫 Custom Amount", callback_data="donate_custom")])
+        buttons.append([InlineKeyboardButton(f"* {t.donation.custom_amount_button}", callback_data="donate_custom")])
         keyboard = InlineKeyboardMarkup(buttons)
 
         await query.edit_message_text(
-            "**Support HandyCalBot** ⭐\n\n"
-            "If you find this bot useful, consider supporting its development "
-            "with Telegram Stars!\n\n"
-            "Your support helps keep the bot running and enables new features.\n\n"
-            "Select an amount:",
+            f"{t.donation.support_title} *\n\n"
+            f"{t.donation.support_description}\n\n"
+            f"{t.donation.support_helps}\n\n"
+            f"{t.donation.select_amount}",
             reply_markup=keyboard,
             parse_mode="Markdown",
         )
@@ -91,8 +105,7 @@ async def donate_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     if query.data == "donate_custom":
         await query.edit_message_text(
-            "**Custom Donation** 💫\n\n"
-            "Please enter the number of Stars you'd like to donate (1-10000):",
+            t.donation.custom_amount_prompt,
             parse_mode="Markdown",
         )
         # Store state in context to handle the next message
@@ -106,7 +119,7 @@ async def donate_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     # Send invoice (check that message is accessible)
     if isinstance(query.message, Message):
-        await send_donation_invoice(query.message.chat_id, amount, context)
+        await send_donation_invoice(query.message.chat_id, amount, context, t)
         await query.delete_message()
 
 
@@ -122,25 +135,32 @@ async def custom_donation_handler(update: Update, context: ContextTypes.DEFAULT_
     # Clear the state
     context.user_data["awaiting_custom_donation"] = False
 
+    # Get user's language
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+        t = get_text(user.language if user else "en")
+
     try:
         amount = int(update.message.text.strip())
         if amount < 1 or amount > 10000:
-            await update.message.reply_text(
-                "Please enter a valid amount between 1 and 10000 Stars."
-            )
+            await update.message.reply_text(t.donation.invalid_amount)
             return
     except ValueError:
-        await update.message.reply_text("Please enter a valid number (1-10000).")
+        await update.message.reply_text(t.donation.invalid_number)
         return
 
     # Send invoice
-    await send_donation_invoice(update.message.chat_id, amount, context)
+    await send_donation_invoice(update.message.chat_id, amount, context, t)
 
 
 async def send_donation_invoice(
-    chat_id: int, amount: int, context: ContextTypes.DEFAULT_TYPE
+    chat_id: int, amount: int, context: ContextTypes.DEFAULT_TYPE, t=None
 ) -> None:
     """Send a Telegram Stars invoice for donation."""
+    if t is None:
+        t = get_text("en")
+
     title = "Support HandyCalBot"
     description = f"Donate {amount} Telegram Stars to support HandyCalBot development"
     payload = f"donation_{amount}"
@@ -164,7 +184,7 @@ async def send_donation_invoice(
         logger.error(f"Failed to send donation invoice: {e}")
         await context.bot.send_message(
             chat_id=chat_id,
-            text="Sorry, there was an error processing your donation. Please try again later.",
+            text=t.donation.donation_error,
         )
 
 
@@ -186,10 +206,16 @@ async def successful_payment_callback(update: Update, _context: ContextTypes.DEF
     payment = update.message.successful_payment
     amount = payment.total_amount
 
+    # Get user's language
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        t = get_text(user.language if user else "en")
+
     await update.message.reply_text(
-        f"**Thank you for your donation!** 🙏\n\n"
-        f"You donated {amount} Telegram Stars. Your support means a lot!\n\n"
-        "Thank you for helping keep HandyCalBot running! ⭐",
+        f"{t.donation.thank_you}\n\n"
+        f"{t.donation.you_donated.format(amount=amount)}\n\n"
+        f"{t.donation.thank_you_running} *",
         parse_mode="Markdown",
     )
 

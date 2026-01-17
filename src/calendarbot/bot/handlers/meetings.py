@@ -11,6 +11,7 @@ from telegram.ext import (
 )
 
 from calendarbot.db.session import async_session_factory
+from calendarbot.i18n import get_text
 from calendarbot.services.calendar import CalendarService
 from calendarbot.services.user import UserService
 
@@ -27,36 +28,37 @@ async def meetings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
         user = await user_service.get_user(update.effective_user.id)
 
         if not user:
-            await update.message.reply_text("Please run /start first.")
+            t = get_text("en")
+            await update.message.reply_text(t.common.please_start_first)
             return
 
+        t = get_text(user.language)
+
         if not await user_service.is_calendar_connected(user):
-            await update.message.reply_text(
-                "Please connect your Google Calendar first with /connect"
-            )
+            await update.message.reply_text(t.settings.click_to_connect.split("\n")[0])
             return
 
         calendar_service = CalendarService(session)
         meetings = await calendar_service.get_upcoming_meetings(user, limit=10)
 
     if not meetings:
-        await update.message.reply_text("No upcoming meetings found.")
+        await update.message.reply_text(t.meetings.no_upcoming_meetings)
         return
 
-    text = "**Upcoming Meetings** 📅\n\n"
+    text = f"{t.meetings.upcoming_meetings}\n\n"
 
     for m in meetings:
         start = m["start_time"].strftime("%H:%M %d %b")
         end = m["end_time"].strftime("%H:%M")
         attendee_count = len(m["attendees"])
 
-        text += f"• **{m['title']}**\n"
-        text += f"  🕐 {start} - {end}\n"
+        text += f"- **{m['title']}**\n"
+        text += f"  * {start} - {end}\n"
         if attendee_count > 0:
-            text += f"  👥 {attendee_count} attendee(s)\n"
+            text += f"  * {t.meetings.attendees_count.format(count=attendee_count)}\n"
         text += "\n"
 
-    text += "_Use /cancel to cancel a meeting_"
+    text += t.meetings.use_cancel_hint
 
     await update.message.reply_text(text, parse_mode="Markdown")
 
@@ -103,11 +105,14 @@ async def show_cancel_menu(
             user = await user_service.get_user(user_id)
 
             if not user:
-                await send_message("Please run /start first.")
+                t = get_text("en")
+                await send_message(t.common.please_start_first)
                 return
 
+            t = get_text(user.language)
+
             if not await user_service.is_calendar_connected(user):
-                await send_message("Please connect your Google Calendar first with /connect")
+                await send_message(t.settings.click_to_connect.split("\n")[0])
                 return
 
             calendar_service = CalendarService(session)
@@ -119,7 +124,7 @@ async def show_cancel_menu(
         return
 
     if not all_meetings:
-        await send_message("No upcoming meetings to cancel.")
+        await send_message(t.meetings.no_upcoming_meetings)
         return
 
     # Store meeting IDs in context.bot_data with short keys
@@ -151,8 +156,8 @@ async def show_cancel_menu(
         start = m["start_time"].strftime("%H:%M %d %b")
         title = m["title"][:25] + "..." if len(m["title"]) > 25 else m["title"]
         attendees = len(m.get("attendees", []))
-        attendee_str = f" 👥{attendees}" if attendees > 0 else ""
-        label = f"🗑 {title} | {start}{attendee_str}"
+        attendee_str = f" *{attendees}" if attendees > 0 else ""
+        label = f"X {title} | {start}{attendee_str}"
         # Use short index instead of full event ID
         buttons.append([InlineKeyboardButton(label, callback_data=f"cm_{user_id}_{global_idx}")])
 
@@ -160,19 +165,20 @@ async def show_cancel_menu(
     nav_buttons = []
     if page > 0:
         nav_buttons.append(
-            InlineKeyboardButton("⬅️ Previous", callback_data=f"cp_{user_id}_{page - 1}")
+            InlineKeyboardButton(f"<< {t.meetings.previous_button}", callback_data=f"cp_{user_id}_{page - 1}")
         )
     if end_idx < total_meetings:
-        nav_buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"cp_{user_id}_{page + 1}"))
+        nav_buttons.append(InlineKeyboardButton(f"{t.meetings.next_button} >>", callback_data=f"cp_{user_id}_{page + 1}"))
     if nav_buttons:
         buttons.append(nav_buttons)
 
     # Cancel button
-    buttons.append([InlineKeyboardButton("❌ Don't cancel anything", callback_data="cancel_none")])
+    buttons.append([InlineKeyboardButton(f"X {t.meetings.dont_cancel_button}", callback_data="cancel_none")])
 
     # Header text
-    page_info = f"Page {page + 1}/{(total_meetings + MEETINGS_PER_PAGE - 1) // MEETINGS_PER_PAGE}"
-    text = f"**Select a meeting to cancel:**\n_{page_info} • {total_meetings} total meetings_"
+    total_pages = (total_meetings + MEETINGS_PER_PAGE - 1) // MEETINGS_PER_PAGE
+    page_info = t.meetings.page_info.format(current=page + 1, total=total_pages)
+    text = f"{t.meetings.select_meeting_to_cancel}\n_{page_info} - {t.meetings.total_meetings.format(count=total_meetings)}_"
 
     await send_message(text, reply_markup=InlineKeyboardMarkup(buttons))
 
@@ -201,7 +207,13 @@ async def cancel_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
     if not query or not query.data or not update.effective_user:
         return
 
-    await query.answer("Cancelling meeting...")
+    # Get user's language first
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+        t = get_text(user.language if user else "en")
+
+    await query.answer(t.meetings.cancelling_meeting)
 
     try:
         # Extract user_id and index from format: cm_{user_id}_{index}
@@ -211,18 +223,18 @@ async def cancel_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
 
         # Verify user
         if stored_user_id != update.effective_user.id:
-            await query.edit_message_text("Error: This is not your cancel menu.")
+            await query.edit_message_text(t.meetings.cancel_not_your_menu)
             return
 
         # Get actual event ID from stored mapping
         cancel_key = f"cancel_meetings_{stored_user_id}"
         if not context.bot_data or cancel_key not in context.bot_data:
-            await query.edit_message_text("Error: Session expired. Please use /cancel again.")
+            await query.edit_message_text(t.meetings.session_expired)
             return
 
         event_id = context.bot_data[cancel_key].get(meeting_idx)
         if not event_id:
-            await query.edit_message_text("Error: Meeting not found. Please use /cancel again.")
+            await query.edit_message_text(t.meetings.meeting_not_found)
             return
 
         async with async_session_factory() as session:
@@ -230,7 +242,7 @@ async def cancel_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             user = await user_service.get_user(update.effective_user.id)
 
             if not user:
-                await query.edit_message_text("Error: User not found.")
+                await query.edit_message_text(t.common.error_user_not_found)
                 return
 
             calendar_service = CalendarService(session)
@@ -241,11 +253,10 @@ async def cancel_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
         context.bot_data.pop(cancel_key, None)
 
         if "error" in result:
-            await query.edit_message_text(f"❌ Error: {result['error']}")
+            await query.edit_message_text(f"X Error: {result['error']}")
         else:
             await query.edit_message_text(
-                f"✅ Meeting cancelled: **{result['title']}**\n\n"
-                "_Attendees will be notified automatically._",
+                f"* {t.meetings.meeting_cancelled.format(title=result['title'])}\n\n{t.meetings.attendees_notified}",
                 parse_mode="Markdown",
             )
     except Exception as e:
@@ -260,7 +271,14 @@ async def cancel_none_callback(update: Update, _context: ContextTypes.DEFAULT_TY
         return
 
     await query.answer()
-    await query.edit_message_text("No meeting cancelled.")
+
+    # Get user's language
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        t = get_text(user.language if user else "en")
+
+    await query.edit_message_text(t.meetings.no_meeting_cancelled)
 
 
 def setup_meeting_handlers(app: Application) -> None:

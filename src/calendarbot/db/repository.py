@@ -24,7 +24,11 @@ class UserRepository:
         return result.scalar_one_or_none()
 
     async def get_or_create(
-        self, telegram_id: int, telegram_username: str | None = None, timezone: str | None = None
+        self,
+        telegram_id: int,
+        telegram_username: str | None = None,
+        timezone: str | None = None,
+        language: str | None = None,
     ) -> tuple[User, bool]:
         """Get existing user or create new one. Returns (user, created)."""
         user = await self.get_by_telegram_id(telegram_id)
@@ -38,6 +42,7 @@ class UserRepository:
             telegram_id=telegram_id,
             telegram_username=telegram_username,
             timezone=timezone or "UTC",
+            language=language or "en",
         )
         self.session.add(user)
         await self.session.flush()
@@ -50,6 +55,7 @@ class UserRepository:
         default_duration: int | None = None,
         default_reminder: str | None = _UNSET,
         notifications_enabled: bool | None = None,
+        language: str | None = None,
     ) -> User:
         """Update user settings."""
         if timezone is not None:
@@ -60,6 +66,8 @@ class UserRepository:
             user.default_reminder = default_reminder
         if notifications_enabled is not None:
             user.notifications_enabled = notifications_enabled
+        if language is not None:
+            user.language = language
         await self.session.flush()
         return user
 

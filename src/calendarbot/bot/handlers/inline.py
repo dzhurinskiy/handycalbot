@@ -21,6 +21,7 @@ from telegram.ext import (
 )
 
 from calendarbot.db.session import async_session_factory
+from calendarbot.i18n import get_text
 from calendarbot.services.calendar import CalendarService
 from calendarbot.services.parser import MeetingParser
 from calendarbot.services.user import UserService
@@ -29,19 +30,25 @@ from calendarbot.utils.timezone import TimezoneHelper
 logger = logging.getLogger(__name__)
 
 
-def _format_reminders(reminders: list[int]) -> str:
+def _format_reminders(reminders: list[int], t) -> str:
     """Format reminder list for display."""
     parts = []
     for m in reminders:
         if m >= 1440:
             days = m // 1440
-            parts.append(f"{days} day{'s' if days > 1 else ''}")
+            if days > 1:
+                parts.append(f"{days} {t.settings.days}")
+            else:
+                parts.append(f"{days} {t.settings.day}")
         elif m >= 60:
             hours = m // 60
-            parts.append(f"{hours} hour{'s' if hours > 1 else ''}")
+            if hours > 1:
+                parts.append(f"{hours} {t.settings.hours}")
+            else:
+                parts.append(f"{hours} {t.settings.hour}")
         else:
-            parts.append(f"{m} min")
-    return "Reminder: " + ", ".join(parts) + " before"
+            parts.append(f"{m} {t.settings.minutes}")
+    return ", ".join(parts)
 
 
 def build_add_to_calendar_url(
@@ -80,40 +87,41 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     text = query.query.strip()
 
-    if not text:
-        # Show help when empty
-        results = [
-            InlineQueryResultArticle(
-                id="help",
-                title="How to create a meeting",
-                description='Type: 14:30 "Meeting Title" email@example.com',
-                input_message_content=InputTextMessageContent(
-                    "To create a meeting, type:\n"
-                    '@handycalbot 14:30 "Meeting Title" email@example.com\n\n'
-                    'Format: TIME [DATE] "TITLE" [EMAILS]'
-                ),
-            )
-        ]
-        await query.answer(results, cache_time=300)
-        return
-
     # Get user settings
     async with async_session_factory() as session:
         user_service = UserService(session)
         user = await user_service.get_user(query.from_user.id)
 
         if not user:
+            t = get_text("en")
             results = [
                 InlineQueryResultArticle(
                     id="not_registered",
-                    title="Please start the bot first",
-                    description="Click to open bot and run /start",
+                    title=t.inline.please_start_first_title,
+                    description=t.inline.please_start_first_description,
                     input_message_content=InputTextMessageContent(
-                        "Please start @handycalbot first by sending /start"
+                        t.inline.please_start_first_message
                     ),
                 )
             ]
             await query.answer(results, cache_time=60)
+            return
+
+        t = get_text(user.language)
+
+        if not text:
+            # Show help when empty
+            results = [
+                InlineQueryResultArticle(
+                    id="help",
+                    title=t.inline.how_to_create,
+                    description=t.inline.inline_help_description,
+                    input_message_content=InputTextMessageContent(
+                        t.inline.inline_help_message
+                    ),
+                )
+            ]
+            await query.answer(results, cache_time=300)
             return
 
         # Check if calendar is connected
@@ -135,13 +143,10 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         results = [
             InlineQueryResultArticle(
                 id="parse_error",
-                title="Could not parse meeting",
-                description='Use format: 14:30 "Meeting Title" emails...',
+                title=t.inline.could_not_parse,
+                description=t.inline.parse_error_description,
                 input_message_content=InputTextMessageContent(
-                    "Could not parse meeting. Use format:\n"
-                    '14:30 "Meeting Title" email@example.com\n\n'
-                    "Time and title in quotes are required.\n"
-                    "Add r 10m for reminder, or just r for default."
+                    t.inline.parse_error_message
                 ),
             )
         ]
@@ -152,7 +157,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     preview = parser.format_preview(meeting, default_reminder=user_default_reminder)
 
     if not calendar_connected:
-        preview += "\n\n⚠️ Calendar not connected - /connect first"
+        preview += f"\n\n* {t.inline.calendar_not_connected_warning}"
 
     # Generate unique ID for this meeting
     result_id = str(uuid.uuid4())
@@ -178,17 +183,19 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("✅ Create Meeting", callback_data=f"create_{result_id}"),
-                InlineKeyboardButton("❌ Cancel", callback_data=f"discard_{result_id}"),
+                InlineKeyboardButton(f"* {t.inline.create_meeting_button}", callback_data=f"create_{result_id}"),
+                InlineKeyboardButton(f"X {t.inline.cancel_button}", callback_data=f"discard_{result_id}"),
             ]
         ]
     )
 
+    date_display = meeting.date or t.inline.today
+
     results = [
         InlineQueryResultArticle(
             id=result_id,
-            title=f"📅 {meeting.title}",
-            description=f"{meeting.time} {meeting.date or 'today'} • {len(meeting.attendees)} attendee(s)",
+            title=f"* {meeting.title}",
+            description=f"{meeting.time} {date_display} - {t.inline.attendees_label.format(count=len(meeting.attendees))}",
             input_message_content=InputTextMessageContent(
                 preview,
                 parse_mode=None,
@@ -206,24 +213,30 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
     if not query or not query.data or not update.effective_user:
         return
 
-    await query.answer("Creating meeting...")
+    # Get user's language first
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+        t = get_text(user.language if user else "en")
+
+    await query.answer(t.inline.creating_meeting)
 
     result_id = query.data.replace("create_", "")
 
     try:
         # Get stored meeting data
         if context.bot_data is None:
-            await query.edit_message_text("Error: Meeting data expired. Please try again.")
+            await query.edit_message_text(t.inline.meeting_data_expired)
             return
 
         meeting_data = context.bot_data.get(f"meeting_{result_id}")
         if not meeting_data:
-            await query.edit_message_text("Error: Meeting data expired. Please try again.")
+            await query.edit_message_text(t.inline.meeting_data_expired)
             return
 
         # Verify user
         if meeting_data["user_id"] != update.effective_user.id:
-            await query.answer("This is not your meeting!", show_alert=True)
+            await query.answer(t.inline.not_your_meeting, show_alert=True)
             return
 
         async with async_session_factory() as session:
@@ -231,8 +244,10 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             user = await user_service.get_user(update.effective_user.id)
 
             if not user:
-                await query.edit_message_text("Error: User not found. Please /start the bot.")
+                await query.edit_message_text(t.common.please_start_first)
                 return
+
+            t = get_text(user.language)
 
             # Reconstruct ParsedMeeting
             from calendarbot.services.parser import ParsedMeeting
@@ -257,24 +272,24 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
         context.bot_data.pop(f"meeting_{result_id}", None)
 
         if "error" in result:
-            await query.edit_message_text(f"❌ Error: {result['error']}")
+            await query.edit_message_text(f"X Error: {result['error']}")
         else:
             start_str = result["start"].strftime("%H:%M on %d %b %Y")
-            text = "✅ Meeting created!\n\n"
+            text = f"* {t.inline.meeting_created}\n\n"
             text += f"**{result['title']}**\n"
-            text += f"🕐 {start_str}\n"
+            text += f"* {start_str}\n"
 
             # Show reminder info
             reminders = result.get("reminders")
             if reminders:
-                reminder_text = _format_reminders(reminders)
-                text += f"🔔 {reminder_text}\n"
+                reminder_text = _format_reminders(reminders, t)
+                text += f"* {t.inline.reminder_label.format(reminder=reminder_text)}\n"
 
             if result["attendees"]:
-                text += "\n📧 Invitations sent to:\n"
+                text += f"\n* {t.inline.invitations_sent}\n"
                 for email in result["attendees"]:
-                    text += f"  • {email}\n"
-                text += "\n_These attendees will receive a calendar invitation automatically._\n"
+                    text += f"  - {email}\n"
+                text += f"\n{t.inline.attendees_will_receive}\n"
 
             # Build universal "Add to Calendar" link that works for anyone
             add_to_cal_url = build_add_to_calendar_url(
@@ -285,20 +300,20 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             )
 
             keyboard = InlineKeyboardMarkup(
-                [[InlineKeyboardButton("📅 Add to My Calendar", url=add_to_cal_url)]]
+                [[InlineKeyboardButton(f"* {t.inline.add_to_calendar_button}", url=add_to_cal_url)]]
             )
 
             if result["attendees"]:
-                text += "\n_Not listed above? Click below to add to your calendar:_"
+                text += f"\n{t.inline.not_listed_add_calendar}"
             else:
-                text += "\n_Click below to add to your calendar:_"
+                text += f"\n{t.inline.click_to_add_calendar}"
 
             await query.edit_message_text(text, parse_mode="Markdown", reply_markup=keyboard)
 
     except Exception as e:
         logger.exception(f"Error creating meeting: {e}")
         with contextlib.suppress(Exception):
-            await query.edit_message_text(f"❌ Error creating meeting: {str(e)}")
+            await query.edit_message_text(f"X Error creating meeting: {str(e)}")
 
 
 async def discard_meeting_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -307,7 +322,13 @@ async def discard_meeting_callback(update: Update, context: ContextTypes.DEFAULT
     if not query or not query.data:
         return
 
-    await query.answer("Cancelled")
+    # Get user's language
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        t = get_text(user.language if user else "en")
+
+    await query.answer(t.common.cancelled)
 
     result_id = query.data.replace("discard_", "")
 
@@ -315,7 +336,7 @@ async def discard_meeting_callback(update: Update, context: ContextTypes.DEFAULT
     if context.bot_data:
         context.bot_data.pop(f"meeting_{result_id}", None)
 
-    await query.edit_message_text("Meeting cancelled.")
+    await query.edit_message_text(t.inline.meeting_cancelled)
 
 
 def setup_inline_handlers(app: Application) -> None:

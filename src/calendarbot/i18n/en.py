@@ -1,0 +1,218 @@
+"""English translations for CalendarBot."""
+
+from calendarbot.i18n.base import (
+    CommonTranslations,
+    DonationTranslations,
+    InlineTranslations,
+    MeetingsTranslations,
+    ReminderTranslations,
+    SettingsTranslations,
+    StartTranslations,
+    Translations,
+)
+
+translations = Translations(
+    common=CommonTranslations(
+        please_start_first="Please run /start first.",
+        cancelled="Cancelled.",
+        error_user_not_found="Error: User not found.",
+    ),
+    start=StartTranslations(
+        welcome_message="""
+Welcome to *HandyCalBot*!
+
+I help you schedule meetings directly from Telegram.
+
+*Quick Start:*
+1. Connect your Google Calendar with /connect
+2. Create meetings by typing @handycalbot in any chat
+
+*Inline Usage:*
+`@handycalbot 14:30 "Meeting Title" email@example.com`
+`@handycalbot 10:00 25-01-2026 "Project Sync"`
+`@handycalbot 14:30 "Meeting" r 10m` (with reminder)
+
+*All Commands:*
+/start - Welcome message
+/help - Show help and usage
+/connect - Connect Google Calendar
+/disconnect - Disconnect calendar
+/meetings - List upcoming meetings
+/cancel - Cancel a meeting
+/settings - View your settings
+/timezone - Change timezone
+/duration - Set default duration
+/reminder - Set default reminder
+/notifications - Toggle reminders
+/language - Change language
+/donate - Support the bot
+""",
+        help_message="""
+*HandyCalBot Help*
+
+*Creating Meetings (Inline):*
+Type `@handycalbot` in any chat followed by:
+- Time (required): `HH:MM` (24-hour format)
+- Date (optional): `DD-MM-YYYY`
+- Title (required): `"Your Meeting Title"`
+- Attendees (optional): `email@example.com`
+- Reminder (optional): `r 10m` or `r 10m/30m` or just `r`
+
+*Reminder Format:*
+- `r 10m` - remind 10 minutes before
+- `r 1h` - remind 1 hour before
+- `r 1d` - remind 1 day before
+- `r 10m/30m` - multiple reminders
+- `r` - use your default reminder
+- (no r) - no reminder
+
+*Examples:*
+`@handycalbot 14:30 "Team Standup"`
+`@handycalbot 10:00 25-01-2026 "Review" john@co.com`
+`@handycalbot 16:00 "Quick Call" r 15m`
+`@handycalbot 14:00 "Meeting" alice@co.com r 10m/1h`
+
+*All Commands:*
+/start - Welcome message
+/help - This help message
+/connect - Connect Google Calendar
+/disconnect - Disconnect calendar
+/meetings - Show upcoming meetings
+/cancel - Cancel a meeting
+/settings - View your settings
+/timezone - Set your timezone
+/duration - Set default meeting duration
+/reminder - Set default reminder
+/notifications - Toggle reminder notifications
+/language - Change language
+/donate - Support the bot with Stars
+""",
+        timezone_detected="I've set your timezone to `{timezone}` based on your Telegram language. Use /timezone to change it if needed.",
+        support_button="Support HandyCalBot",
+    ),
+    settings=SettingsTranslations(
+        # Settings display
+        your_settings="**Your Settings**",
+        timezone_label="Timezone",
+        duration_label="Default Duration",
+        reminder_label="Default Reminder",
+        notifications_label="Notifications",
+        google_calendar_label="Google Calendar",
+        change_settings="**Change Settings:**",
+        connected="Connected",
+        not_connected="Not connected",
+        enabled="Enabled",
+        disabled="Disabled",
+        no_reminder="No reminder",
+        before="before",
+        day="day",
+        days="days",
+        hour="hour",
+        hours="hours",
+        minutes="min",
+        # Connect/Disconnect
+        calendar_already_connected="Google Calendar is already connected!\nUse /disconnect to unlink it first.",
+        click_to_connect="Click the button below to connect your Google Calendar.\n\nYou'll be redirected to Google to authorize access.",
+        connect_button="Connect Google Calendar",
+        calendar_disconnected="Google Calendar disconnected successfully.\nUse /connect to link it again.",
+        no_calendar_connected="No calendar connected.",
+        # Timezone
+        select_timezone="Select your timezone or type it manually (e.g., `Europe/Berlin`):",
+        timezone_set="Timezone set to: `{timezone}`",
+        timezone_set_ready="Timezone set to: `{timezone}`\n\nYou're all set! Create meetings using:\n`@handycalbot 14:30 \"Meeting Title\"`",
+        invalid_timezone="Invalid timezone: `{timezone}`\nPlease use a valid timezone like `Europe/London` or `America/New_York`.",
+        # Duration
+        select_duration="Select default meeting duration:",
+        duration_set="Default duration set to: {duration} minutes",
+        # Reminder
+        select_reminder="Select default reminder for new meetings:\n\n_You can override this per-meeting using `r 10m` in your inline query._",
+        reminder_set="Default reminder set to: {reminder}",
+        reminder_override_hint="_Use `r` in your inline query to apply this default, or `r 10m` to override with a specific time._",
+        # Notifications
+        notifications_title="**Meeting Notifications**",
+        notifications_status="Status: {status}",
+        notifications_explanation="When enabled, you'll receive Telegram notifications before your meetings (based on the reminder times you set).",
+        select_option="Select an option:",
+        enable_button="Enable",
+        disable_button="Disable",
+        current_suffix="(current)",
+        notifications_updated="{emoji} Meeting notifications {status}.",
+        will_receive_reminders="You will now receive reminders before your meetings.",
+        will_not_receive_reminders="You will no longer receive meeting reminders.",
+        # Language
+        select_language="Select your preferred language:",
+        language_updated="Language updated successfully!",
+    ),
+    meetings=MeetingsTranslations(
+        upcoming_meetings="**Upcoming Meetings**",
+        no_upcoming_meetings="No upcoming meetings found.",
+        use_cancel_hint="_Use /cancel to cancel a meeting_",
+        attendees_count="{count} attendee(s)",
+        # Cancel menu
+        select_meeting_to_cancel="**Select a meeting to cancel:**",
+        page_info="Page {current}/{total}",
+        total_meetings="{count} total meetings",
+        previous_button="Previous",
+        next_button="Next",
+        dont_cancel_button="Don't cancel anything",
+        no_meeting_cancelled="No meeting cancelled.",
+        cancelling_meeting="Cancelling meeting...",
+        meeting_cancelled="Meeting cancelled: **{title}**",
+        attendees_notified="_Attendees will be notified automatically._",
+        cancel_not_your_menu="Error: This is not your cancel menu.",
+        session_expired="Error: Session expired. Please use /cancel again.",
+        meeting_not_found="Error: Meeting not found. Please use /cancel again.",
+    ),
+    inline=InlineTranslations(
+        # Help
+        how_to_create="How to create a meeting",
+        inline_help_description='Type: 14:30 "Meeting Title" email@example.com',
+        inline_help_message='To create a meeting, type:\n@handycalbot 14:30 "Meeting Title" email@example.com\n\nFormat: TIME [DATE] "TITLE" [EMAILS]',
+        # Not registered
+        please_start_first_title="Please start the bot first",
+        please_start_first_description="Click to open bot and run /start",
+        please_start_first_message="Please start @handycalbot first by sending /start",
+        # Parse error
+        could_not_parse="Could not parse meeting",
+        parse_error_description='Use format: 14:30 "Meeting Title" emails...',
+        parse_error_message='Could not parse meeting. Use format:\n14:30 "Meeting Title" email@example.com\n\nTime and title in quotes are required.\nAdd r 10m for reminder, or just r for default.',
+        # Calendar not connected
+        calendar_not_connected_warning="Calendar not connected - /connect first",
+        # Meeting preview
+        attendees_label="{count} attendee(s)",
+        today="today",
+        # Create/Cancel buttons
+        create_meeting_button="Create Meeting",
+        cancel_button="Cancel",
+        # Creation results
+        creating_meeting="Creating meeting...",
+        meeting_data_expired="Error: Meeting data expired. Please try again.",
+        not_your_meeting="This is not your meeting!",
+        meeting_created="Meeting created!",
+        reminder_label="Reminder: {reminder} before",
+        invitations_sent="Invitations sent to:",
+        attendees_will_receive="_These attendees will receive a calendar invitation automatically._",
+        add_to_calendar_button="Add to My Calendar",
+        not_listed_add_calendar="_Not listed above? Click below to add to your calendar:_",
+        click_to_add_calendar="_Click below to add to your calendar:_",
+        meeting_cancelled="Meeting cancelled.",
+    ),
+    donation=DonationTranslations(
+        support_title="**Support HandyCalBot**",
+        support_description="If you find this bot useful, consider supporting its development with Telegram Stars!",
+        support_helps="Your support helps keep the bot running and enables new features.",
+        select_amount="Select an amount:",
+        custom_amount_button="Custom Amount",
+        custom_amount_prompt="**Custom Donation**\n\nPlease enter the number of Stars you'd like to donate (1-10000):",
+        invalid_amount="Please enter a valid amount between 1 and 10000 Stars.",
+        invalid_number="Please enter a valid number (1-10000).",
+        donation_error="Sorry, there was an error processing your donation. Please try again later.",
+        thank_you="**Thank you for your donation!**",
+        you_donated="You donated {amount} Telegram Stars. Your support means a lot!",
+        thank_you_running="Thank you for helping keep HandyCalBot running!",
+    ),
+    reminder=ReminderTranslations(
+        meeting_reminder="*Meeting Reminder*",
+        starting_in="Starting in {time}",
+    ),
+)

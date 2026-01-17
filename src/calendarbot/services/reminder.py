@@ -11,6 +11,7 @@ from calendarbot.config import get_settings
 from calendarbot.db.models import Meeting, User
 from calendarbot.db.repository import MeetingRepository
 from calendarbot.db.session import async_session_factory
+from calendarbot.i18n import get_text
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ class ReminderService:
             return False
 
     def _format_reminder_message(
-        self, meeting: Meeting, minutes_before: int, user_timezone: str
+        self, meeting: Meeting, minutes_before: int, user_timezone: str, user_language: str
     ) -> str:
         """Format the reminder notification message."""
         # Convert UTC time to user's timezone for display
@@ -53,6 +54,8 @@ class ReminderService:
         from zoneinfo import ZoneInfo
 
         from calendarbot.utils.timezone import TimezoneHelper
+
+        t = get_text(user_language)
 
         start_utc = meeting.start_time.replace(tzinfo=ZoneInfo("UTC"))
         start_local = TimezoneHelper.from_utc(start_utc, user_timezone)
@@ -63,23 +66,23 @@ class ReminderService:
         # Format the "time until" part
         if minutes_before >= 1440:
             days = minutes_before // 1440
-            time_until = f"{days} day{'s' if days > 1 else ''}"
+            time_until = f"{days} {t.settings.days}" if days > 1 else f"{days} {t.settings.day}"
         elif minutes_before >= 60:
             hours = minutes_before // 60
-            time_until = f"{hours} hour{'s' if hours > 1 else ''}"
+            time_until = f"{hours} {t.settings.hours}" if hours > 1 else f"{hours} {t.settings.hour}"
         else:
-            time_until = f"{minutes_before} minute{'s' if minutes_before > 1 else ''}"
+            time_until = f"{minutes_before} {t.settings.minutes}"
 
-        text = "🔔 *Meeting Reminder*\n\n"
-        text += f"📅 *{meeting.title}*\n"
-        text += f"🕐 {time_str} on {date_str}\n"
-        text += f"⏰ Starting in {time_until}\n"
+        text = f"* {t.reminder.meeting_reminder}\n\n"
+        text += f"* *{meeting.title}*\n"
+        text += f"* {time_str} on {date_str}\n"
+        text += f"* {t.reminder.starting_in.format(time=time_until)}\n"
 
         # Add attendees if any
         if meeting.attendees and meeting.attendees.get("emails"):
             emails = meeting.attendees["emails"]
             if emails:
-                text += f"\n👥 Attendees: {', '.join(emails)}"
+                text += f"\n* Attendees: {', '.join(emails)}"
 
         return text
 
@@ -129,7 +132,9 @@ class ReminderService:
                                 f"to user {user.telegram_id}"
                             )
 
-                            message = self._format_reminder_message(meeting, minutes, user.timezone)
+                            message = self._format_reminder_message(
+                                meeting, minutes, user.timezone, user.language
+                            )
                             success = await self.send_telegram_message(user.telegram_id, message)
 
                             if success:

@@ -41,6 +41,8 @@ class User(Base):
     default_reminder: Mapped[str | None] = mapped_column(String(100), nullable=True, default=None)
     # Whether to send Telegram notifications for meeting reminders
     notifications_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    # User's preferred language code (en, es, fr, de, ru, ko, ja, zh)
+    language: Mapped[str] = mapped_column(String(10), default="en")
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()

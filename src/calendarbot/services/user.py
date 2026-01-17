@@ -15,10 +15,14 @@ class UserService:
         self.token_repo = OAuthTokenRepository(session)
 
     async def get_or_create_user(
-        self, telegram_id: int, telegram_username: str | None = None, timezone: str | None = None
+        self,
+        telegram_id: int,
+        telegram_username: str | None = None,
+        timezone: str | None = None,
+        language: str | None = None,
     ) -> tuple[User, bool]:
         """Get or create user. Returns (user, is_new)."""
-        return await self.user_repo.get_or_create(telegram_id, telegram_username, timezone)
+        return await self.user_repo.get_or_create(telegram_id, telegram_username, timezone, language)
 
     async def get_user(self, telegram_id: int) -> User | None:
         """Get user by Telegram ID."""
@@ -39,6 +43,10 @@ class UserService:
     async def update_notifications(self, user: User, enabled: bool) -> User:
         """Update notifications enabled setting."""
         return await self.user_repo.update_settings(user, notifications_enabled=enabled)
+
+    async def update_language(self, user: User, language: str) -> User:
+        """Update user's preferred language."""
+        return await self.user_repo.update_settings(user, language=language)
 
     async def is_calendar_connected(self, user: User, provider: str = "google") -> bool:
         """Check if user has connected their calendar."""

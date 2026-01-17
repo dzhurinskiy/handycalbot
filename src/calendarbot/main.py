@@ -33,6 +33,7 @@ BOT_COMMANDS = [
     BotCommand("duration", "Set default meeting duration"),
     BotCommand("reminder", "Set default reminder"),
     BotCommand("notifications", "Toggle meeting notifications"),
+    BotCommand("language", "Change language"),
     BotCommand("donate", "Support the bot with Telegram Stars"),
 ]
 
