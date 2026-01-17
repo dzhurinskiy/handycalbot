@@ -21,6 +21,9 @@ class StartTranslations:
     help_message: str
     timezone_detected: str
     support_button: str
+    # Pending invites
+    pending_invites_found: str
+    pending_invite_notification: str
 
 
 @dataclass(frozen=True)
@@ -84,6 +87,13 @@ class SettingsTranslations:
     # Language
     select_language: str
     language_updated: str
+
+    # Privacy settings
+    privacy_title: str
+    privacy_username_invites: str
+    privacy_enabled_desc: str
+    privacy_disabled_desc: str
+    privacy_updated: str
 
 
 @dataclass(frozen=True)
@@ -154,6 +164,13 @@ class InlineTranslations:
     click_to_add_calendar: str
     meeting_cancelled: str
 
+    # Username mentions
+    username_registered: str
+    username_privacy_disabled: str
+    username_not_found: str
+    pending_invites_note: str
+    rate_limit_warning: str
+
 
 @dataclass(frozen=True)
 class DonationTranslations:
@@ -207,6 +224,7 @@ class CommandTranslations:
     duration: str
     reminder: str
     notifications: str
+    privacy: str
     language: str
     donate: str
     feedback: str

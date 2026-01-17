@@ -34,6 +34,7 @@ I help you schedule meetings directly from Telegram.
 `@handycalbot 14:30 "Meeting Title" email@example.com`
 `@handycalbot 10:00 25-01-2026 "Project Sync"`
 `@handycalbot 14:30 "Meeting" r 10m` (with reminder)
+`@handycalbot 14:30 "Meeting" @alice @bob` (invite by username)
 
 *All Commands:*
 /start - Welcome message
@@ -47,6 +48,7 @@ I help you schedule meetings directly from Telegram.
 /duration - Set default duration
 /reminder - Set default reminder
 /notifications - Toggle reminders
+/privacy - Username invite settings
 /language - Change language
 /feedback - Send feedback or report bugs
 /donate - Support the bot ⭐
@@ -61,7 +63,7 @@ Type `@handycalbot` in any chat followed by:
 • Time (required): `HH:MM` (24-hour format)
 • Date (optional): `DD-MM-YYYY`
 • Title (required): `"Your Meeting Title"`
-• Attendees (optional): `email@example.com`
+• Attendees (optional): `email@example.com` or `@username`
 • Reminder (optional): `r 10m` or `r 10m/30m` or just `r`
 
 *Reminder Format:*
@@ -76,7 +78,7 @@ Type `@handycalbot` in any chat followed by:
 `@handycalbot 14:30 "Team Standup"`
 `@handycalbot 10:00 25-01-2026 "Review" john@co.com`
 `@handycalbot 16:00 "Quick Call" r 15m`
-`@handycalbot 14:00 "Meeting" alice@co.com r 10m/1h`
+`@handycalbot 14:00 "Meeting" @alice @bob r 10m`
 
 *All Commands:*
 /start - Welcome message
@@ -90,12 +92,15 @@ Type `@handycalbot` in any chat followed by:
 /duration - Set default meeting duration
 /reminder - Set default reminder
 /notifications - Toggle reminder notifications
+/privacy - Username invite settings
 /language - Change language
 /feedback - Send feedback or report bugs
 /donate - Support the bot with Stars ⭐
 """,
         timezone_detected="I've set your timezone to `{timezone}` based on your Telegram language. Use /timezone to change it if needed.",
         support_button="⭐ Support HandyCalBot",
+        pending_invites_found="🎉 You have pending meeting invitations!",
+        pending_invite_notification="📅 **{title}**\n🕐 {time}\nInvited by: {inviter}",
     ),
     settings=SettingsTranslations(
         # Settings display
@@ -149,6 +154,12 @@ Type `@handycalbot` in any chat followed by:
         # Language
         select_language="🌍 Select your preferred language:",
         language_updated="✅ Language updated successfully!",
+        # Privacy settings
+        privacy_title="**Privacy Settings** 🔒",
+        privacy_username_invites="Allow @username invites",
+        privacy_enabled_desc="Others can invite you to meetings using your @username",
+        privacy_disabled_desc="Only direct email invites will work",
+        privacy_updated="{emoji} Username invites {status}.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Upcoming Meetings** 📅",
@@ -203,6 +214,12 @@ Type `@handycalbot` in any chat followed by:
         not_listed_add_calendar="_Not listed above? Click below to add to your calendar:_",
         click_to_add_calendar="_Click below to add to your calendar:_",
         meeting_cancelled="Meeting cancelled.",
+        # Username mentions
+        username_registered="registered",
+        username_privacy_disabled="privacy disabled",
+        username_not_found="not found",
+        pending_invites_note="⏳ Pending (will be invited when they register):",
+        rate_limit_warning="⚠️ Too many username lookups. Try again later.",
     ),
     donation=DonationTranslations(
         support_title="**Support HandyCalBot** ⭐",
@@ -241,6 +258,7 @@ Type `@handycalbot` in any chat followed by:
         duration="Set default meeting duration",
         reminder="Set default reminder",
         notifications="Toggle meeting notifications",
+        privacy="Privacy settings for @username invites",
         language="Change language",
         donate="Support the bot with Telegram Stars",
         feedback="Send feedback or report a bug",

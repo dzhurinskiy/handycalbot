@@ -100,6 +100,9 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
         # Format reminder display
         reminder_display = _format_reminder_setting(user.default_reminder, t)
 
+        # Get privacy setting
+        privacy_enabled = user.allow_username_invites
+
     # Format notifications status
     notifications_status = (
         f"✅ {t.settings.enabled}" if user.notifications_enabled else f"❌ {t.settings.disabled}"
@@ -112,6 +115,11 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
         else t.settings.not_connected
     )
 
+    # Format privacy status
+    privacy_status = (
+        f"✅ {t.settings.enabled}" if privacy_enabled else f"❌ {t.settings.disabled}"
+    )
+
     text = f"""
 {t.settings.your_settings}
 
@@ -119,6 +127,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 ⏱️ {t.settings.duration_label}: `{summary['default_duration']} {t.settings.minutes}`
 🔔 {t.settings.reminder_label}: `{reminder_display}`
 📬 {t.settings.notifications_label}: {notifications_status}
+🔒 {t.settings.privacy_username_invites}: {privacy_status}
 📅 {t.settings.google_calendar_label}: {calendar_status}
 
 {t.settings.change_settings}
@@ -126,6 +135,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 /duration - {t.settings.duration_label}
 /reminder - {t.settings.reminder_label}
 /notifications - {t.settings.notifications_label}
+/privacy - {t.settings.privacy_username_invites}
 /language - Language
 /connect - {t.settings.google_calendar_label}
 /disconnect - {t.settings.google_calendar_label}
@@ -606,6 +616,93 @@ async def language_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     await query.edit_message_text(t.settings.language_updated)
 
 
+async def privacy_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /privacy command - show privacy settings."""
+    if not update.effective_user or not update.message:
+        return
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await update.message.reply_text(t.common.please_start_first)
+            return
+
+        t = get_text(user.language)
+        current_state = user.allow_username_invites
+
+    # Show toggle buttons
+    enable_label = f"✅ {t.settings.enable_button}" + (
+        f" {t.settings.current_suffix}" if current_state else ""
+    )
+    disable_label = f"❌ {t.settings.disable_button}" + (
+        f" {t.settings.current_suffix}" if not current_state else ""
+    )
+
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(enable_label, callback_data="privacy_on"),
+                InlineKeyboardButton(disable_label, callback_data="privacy_off"),
+            ]
+        ]
+    )
+
+    status = f"✅ {t.settings.enabled}" if current_state else f"❌ {t.settings.disabled}"
+    description = (
+        t.settings.privacy_enabled_desc if current_state else t.settings.privacy_disabled_desc
+    )
+
+    await update.message.reply_text(
+        f"{t.settings.privacy_title}\n\n"
+        f"{t.settings.privacy_username_invites}: {status}\n\n"
+        f"_{description}_\n\n"
+        f"{t.settings.select_option}",
+        reply_markup=keyboard,
+        parse_mode="Markdown",
+    )
+
+
+async def privacy_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle privacy toggle button press."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    await query.answer()
+
+    # Determine new state
+    new_state = query.data == "privacy_on"
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await query.edit_message_text(t.common.error_user_not_found)
+            return
+
+        t = get_text(user.language)
+
+        # Update privacy setting
+        await user_service.update_privacy(user, new_state)
+        await session.commit()
+
+    status = t.settings.enabled.lower() if new_state else t.settings.disabled.lower()
+    emoji = "✅" if new_state else "❌"
+    follow_up = (
+        t.settings.privacy_enabled_desc if new_state else t.settings.privacy_disabled_desc
+    )
+
+    await query.edit_message_text(
+        f"{t.settings.privacy_updated.format(emoji=emoji, status=status)}\n\n_{follow_up}_",
+        parse_mode="Markdown",
+    )
+
+
 def setup_settings_handlers(app: Application) -> None:
     """Register settings handlers."""
     # Simple commands
@@ -614,12 +711,16 @@ def setup_settings_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("disconnect", disconnect_command))
     app.add_handler(CommandHandler("notifications", notifications_command))
     app.add_handler(CommandHandler("language", language_command))
+    app.add_handler(CommandHandler("privacy", privacy_command))
 
     # Notifications callback
     app.add_handler(CallbackQueryHandler(notifications_callback, pattern=r"^notif_"))
 
     # Language callback
     app.add_handler(CallbackQueryHandler(language_callback, pattern=r"^lang_"))
+
+    # Privacy callback
+    app.add_handler(CallbackQueryHandler(privacy_callback, pattern=r"^privacy_"))
 
     # Standalone timezone callback (handles tz_ buttons from OAuth and other contexts)
     # This must be registered BEFORE the ConversationHandler to catch callbacks

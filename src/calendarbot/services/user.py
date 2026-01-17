@@ -50,6 +50,12 @@ class UserService:
         """Update user's preferred language."""
         return await self.user_repo.update_settings(user, language=language)
 
+    async def update_privacy(self, user: User, allow_username_invites: bool) -> User:
+        """Update user's privacy setting for username invites."""
+        return await self.user_repo.update_settings(
+            user, allow_username_invites=allow_username_invites
+        )
+
     async def is_calendar_connected(self, user: User, provider: str = "google") -> bool:
         """Check if user has connected their calendar."""
         token = await self.token_repo.get_token(user.id, provider)

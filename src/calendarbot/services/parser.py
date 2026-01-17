@@ -14,7 +14,8 @@ class ParsedMeeting:
     time: str  # HH:MM
     date: str | None  # DD-MM-YYYY or None
     title: str
-    attendees: list[str]
+    attendees: list[str]  # Email addresses (manual input)
+    usernames: list[str]  # @mentions (without the @ prefix)
     start_datetime: datetime  # Combined datetime in user's timezone
     end_datetime: datetime
     # Reminders in minutes before meeting, None means no reminder, empty list means use default
@@ -41,6 +42,8 @@ class MeetingParser:
     EMAIL_PATTERN = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
     # Reminder pattern: r followed by optional time values like 10m, 30m/60m, 1d
     REMINDER_PATTERN = r"\br\s*((?:\d+[mhd](?:/\d+[mhd])*)?)\b"
+    # Telegram username pattern: @username (5-32 chars, alphanumeric + underscore, starts with letter)
+    USERNAME_PATTERN = r"@([a-zA-Z][a-zA-Z0-9_]{4,31})"
 
     # Various quote characters to normalize (Russian, curly, single, guillemets, etc.)
     # iPhone and other devices may use any of these instead of standard double quotes
@@ -157,13 +160,18 @@ class MeetingParser:
                 # Just "r" without values - use default
                 use_default_reminder = True
 
-        # Extract emails (optional)
+        # Extract emails and usernames (optional)
         # Find all text after the title, excluding the reminder part
         title_end = title_match.end()
         remaining_text = text[title_end:]
-        # Remove reminder pattern from remaining text before extracting emails
+        # Remove reminder pattern from remaining text before extracting emails/usernames
         remaining_text = re.sub(self.REMINDER_PATTERN, "", remaining_text)
-        attendees = re.findall(self.EMAIL_PATTERN, remaining_text)
+
+        # Extract @usernames (without the @ prefix)
+        usernames = re.findall(self.USERNAME_PATTERN, remaining_text)
+        # Remove usernames from text before email extraction to avoid partial matches
+        remaining_text_no_usernames = re.sub(self.USERNAME_PATTERN, "", remaining_text)
+        attendees = re.findall(self.EMAIL_PATTERN, remaining_text_no_usernames)
 
         # Build datetime
         try:
@@ -177,6 +185,7 @@ class MeetingParser:
             date=date_str,
             title=title,
             attendees=attendees,
+            usernames=usernames,
             start_datetime=start_datetime,
             end_datetime=end_datetime,
             reminders=reminders,
@@ -221,8 +230,19 @@ class MeetingParser:
 
         return dt
 
-    def format_preview(self, meeting: ParsedMeeting, default_reminder: str | None = None) -> str:
-        """Format meeting for inline preview."""
+    def format_preview(
+        self,
+        meeting: ParsedMeeting,
+        default_reminder: str | None = None,
+        username_statuses: dict[str, str] | None = None,
+    ) -> str:
+        """Format meeting for inline preview.
+
+        Args:
+            meeting: The parsed meeting data
+            default_reminder: User's default reminder setting
+            username_statuses: Dict mapping usernames to status strings (e.g. "✓", "🔒", "❓")
+        """
         date_display = meeting.start_datetime.strftime("%d %b %Y")
         time_display = meeting.start_datetime.strftime("%H:%M")
 
@@ -235,8 +255,24 @@ class MeetingParser:
         if reminder_text:
             text += f"🔔 {reminder_text}\n"
 
-        if meeting.attendees:
-            text += f"👥 Attendees: {', '.join(meeting.attendees)}"
+        # Build attendee list combining emails and usernames
+        attendee_parts = []
+
+        # Add usernames with status icons
+        if meeting.usernames and username_statuses:
+            for username in meeting.usernames:
+                status = username_statuses.get(username, "❓")
+                attendee_parts.append(f"@{username} {status}")
+        elif meeting.usernames:
+            # No status info yet, just show usernames
+            for username in meeting.usernames:
+                attendee_parts.append(f"@{username}")
+
+        # Add email addresses
+        attendee_parts.extend(meeting.attendees)
+
+        if attendee_parts:
+            text += f"👥 Attendees: {', '.join(attendee_parts)}"
         else:
             text += "👤 No attendees (private event)"
 

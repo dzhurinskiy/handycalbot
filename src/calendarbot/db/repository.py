@@ -6,7 +6,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from calendarbot.db.models import Meeting, OAuthToken, User
+from calendarbot.db.models import Meeting, OAuthToken, PendingInvite, User, UsernameLookup
 
 # Sentinel value to distinguish "not provided" from None
 _UNSET: Any = object()
@@ -56,6 +56,7 @@ class UserRepository:
         default_reminder: str | None = _UNSET,
         notifications_enabled: bool | None = None,
         language: str | None = None,
+        allow_username_invites: bool | None = None,
     ) -> User:
         """Update user settings."""
         if timezone is not None:
@@ -68,8 +69,30 @@ class UserRepository:
             user.notifications_enabled = notifications_enabled
         if language is not None:
             user.language = language
+        if allow_username_invites is not None:
+            user.allow_username_invites = allow_username_invites
         await self.session.flush()
         return user
+
+    async def get_by_username(self, username: str) -> User | None:
+        """Get user by Telegram username (case-insensitive)."""
+        result = await self.session.execute(
+            select(User).where(User.telegram_username.ilike(username))
+        )
+        return result.scalar_one_or_none()
+
+    async def get_users_by_usernames(self, usernames: list[str]) -> list[User]:
+        """Get multiple users by their Telegram usernames."""
+        if not usernames:
+            return []
+        # Use case-insensitive matching
+        from sqlalchemy import func as sa_func
+
+        lower_usernames = [u.lower() for u in usernames]
+        result = await self.session.execute(
+            select(User).where(sa_func.lower(User.telegram_username).in_(lower_usernames))
+        )
+        return list(result.scalars().all())
 
 
 class OAuthTokenRepository:
@@ -224,3 +247,134 @@ class MeetingRepository:
             await self.session.delete(meeting)
             return True
         return False
+
+
+class PendingInviteRepository:
+    """Pending invite data access."""
+
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def create(
+        self,
+        inviter_telegram_id: int,
+        invitee_username: str,
+        meeting_id: str,
+        meeting_title: str,
+        meeting_time: datetime,
+    ) -> PendingInvite:
+        """Create a pending invite for an unregistered user."""
+        invite = PendingInvite(
+            inviter_telegram_id=inviter_telegram_id,
+            invitee_username=invitee_username.lower(),  # Store lowercase for consistency
+            meeting_id=meeting_id,
+            meeting_title=meeting_title,
+            meeting_time=meeting_time,
+        )
+        self.session.add(invite)
+        await self.session.flush()
+        return invite
+
+    async def get_by_username(self, username: str) -> list[PendingInvite]:
+        """Get all pending invites for a username."""
+        result = await self.session.execute(
+            select(PendingInvite).where(
+                PendingInvite.invitee_username == username.lower()
+            )
+        )
+        return list(result.scalars().all())
+
+    async def get_by_id(self, invite_id: int) -> PendingInvite | None:
+        """Get a specific pending invite by ID."""
+        result = await self.session.execute(
+            select(PendingInvite).where(PendingInvite.id == invite_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def delete(self, invite: PendingInvite) -> None:
+        """Delete a pending invite."""
+        await self.session.delete(invite)
+
+    async def delete_by_username(self, username: str) -> int:
+        """Delete all pending invites for a username. Returns count deleted."""
+        invites = await self.get_by_username(username)
+        for invite in invites:
+            await self.session.delete(invite)
+        return len(invites)
+
+
+class UsernameLookupRepository:
+    """Username lookup rate limiting data access."""
+
+    RATE_LIMIT = 50  # lookups per hour per user
+    WINDOW_HOURS = 1
+
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def get_or_create(self, telegram_id: int) -> UsernameLookup:
+        """Get or create a lookup record for a user."""
+        result = await self.session.execute(
+            select(UsernameLookup).where(
+                UsernameLookup.requester_telegram_id == telegram_id
+            )
+        )
+        lookup = result.scalar_one_or_none()
+
+        if not lookup:
+            lookup = UsernameLookup(
+                requester_telegram_id=telegram_id,
+                lookup_count=0,
+                window_start=datetime.now(datetime.UTC),
+            )
+            self.session.add(lookup)
+            await self.session.flush()
+
+        return lookup
+
+    async def check_and_increment(self, telegram_id: int, count: int = 1) -> bool:
+        """Check if user is within rate limit and increment counter.
+
+        Returns True if within limit, False if rate limited.
+        """
+        from datetime import timedelta
+
+        lookup = await self.get_or_create(telegram_id)
+        now = datetime.now(datetime.UTC)
+
+        # Make window_start timezone-aware if it isn't
+        window_start = lookup.window_start
+        if window_start.tzinfo is None:
+            window_start = window_start.replace(tzinfo=datetime.UTC)
+
+        # Reset window if expired
+        if now - window_start > timedelta(hours=self.WINDOW_HOURS):
+            lookup.lookup_count = 0
+            lookup.window_start = now
+
+        # Check limit
+        if lookup.lookup_count + count > self.RATE_LIMIT:
+            return False
+
+        # Increment and allow
+        lookup.lookup_count += count
+        await self.session.flush()
+        return True
+
+    async def get_remaining(self, telegram_id: int) -> int:
+        """Get remaining lookups for a user in current window."""
+        from datetime import timedelta
+
+        lookup = await self.get_or_create(telegram_id)
+        now = datetime.now(datetime.UTC)
+
+        # Make window_start timezone-aware if it isn't
+        window_start = lookup.window_start
+        if window_start.tzinfo is None:
+            window_start = window_start.replace(tzinfo=datetime.UTC)
+
+        # If window expired, full limit available
+        if now - window_start > timedelta(hours=self.WINDOW_HOURS):
+            return self.RATE_LIMIT
+
+        return max(0, self.RATE_LIMIT - lookup.lookup_count)

@@ -96,6 +96,8 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
 """,
         timezone_detected="텔레그램 언어 설정을 기반으로 시간대를 `{timezone}`로 설정했습니다. 변경하려면 /timezone을 사용하세요.",
         support_button="⭐ HandyCalBot 후원하기",
+        pending_invites_found="🎉 대기 중인 회의 초대가 있습니다!",
+        pending_invite_notification="📅 **{title}**\n🕐 {time}\n초대자: {inviter}",
     ),
     settings=SettingsTranslations(
         your_settings="**설정**",
@@ -142,6 +144,11 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         will_not_receive_reminders="더 이상 회의 알림을 받지 않습니다.",
         select_language="선호하는 언어 선택:",
         language_updated="✅ 언어가 성공적으로 업데이트되었습니다!",
+        privacy_title="**개인정보 설정** 🔒",
+        privacy_username_invites="@사용자명 초대 허용",
+        privacy_enabled_desc="다른 사람들이 @사용자명으로 회의에 초대할 수 있습니다",
+        privacy_disabled_desc="직접 이메일 초대만 작동합니다",
+        privacy_updated="{emoji} 사용자명 초대 {status}.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**예정된 회의**",
@@ -188,6 +195,11 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         not_listed_add_calendar="_목록에 없으신가요? 아래를 클릭하여 캘린더에 추가:_",
         click_to_add_calendar="_아래를 클릭하여 캘린더에 추가:_",
         meeting_cancelled="✅ 회의가 취소되었습니다.",
+        username_registered="등록됨",
+        username_privacy_disabled="개인정보 비활성화",
+        username_not_found="찾을 수 없음",
+        pending_invites_note="⏳ 대기 중 (등록 시 초대됨):",
+        rate_limit_warning="⚠️ 사용자 검색이 너무 많습니다. 나중에 다시 시도하세요.",
     ),
     donation=DonationTranslations(
         support_title="**HandyCalBot 후원하기**",
@@ -229,5 +241,6 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         language="언어 변경",
         donate="Stars로 봇 후원",
         feedback="피드백 보내기 또는 버그 신고",
+        privacy="초대 개인정보 설정",
     ),
 )

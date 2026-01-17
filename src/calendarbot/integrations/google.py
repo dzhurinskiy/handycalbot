@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_CALENDAR_API = "https://www.googleapis.com/calendar/v3"
+GOOGLE_USERINFO_API = "https://www.googleapis.com/oauth2/v2/userinfo"
 
 
 class GoogleCalendarClient:
@@ -176,6 +177,13 @@ class GoogleCalendarClient:
         url = f"{GOOGLE_CALENDAR_API}/users/me/calendarList"
         return await self._request("GET", url)
 
+    async def get_user_email(self) -> str | None:
+        """Get the user's email from their Google account."""
+        result = await self._request("GET", GOOGLE_USERINFO_API)
+        if "error" in result:
+            return None
+        return result.get("email")
+
 
 class GoogleOAuthFlow:
     """Handle Google OAuth2 flow."""
@@ -183,6 +191,7 @@ class GoogleOAuthFlow:
     SCOPES = [
         "https://www.googleapis.com/auth/calendar.events",
         "https://www.googleapis.com/auth/calendar.readonly",
+        "https://www.googleapis.com/auth/userinfo.email",
     ]
     AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 

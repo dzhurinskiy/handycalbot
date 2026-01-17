@@ -24,6 +24,7 @@ def get_bot_commands(language: str = "en") -> list[BotCommand]:
         BotCommand("duration", t.commands.duration),
         BotCommand("reminder", t.commands.reminder),
         BotCommand("notifications", t.commands.notifications),
+        BotCommand("privacy", t.commands.privacy),
         BotCommand("language", t.commands.language),
         BotCommand("donate", t.commands.donate),
         BotCommand("feedback", t.commands.feedback),

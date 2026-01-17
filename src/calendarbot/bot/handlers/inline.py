@@ -20,11 +20,13 @@ from telegram.ext import (
     InlineQueryHandler,
 )
 
+from calendarbot.db.repository import PendingInviteRepository
 from calendarbot.db.session import async_session_factory
 from calendarbot.i18n import get_text
 from calendarbot.services.calendar import CalendarService
 from calendarbot.services.parser import MeetingParser
 from calendarbot.services.user import UserService
+from calendarbot.services.username_resolver import UsernameResolverService
 from calendarbot.utils.timezone import TimezoneHelper
 
 logger = logging.getLogger(__name__)
@@ -129,6 +131,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         user_timezone = user.timezone
         user_default_duration = user.default_duration
         user_default_reminder = user.default_reminder
+        user_telegram_id = query.from_user.id
 
     # Parse the query
     parser = MeetingParser(
@@ -149,8 +152,30 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await query.answer(results, cache_time=10)
         return
 
-    # Generate preview with reminder info
-    preview = parser.format_preview(meeting, default_reminder=user_default_reminder)
+    # Resolve usernames if present
+    username_statuses: dict[str, str] = {}
+    rate_limited = False
+    if meeting.usernames:
+        async with async_session_factory() as session:
+            resolver = UsernameResolverService(session)
+            # Check rate limit first
+            remaining = await resolver.get_remaining_lookups(user_telegram_id)
+            if remaining < len(meeting.usernames):
+                rate_limited = True
+            else:
+                username_statuses = await resolver.get_username_statuses(
+                    meeting.usernames, user_telegram_id
+                )
+
+    # Generate preview with reminder info and username statuses
+    preview = parser.format_preview(
+        meeting,
+        default_reminder=user_default_reminder,
+        username_statuses=username_statuses if not rate_limited else None,
+    )
+
+    if rate_limited:
+        preview += f"\n\n{t.inline.rate_limit_warning}"
 
     if not calendar_connected:
         preview += f"\n\n{t.inline.calendar_not_connected_warning}"
@@ -168,6 +193,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             "date": meeting.date,
             "title": meeting.title,
             "attendees": meeting.attendees,
+            "usernames": meeting.usernames,
             "start_datetime": meeting.start_datetime.isoformat(),
             "end_datetime": meeting.end_datetime.isoformat(),
             "reminders": meeting.reminders,
@@ -191,11 +217,14 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     date_display = meeting.date or t.inline.today
 
+    # Count total attendees (emails + usernames)
+    total_attendees = len(meeting.attendees) + len(meeting.usernames)
+
     results = [
         InlineQueryResultArticle(
             id=result_id,
             title=f"📅 {meeting.title}",
-            description=f"{meeting.time} {date_display} - {t.inline.attendees_label.format(count=len(meeting.attendees))}",
+            description=f"{meeting.time} {date_display} - {t.inline.attendees_label.format(count=total_attendees)}",
             input_message_content=InputTextMessageContent(
                 preview,
                 parse_mode=None,
@@ -253,11 +282,26 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             from calendarbot.services.parser import ParsedMeeting
 
             m = meeting_data["meeting"]
+            usernames = m.get("usernames", [])
+
+            # Resolve usernames to emails
+            resolved_emails: list[str] = []
+            unresolved_usernames: list[str] = []
+            if usernames:
+                resolver = UsernameResolverService(session)
+                resolved_emails, unresolved_usernames = await resolver.get_emails_for_meeting(
+                    usernames, update.effective_user.id
+                )
+
+            # Combine manual emails with resolved username emails
+            all_attendees = m["attendees"] + resolved_emails
+
             parsed = ParsedMeeting(
                 time=m["time"],
                 date=m["date"],
                 title=m["title"],
-                attendees=m["attendees"],
+                attendees=all_attendees,
+                usernames=[],  # Clear usernames as they're now resolved
                 start_datetime=datetime.fromisoformat(m["start_datetime"]),
                 end_datetime=datetime.fromisoformat(m["end_datetime"]),
                 reminders=m.get("reminders"),
@@ -266,6 +310,21 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
 
             calendar_service = CalendarService(session)
             result = await calendar_service.create_meeting(user, parsed)
+
+            # Create pending invites for unresolved usernames
+            pending_invites_created: list[str] = []
+            if unresolved_usernames and "event_id" in result:
+                pending_repo = PendingInviteRepository(session)
+                for username in unresolved_usernames:
+                    await pending_repo.create(
+                        inviter_telegram_id=update.effective_user.id,
+                        invitee_username=username,
+                        meeting_id=result["event_id"],
+                        meeting_title=parsed.title,
+                        meeting_time=parsed.start_datetime,
+                    )
+                    pending_invites_created.append(username)
+
             await session.commit()
 
         # Clean up stored data
@@ -285,11 +344,27 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 reminder_text = _format_reminders(reminders, t)
                 text += f"{t.inline.reminder_label.format(reminder=reminder_text)}\n"
 
-            if result["attendees"]:
+            # Show invitations sent (both email and resolved usernames)
+            original_usernames = m.get("usernames", [])
+            resolved_usernames = [
+                u for u in original_usernames if u not in unresolved_usernames
+            ]
+
+            if result["attendees"] or resolved_usernames:
                 text += f"\n{t.inline.invitations_sent}\n"
-                for email in result["attendees"]:
+                # Show resolved usernames
+                for username in resolved_usernames:
+                    text += f"  • @{username} ({t.inline.username_registered})\n"
+                # Show manual email addresses
+                for email in m["attendees"]:  # Original emails only
                     text += f"  • {email}\n"
                 text += f"\n{t.inline.attendees_will_receive}\n"
+
+            # Show pending invites for unresolved usernames
+            if pending_invites_created:
+                text += f"\n{t.inline.pending_invites_note}\n"
+                for username in pending_invites_created:
+                    text += f"  • @{username}\n"
 
             # Build universal "Add to Calendar" link that works for anyone
             add_to_cal_url = build_add_to_calendar_url(
@@ -303,7 +378,7 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 [[InlineKeyboardButton(t.inline.add_to_calendar_button, url=add_to_cal_url)]]
             )
 
-            if result["attendees"]:
+            if result["attendees"] or resolved_usernames:
                 text += f"\n{t.inline.not_listed_add_calendar}"
             else:
                 text += f"\n{t.inline.click_to_add_calendar}"

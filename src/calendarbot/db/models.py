@@ -43,6 +43,8 @@ class User(Base):
     notifications_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     # User's preferred language code (en, es, fr, de, ru, ko, ja, zh)
     language: Mapped[str] = mapped_column(String(10), default="en")
+    # Privacy setting: allow others to invite by @username
+    allow_username_invites: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
@@ -119,3 +121,38 @@ class Meeting(Base):
 
     def __repr__(self) -> str:
         return f"<Meeting(id={self.id}, title={self.title})>"
+
+
+class PendingInvite(Base):
+    """Pending invites for unregistered users."""
+
+    __tablename__ = "pending_invites"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    inviter_telegram_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    invitee_username: Mapped[str] = mapped_column(String(255), nullable=False)
+    meeting_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    meeting_title: Mapped[str] = mapped_column(String(255), nullable=False)
+    meeting_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (Index("idx_pending_invites_username", "invitee_username"),)
+
+    def __repr__(self) -> str:
+        return f"<PendingInvite(id={self.id}, invitee={self.invitee_username})>"
+
+
+class UsernameLookup(Base):
+    """Rate limiting for username lookups."""
+
+    __tablename__ = "username_lookups"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    requester_telegram_id: Mapped[int] = mapped_column(BigInteger, nullable=False, unique=True)
+    lookup_count: Mapped[int] = mapped_column(Integer, default=0)
+    window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (Index("idx_username_lookups_requester", "requester_telegram_id"),)
+
+    def __repr__(self) -> str:
+        return f"<UsernameLookup(id={self.id}, requester={self.requester_telegram_id})>"
