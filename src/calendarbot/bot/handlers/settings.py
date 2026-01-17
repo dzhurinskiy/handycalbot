@@ -100,10 +100,16 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
         reminder_display = _format_reminder_setting(user.default_reminder, t)
 
     # Format notifications status
-    notifications_status = f"* {t.settings.enabled}" if user.notifications_enabled else f"X {t.settings.disabled}"
+    notifications_status = (
+        f"* {t.settings.enabled}" if user.notifications_enabled else f"X {t.settings.disabled}"
+    )
 
     # Format calendar status
-    calendar_status = t.settings.connected if summary['google_calendar'] == "Connected" else t.settings.not_connected
+    calendar_status = (
+        t.settings.connected
+        if summary["google_calendar"] == "Connected"
+        else t.settings.not_connected
+    )
 
     text = f"""
 {t.settings.your_settings} *
@@ -202,7 +208,9 @@ async def timezone_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     # Get user's language
     async with async_session_factory() as session:
         user_service = UserService(session)
-        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        user = (
+            await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        )
         user_lang = user.language if user else "en"
 
     t = get_text(user_lang)
@@ -307,7 +315,9 @@ async def duration_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     # Get user's language
     async with async_session_factory() as session:
         user_service = UserService(session)
-        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        user = (
+            await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        )
         user_lang = user.language if user else "en"
 
     t = get_text(user_lang)
@@ -368,7 +378,9 @@ async def reminder_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     # Get user's language
     async with async_session_factory() as session:
         user_service = UserService(session)
-        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        user = (
+            await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        )
         user_lang = user.language if user else "en"
 
     t = get_text(user_lang)
@@ -425,7 +437,11 @@ async def cancel_conversation(update: Update, _context: ContextTypes.DEFAULT_TYP
         # Get user's language
         async with async_session_factory() as session:
             user_service = UserService(session)
-            user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+            user = (
+                await user_service.get_user(update.effective_user.id)
+                if update.effective_user
+                else None
+            )
             user_lang = user.language if user else "en"
         t = get_text(user_lang)
         await update.message.reply_text(t.common.cancelled)
@@ -452,8 +468,12 @@ async def notifications_command(update: Update, _context: ContextTypes.DEFAULT_T
         current_state = user.notifications_enabled
 
     # Show toggle buttons
-    enable_label = f"* {t.settings.enable_button}" + (f" {t.settings.current_suffix}" if current_state else "")
-    disable_label = f"X {t.settings.disable_button}" + (f" {t.settings.current_suffix}" if not current_state else "")
+    enable_label = f"* {t.settings.enable_button}" + (
+        f" {t.settings.current_suffix}" if current_state else ""
+    )
+    disable_label = f"X {t.settings.disable_button}" + (
+        f" {t.settings.current_suffix}" if not current_state else ""
+    )
 
     keyboard = InlineKeyboardMarkup(
         [
@@ -504,7 +524,9 @@ async def notifications_callback(update: Update, _context: ContextTypes.DEFAULT_
 
     status = t.settings.enabled.lower() if new_state else t.settings.disabled.lower()
     emoji = "*" if new_state else "X"
-    follow_up = t.settings.will_receive_reminders if new_state else t.settings.will_not_receive_reminders
+    follow_up = (
+        t.settings.will_receive_reminders if new_state else t.settings.will_not_receive_reminders
+    )
 
     await query.edit_message_text(
         f"{t.settings.notifications_updated.format(emoji=emoji, status=status)}\n\n{follow_up}",

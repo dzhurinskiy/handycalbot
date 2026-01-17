@@ -116,7 +116,7 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         no_calendar_connected="No hay calendario conectado.",
         select_timezone="Selecciona tu zona horaria o escribela manualmente (ej., `Europe/Madrid`):",
         timezone_set="Zona horaria establecida: `{timezone}`",
-        timezone_set_ready="Zona horaria establecida: `{timezone}`\n\nTodo listo! Crea reuniones usando:\n`@handycalbot 14:30 \"Titulo de Reunion\"`",
+        timezone_set_ready='Zona horaria establecida: `{timezone}`\n\nTodo listo! Crea reuniones usando:\n`@handycalbot 14:30 "Titulo de Reunion"`',
         invalid_timezone="Zona horaria invalida: `{timezone}`\nPor favor usa una zona horaria valida como `Europe/Madrid` o `America/Mexico_City`.",
         select_duration="Selecciona la duracion predeterminada de reuniones:",
         duration_set="Duracion predeterminada establecida: {duration} minutos",

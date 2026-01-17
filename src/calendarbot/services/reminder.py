@@ -69,7 +69,9 @@ class ReminderService:
             time_until = f"{days} {t.settings.days}" if days > 1 else f"{days} {t.settings.day}"
         elif minutes_before >= 60:
             hours = minutes_before // 60
-            time_until = f"{hours} {t.settings.hours}" if hours > 1 else f"{hours} {t.settings.hour}"
+            time_until = (
+                f"{hours} {t.settings.hours}" if hours > 1 else f"{hours} {t.settings.hour}"
+            )
         else:
             time_until = f"{minutes_before} {t.settings.minutes}"
 

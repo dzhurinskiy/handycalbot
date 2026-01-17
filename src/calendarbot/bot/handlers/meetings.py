@@ -165,15 +165,23 @@ async def show_cancel_menu(
     nav_buttons = []
     if page > 0:
         nav_buttons.append(
-            InlineKeyboardButton(f"<< {t.meetings.previous_button}", callback_data=f"cp_{user_id}_{page - 1}")
+            InlineKeyboardButton(
+                f"<< {t.meetings.previous_button}", callback_data=f"cp_{user_id}_{page - 1}"
+            )
         )
     if end_idx < total_meetings:
-        nav_buttons.append(InlineKeyboardButton(f"{t.meetings.next_button} >>", callback_data=f"cp_{user_id}_{page + 1}"))
+        nav_buttons.append(
+            InlineKeyboardButton(
+                f"{t.meetings.next_button} >>", callback_data=f"cp_{user_id}_{page + 1}"
+            )
+        )
     if nav_buttons:
         buttons.append(nav_buttons)
 
     # Cancel button
-    buttons.append([InlineKeyboardButton(f"X {t.meetings.dont_cancel_button}", callback_data="cancel_none")])
+    buttons.append(
+        [InlineKeyboardButton(f"X {t.meetings.dont_cancel_button}", callback_data="cancel_none")]
+    )
 
     # Header text
     total_pages = (total_meetings + MEETINGS_PER_PAGE - 1) // MEETINGS_PER_PAGE
@@ -275,7 +283,9 @@ async def cancel_none_callback(update: Update, _context: ContextTypes.DEFAULT_TY
     # Get user's language
     async with async_session_factory() as session:
         user_service = UserService(session)
-        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        user = (
+            await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        )
         t = get_text(user.language if user else "en")
 
     await query.edit_message_text(t.meetings.no_meeting_cancelled)

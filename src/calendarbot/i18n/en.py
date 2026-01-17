@@ -119,7 +119,7 @@ Type `@handycalbot` in any chat followed by:
         # Timezone
         select_timezone="Select your timezone or type it manually (e.g., `Europe/Berlin`):",
         timezone_set="Timezone set to: `{timezone}`",
-        timezone_set_ready="Timezone set to: `{timezone}`\n\nYou're all set! Create meetings using:\n`@handycalbot 14:30 \"Meeting Title\"`",
+        timezone_set_ready='Timezone set to: `{timezone}`\n\nYou\'re all set! Create meetings using:\n`@handycalbot 14:30 "Meeting Title"`',
         invalid_timezone="Invalid timezone: `{timezone}`\nPlease use a valid timezone like `Europe/London` or `America/New_York`.",
         # Duration
         select_duration="Select default meeting duration:",

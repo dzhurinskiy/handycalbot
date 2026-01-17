@@ -67,7 +67,9 @@ async def help_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> N
     # Get user's language preference
     async with async_session_factory() as session:
         user_service = UserService(session)
-        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        user = (
+            await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        )
         user_lang = user.language if user else "en"
 
     t = get_text(user_lang)

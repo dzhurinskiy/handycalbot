@@ -51,7 +51,13 @@ async def donate_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) ->
         buttons.append(row)
 
     # Add custom amount button
-    buttons.append([InlineKeyboardButton(f"* {t.donation.custom_amount_button}", callback_data="donate_custom")])
+    buttons.append(
+        [
+            InlineKeyboardButton(
+                f"* {t.donation.custom_amount_button}", callback_data="donate_custom"
+            )
+        ]
+    )
 
     keyboard = InlineKeyboardMarkup(buttons)
 
@@ -90,7 +96,13 @@ async def donate_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 row = []
         if row:
             buttons.append(row)
-        buttons.append([InlineKeyboardButton(f"* {t.donation.custom_amount_button}", callback_data="donate_custom")])
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    f"* {t.donation.custom_amount_button}", callback_data="donate_custom"
+                )
+            ]
+        )
         keyboard = InlineKeyboardMarkup(buttons)
 
         await query.edit_message_text(
@@ -209,7 +221,9 @@ async def successful_payment_callback(update: Update, _context: ContextTypes.DEF
     # Get user's language
     async with async_session_factory() as session:
         user_service = UserService(session)
-        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        user = (
+            await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        )
         t = get_text(user.language if user else "en")
 
     await update.message.reply_text(

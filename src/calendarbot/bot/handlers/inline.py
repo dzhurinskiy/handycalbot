@@ -116,9 +116,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                     id="help",
                     title=t.inline.how_to_create,
                     description=t.inline.inline_help_description,
-                    input_message_content=InputTextMessageContent(
-                        t.inline.inline_help_message
-                    ),
+                    input_message_content=InputTextMessageContent(t.inline.inline_help_message),
                 )
             ]
             await query.answer(results, cache_time=300)
@@ -145,9 +143,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 id="parse_error",
                 title=t.inline.could_not_parse,
                 description=t.inline.parse_error_description,
-                input_message_content=InputTextMessageContent(
-                    t.inline.parse_error_message
-                ),
+                input_message_content=InputTextMessageContent(t.inline.parse_error_message),
             )
         ]
         await query.answer(results, cache_time=10)
@@ -183,8 +179,12 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton(f"* {t.inline.create_meeting_button}", callback_data=f"create_{result_id}"),
-                InlineKeyboardButton(f"X {t.inline.cancel_button}", callback_data=f"discard_{result_id}"),
+                InlineKeyboardButton(
+                    f"* {t.inline.create_meeting_button}", callback_data=f"create_{result_id}"
+                ),
+                InlineKeyboardButton(
+                    f"X {t.inline.cancel_button}", callback_data=f"discard_{result_id}"
+                ),
             ]
         ]
     )
@@ -325,7 +325,9 @@ async def discard_meeting_callback(update: Update, context: ContextTypes.DEFAULT
     # Get user's language
     async with async_session_factory() as session:
         user_service = UserService(session)
-        user = await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        user = (
+            await user_service.get_user(update.effective_user.id) if update.effective_user else None
+        )
         t = get_text(user.language if user else "en")
 
     await query.answer(t.common.cancelled)

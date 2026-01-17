@@ -116,7 +116,7 @@ Telegramから直接ミーティングをスケジュールできます。
         no_calendar_connected="接続されたカレンダーはありません。",
         select_timezone="タイムゾーンを選択するか、手動で入力してください (例: `Asia/Tokyo`):",
         timezone_set="タイムゾーン設定: `{timezone}`",
-        timezone_set_ready="タイムゾーン設定: `{timezone}`\n\n準備完了! ミーティング作成:\n`@handycalbot 14:30 \"ミーティングタイトル\"`",
+        timezone_set_ready='タイムゾーン設定: `{timezone}`\n\n準備完了! ミーティング作成:\n`@handycalbot 14:30 "ミーティングタイトル"`',
         invalid_timezone="無効なタイムゾーン: `{timezone}`\n`Asia/Tokyo` や `Asia/Seoul` などの有効なタイムゾーンを使用してください。",
         select_duration="デフォルトミーティング時間を選択:",
         duration_set="デフォルト時間設定: {duration}分",

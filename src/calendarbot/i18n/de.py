@@ -116,7 +116,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         no_calendar_connected="Kein Kalender verbunden.",
         select_timezone="Wahle deine Zeitzone oder gib sie manuell ein (z.B. `Europe/Berlin`):",
         timezone_set="Zeitzone gesetzt auf: `{timezone}`",
-        timezone_set_ready="Zeitzone gesetzt auf: `{timezone}`\n\nDu bist bereit! Erstelle Besprechungen mit:\n`@handycalbot 14:30 \"Besprechungstitel\"`",
+        timezone_set_ready='Zeitzone gesetzt auf: `{timezone}`\n\nDu bist bereit! Erstelle Besprechungen mit:\n`@handycalbot 14:30 "Besprechungstitel"`',
         invalid_timezone="Ungultige Zeitzone: `{timezone}`\nBitte benutze eine gultige Zeitzone wie `Europe/Berlin` oder `Europe/Vienna`.",
         select_duration="Wahle die Standard-Besprechungsdauer:",
         duration_set="Standarddauer gesetzt auf: {duration} Minuten",

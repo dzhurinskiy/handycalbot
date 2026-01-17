@@ -22,7 +22,9 @@ class UserService:
         language: str | None = None,
     ) -> tuple[User, bool]:
         """Get or create user. Returns (user, is_new)."""
-        return await self.user_repo.get_or_create(telegram_id, telegram_username, timezone, language)
+        return await self.user_repo.get_or_create(
+            telegram_id, telegram_username, timezone, language
+        )
 
     async def get_user(self, telegram_id: int) -> User | None:
         """Get user by Telegram ID."""
