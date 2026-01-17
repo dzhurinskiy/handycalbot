@@ -116,9 +116,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     )
 
     # Format privacy status
-    privacy_status = (
-        f"✅ {t.settings.enabled}" if privacy_enabled else f"❌ {t.settings.disabled}"
-    )
+    privacy_status = f"✅ {t.settings.enabled}" if privacy_enabled else f"❌ {t.settings.disabled}"
 
     text = f"""
 {t.settings.your_settings}
@@ -693,9 +691,7 @@ async def privacy_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 
     status = t.settings.enabled.lower() if new_state else t.settings.disabled.lower()
     emoji = "✅" if new_state else "❌"
-    follow_up = (
-        t.settings.privacy_enabled_desc if new_state else t.settings.privacy_disabled_desc
-    )
+    follow_up = t.settings.privacy_enabled_desc if new_state else t.settings.privacy_disabled_desc
 
     await query.edit_message_text(
         f"{t.settings.privacy_updated.format(emoji=emoji, status=status)}\n\n_{follow_up}_",

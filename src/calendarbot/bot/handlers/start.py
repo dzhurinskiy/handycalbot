@@ -82,9 +82,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text(invite_text, parse_mode="Markdown")
 
 
-async def _process_pending_invites(
-    session, user_id: int, username: str, _t
-) -> list[dict]:
+async def _process_pending_invites(session, user_id: int, username: str, _t) -> list[dict]:
     """Process pending invites for a user and send calendar invitations.
 
     Returns list of processed invite info for notification.
@@ -126,17 +124,17 @@ async def _process_pending_invites(
             # Add user as attendee to the existing meeting
             # Note: We can't directly add attendees to someone else's event,
             # but we can notify the user about the invitation
-            processed.append({
-                "title": invite.meeting_title,
-                "time": invite.meeting_time.strftime("%H:%M on %d %b %Y"),
-                "inviter": f"User #{invite.inviter_telegram_id}",
-            })
+            processed.append(
+                {
+                    "title": invite.meeting_title,
+                    "time": invite.meeting_time.strftime("%H:%M on %d %b %Y"),
+                    "inviter": f"User #{invite.inviter_telegram_id}",
+                }
+            )
 
             # Delete the processed invite
             await pending_repo.delete(invite)
-            logger.info(
-                f"Processed pending invite for @{username}: {invite.meeting_title}"
-            )
+            logger.info(f"Processed pending invite for @{username}: {invite.meeting_title}")
         except Exception as e:
             logger.error(f"Error processing invite {invite.id}: {e}")
 

@@ -150,7 +150,9 @@ class UsernameLookup(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     requester_telegram_id: Mapped[int] = mapped_column(BigInteger, nullable=False, unique=True)
     lookup_count: Mapped[int] = mapped_column(Integer, default=0)
-    window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    window_start: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
     __table_args__ = (Index("idx_username_lookups_requester", "requester_telegram_id"),)
 

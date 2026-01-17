@@ -228,6 +228,5 @@ class UsernameResolverService:
         """
         resolved = await self.resolve_usernames(usernames, requester_id)
         return {
-            username: self.get_status_icon(result.status)
-            for username, result in resolved.items()
+            username: self.get_status_icon(result.status) for username, result in resolved.items()
         }

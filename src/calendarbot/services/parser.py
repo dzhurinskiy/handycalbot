@@ -43,7 +43,8 @@ class MeetingParser:
     # Reminder pattern: r followed by optional time values like 10m, 30m/60m, 1d
     REMINDER_PATTERN = r"\br\s*((?:\d+[mhd](?:/\d+[mhd])*)?)\b"
     # Telegram username pattern: @username (5-32 chars, alphanumeric + underscore, starts with letter)
-    USERNAME_PATTERN = r"@([a-zA-Z][a-zA-Z0-9_]{4,31})"
+    # Use lookbehind to ensure @ is not preceded by word chars (to avoid matching @domain in emails)
+    USERNAME_PATTERN = r"(?<![a-zA-Z0-9._%+-])@([a-zA-Z][a-zA-Z0-9_]{4,31})"
 
     # Various quote characters to normalize (Russian, curly, single, guillemets, etc.)
     # iPhone and other devices may use any of these instead of standard double quotes

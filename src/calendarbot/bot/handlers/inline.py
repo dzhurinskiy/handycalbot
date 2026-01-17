@@ -346,9 +346,7 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
 
             # Show invitations sent (both email and resolved usernames)
             original_usernames = m.get("usernames", [])
-            resolved_usernames = [
-                u for u in original_usernames if u not in unresolved_usernames
-            ]
+            resolved_usernames = [u for u in original_usernames if u not in unresolved_usernames]
 
             if result["attendees"] or resolved_usernames:
                 text += f"\n{t.inline.invitations_sent}\n"

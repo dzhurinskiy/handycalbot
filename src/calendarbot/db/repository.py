@@ -278,9 +278,7 @@ class PendingInviteRepository:
     async def get_by_username(self, username: str) -> list[PendingInvite]:
         """Get all pending invites for a username."""
         result = await self.session.execute(
-            select(PendingInvite).where(
-                PendingInvite.invitee_username == username.lower()
-            )
+            select(PendingInvite).where(PendingInvite.invitee_username == username.lower())
         )
         return list(result.scalars().all())
 
@@ -315,9 +313,7 @@ class UsernameLookupRepository:
     async def get_or_create(self, telegram_id: int) -> UsernameLookup:
         """Get or create a lookup record for a user."""
         result = await self.session.execute(
-            select(UsernameLookup).where(
-                UsernameLookup.requester_telegram_id == telegram_id
-            )
+            select(UsernameLookup).where(UsernameLookup.requester_telegram_id == telegram_id)
         )
         lookup = result.scalar_one_or_none()
 
