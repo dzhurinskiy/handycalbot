@@ -87,8 +87,7 @@ async def receive_feedback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     # Thank the user
     t = get_text(user_lang)
     await update.message.reply_text(
-        f"{t.feedback.feedback_received}\n\n"
-        f"{t.feedback.feedback_thank_you}",
+        f"{t.feedback.feedback_received}\n\n" f"{t.feedback.feedback_thank_you}",
         parse_mode="Markdown",
     )
 
