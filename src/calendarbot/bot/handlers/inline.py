@@ -153,7 +153,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     preview = parser.format_preview(meeting, default_reminder=user_default_reminder)
 
     if not calendar_connected:
-        preview += f"\n\n* {t.inline.calendar_not_connected_warning}"
+        preview += f"\n\n{t.inline.calendar_not_connected_warning}"
 
     # Generate unique ID for this meeting
     result_id = str(uuid.uuid4())
@@ -180,10 +180,10 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         [
             [
                 InlineKeyboardButton(
-                    f"* {t.inline.create_meeting_button}", callback_data=f"create_{result_id}"
+                    f"✅ {t.inline.create_meeting_button}", callback_data=f"create_{result_id}"
                 ),
                 InlineKeyboardButton(
-                    f"X {t.inline.cancel_button}", callback_data=f"discard_{result_id}"
+                    f"❌ {t.inline.cancel_button}", callback_data=f"discard_{result_id}"
                 ),
             ]
         ]
@@ -194,7 +194,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     results = [
         InlineQueryResultArticle(
             id=result_id,
-            title=f"* {meeting.title}",
+            title=f"📅 {meeting.title}",
             description=f"{meeting.time} {date_display} - {t.inline.attendees_label.format(count=len(meeting.attendees))}",
             input_message_content=InputTextMessageContent(
                 preview,
@@ -272,23 +272,23 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
         context.bot_data.pop(f"meeting_{result_id}", None)
 
         if "error" in result:
-            await query.edit_message_text(f"X Error: {result['error']}")
+            await query.edit_message_text(f"❌ Error: {result['error']}")
         else:
             start_str = result["start"].strftime("%H:%M on %d %b %Y")
-            text = f"* {t.inline.meeting_created}\n\n"
+            text = f"✅ {t.inline.meeting_created}\n\n"
             text += f"**{result['title']}**\n"
-            text += f"* {start_str}\n"
+            text += f"🕐 {start_str}\n"
 
             # Show reminder info
             reminders = result.get("reminders")
             if reminders:
                 reminder_text = _format_reminders(reminders, t)
-                text += f"* {t.inline.reminder_label.format(reminder=reminder_text)}\n"
+                text += f"{t.inline.reminder_label.format(reminder=reminder_text)}\n"
 
             if result["attendees"]:
-                text += f"\n* {t.inline.invitations_sent}\n"
+                text += f"\n{t.inline.invitations_sent}\n"
                 for email in result["attendees"]:
-                    text += f"  - {email}\n"
+                    text += f"  • {email}\n"
                 text += f"\n{t.inline.attendees_will_receive}\n"
 
             # Build universal "Add to Calendar" link that works for anyone
@@ -300,7 +300,7 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             )
 
             keyboard = InlineKeyboardMarkup(
-                [[InlineKeyboardButton(f"* {t.inline.add_to_calendar_button}", url=add_to_cal_url)]]
+                [[InlineKeyboardButton(t.inline.add_to_calendar_button, url=add_to_cal_url)]]
             )
 
             if result["attendees"]:
@@ -313,7 +313,7 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
     except Exception as e:
         logger.exception(f"Error creating meeting: {e}")
         with contextlib.suppress(Exception):
-            await query.edit_message_text(f"X Error creating meeting: {str(e)}")
+            await query.edit_message_text(f"❌ Error creating meeting: {str(e)}")
 
 
 async def discard_meeting_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

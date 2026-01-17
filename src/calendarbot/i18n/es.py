@@ -19,13 +19,13 @@ translations = Translations(
     ),
     start=StartTranslations(
         welcome_message="""
-Bienvenido a *HandyCalBot*!
+Bienvenido a *HandyCalBot*! 📅
 
 Te ayudo a programar reuniones directamente desde Telegram.
 
 *Inicio Rapido:*
-1. Conecta tu Google Calendar con /connect
-2. Crea reuniones escribiendo @handycalbot en cualquier chat
+1️⃣ Conecta tu Google Calendar con /connect
+2️⃣ Crea reuniones escribiendo @handycalbot en cualquier chat
 
 *Uso en Linea:*
 `@handycalbot 14:30 "Titulo de Reunion" email@ejemplo.com`
@@ -98,7 +98,7 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         notifications_label="Notificaciones",
         google_calendar_label="Google Calendar",
         change_settings="**Cambiar Configuracion:**",
-        connected="Conectado",
+        connected="✅ Conectado",
         not_connected="No conectado",
         enabled="Habilitado",
         disabled="Deshabilitado",
@@ -112,14 +112,14 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         calendar_already_connected="Google Calendar ya esta conectado!\nUsa /disconnect para desvincularlo primero.",
         click_to_connect="Haz clic en el boton de abajo para conectar tu Google Calendar.\n\nSeras redirigido a Google para autorizar el acceso.",
         connect_button="Conectar Google Calendar",
-        calendar_disconnected="Google Calendar desconectado exitosamente.\nUsa /connect para vincularlo de nuevo.",
+        calendar_disconnected="✅ Google Calendar desconectado exitosamente.\nUsa /connect para vincularlo de nuevo.",
         no_calendar_connected="No hay calendario conectado.",
         select_timezone="Selecciona tu zona horaria o escribela manualmente (ej., `Europe/Madrid`):",
-        timezone_set="Zona horaria establecida: `{timezone}`",
+        timezone_set="✅ Zona horaria establecida: `{timezone}`",
         timezone_set_ready='Zona horaria establecida: `{timezone}`\n\nTodo listo! Crea reuniones usando:\n`@handycalbot 14:30 "Titulo de Reunion"`',
-        invalid_timezone="Zona horaria invalida: `{timezone}`\nPor favor usa una zona horaria valida como `Europe/Madrid` o `America/Mexico_City`.",
+        invalid_timezone="❌ Zona horaria invalida: `{timezone}`\nPor favor usa una zona horaria valida como `Europe/Madrid` o `America/Mexico_City`.",
         select_duration="Selecciona la duracion predeterminada de reuniones:",
-        duration_set="Duracion predeterminada establecida: {duration} minutos",
+        duration_set="✅ Duracion predeterminada establecida: {duration} minutos",
         select_reminder="Selecciona el recordatorio predeterminado para nuevas reuniones:\n\n_Puedes sobrescribirlo por reunion usando `r 10m` en tu consulta en linea._",
         reminder_set="Recordatorio predeterminado establecido: {reminder}",
         reminder_override_hint="_Usa `r` en tu consulta para aplicar este predeterminado, o `r 10m` para sobrescribirlo con un tiempo especifico._",
@@ -134,7 +134,7 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         will_receive_reminders="Ahora recibiras recordatorios antes de tus reuniones.",
         will_not_receive_reminders="Ya no recibiras recordatorios de reuniones.",
         select_language="Selecciona tu idioma preferido:",
-        language_updated="Idioma actualizado exitosamente!",
+        language_updated="✅ Idioma actualizado exitosamente!",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Proximas Reuniones**",
@@ -147,13 +147,13 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         previous_button="Anterior",
         next_button="Siguiente",
         dont_cancel_button="No cancelar nada",
-        no_meeting_cancelled="No se cancelo ninguna reunion.",
+        no_meeting_cancelled="✅ No se cancelo ninguna reunion.",
         cancelling_meeting="Cancelando reunion...",
-        meeting_cancelled="Reunion cancelada: **{title}**",
+        meeting_cancelled="✅ Reunion cancelada: **{title}**",
         attendees_notified="_Los asistentes seran notificados automaticamente._",
-        cancel_not_your_menu="Error: Este no es tu menu de cancelacion.",
-        session_expired="Error: Sesion expirada. Por favor usa /cancel de nuevo.",
-        meeting_not_found="Error: Reunion no encontrada. Por favor usa /cancel de nuevo.",
+        cancel_not_your_menu="❌ Error: Este no es tu menu de cancelacion.",
+        session_expired="❌ Error: Sesion expirada. Por favor usa /cancel de nuevo.",
+        meeting_not_found="❌ Error: Reunion no encontrada. Por favor usa /cancel de nuevo.",
     ),
     inline=InlineTranslations(
         how_to_create="Como crear una reunion",
@@ -165,14 +165,14 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         could_not_parse="No se pudo analizar la reunion",
         parse_error_description='Usa el formato: 14:30 "Titulo de Reunion" emails...',
         parse_error_message='No se pudo analizar la reunion. Usa el formato:\n14:30 "Titulo de Reunion" email@ejemplo.com\n\nLa hora y el titulo entre comillas son requeridos.\nAgrega r 10m para recordatorio, o solo r para el predeterminado.',
-        calendar_not_connected_warning="Calendario no conectado - /connect primero",
+        calendar_not_connected_warning="⚠️ Calendario no conectado - /connect primero",
         attendees_label="{count} asistente(s)",
         today="hoy",
         create_meeting_button="Crear Reunion",
         cancel_button="Cancelar",
         creating_meeting="Creando reunion...",
-        meeting_data_expired="Error: Datos de reunion expirados. Por favor intenta de nuevo.",
-        not_your_meeting="Esta no es tu reunion!",
+        meeting_data_expired="❌ Error: Datos de reunion expirados. Por favor intenta de nuevo.",
+        not_your_meeting="❌ Esta no es tu reunion!",
         meeting_created="Reunion creada!",
         reminder_label="Recordatorio: {reminder} antes",
         invitations_sent="Invitaciones enviadas a:",
@@ -180,7 +180,7 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         add_to_calendar_button="Agregar a Mi Calendario",
         not_listed_add_calendar="_No estas en la lista? Haz clic abajo para agregar a tu calendario:_",
         click_to_add_calendar="_Haz clic abajo para agregar a tu calendario:_",
-        meeting_cancelled="Reunion cancelada.",
+        meeting_cancelled="✅ Reunion cancelada.",
     ),
     donation=DonationTranslations(
         support_title="**Apoya a HandyCalBot**",

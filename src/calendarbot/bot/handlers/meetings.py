@@ -52,10 +52,10 @@ async def meetings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
         end = m["end_time"].strftime("%H:%M")
         attendee_count = len(m["attendees"])
 
-        text += f"- **{m['title']}**\n"
-        text += f"  * {start} - {end}\n"
+        text += f"• **{m['title']}**\n"
+        text += f"  🕐 {start} - {end}\n"
         if attendee_count > 0:
-            text += f"  * {t.meetings.attendees_count.format(count=attendee_count)}\n"
+            text += f"  {t.meetings.attendees_count.format(count=attendee_count)}\n"
         text += "\n"
 
     text += t.meetings.use_cancel_hint
@@ -156,8 +156,8 @@ async def show_cancel_menu(
         start = m["start_time"].strftime("%H:%M %d %b")
         title = m["title"][:25] + "..." if len(m["title"]) > 25 else m["title"]
         attendees = len(m.get("attendees", []))
-        attendee_str = f" *{attendees}" if attendees > 0 else ""
-        label = f"X {title} | {start}{attendee_str}"
+        attendee_str = f" 👥{attendees}" if attendees > 0 else ""
+        label = f"🗑️ {title} | {start}{attendee_str}"
         # Use short index instead of full event ID
         buttons.append([InlineKeyboardButton(label, callback_data=f"cm_{user_id}_{global_idx}")])
 
@@ -166,21 +166,19 @@ async def show_cancel_menu(
     if page > 0:
         nav_buttons.append(
             InlineKeyboardButton(
-                f"<< {t.meetings.previous_button}", callback_data=f"cp_{user_id}_{page - 1}"
+                t.meetings.previous_button, callback_data=f"cp_{user_id}_{page - 1}"
             )
         )
     if end_idx < total_meetings:
         nav_buttons.append(
-            InlineKeyboardButton(
-                f"{t.meetings.next_button} >>", callback_data=f"cp_{user_id}_{page + 1}"
-            )
+            InlineKeyboardButton(t.meetings.next_button, callback_data=f"cp_{user_id}_{page + 1}")
         )
     if nav_buttons:
         buttons.append(nav_buttons)
 
     # Cancel button
     buttons.append(
-        [InlineKeyboardButton(f"X {t.meetings.dont_cancel_button}", callback_data="cancel_none")]
+        [InlineKeyboardButton(t.meetings.dont_cancel_button, callback_data="cancel_none")]
     )
 
     # Header text
@@ -261,10 +259,10 @@ async def cancel_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
         context.bot_data.pop(cancel_key, None)
 
         if "error" in result:
-            await query.edit_message_text(f"X Error: {result['error']}")
+            await query.edit_message_text(f"❌ Error: {result['error']}")
         else:
             await query.edit_message_text(
-                f"* {t.meetings.meeting_cancelled.format(title=result['title'])}\n\n{t.meetings.attendees_notified}",
+                f"{t.meetings.meeting_cancelled.format(title=result['title'])}\n\n{t.meetings.attendees_notified}",
                 parse_mode="Markdown",
             )
     except Exception as e:

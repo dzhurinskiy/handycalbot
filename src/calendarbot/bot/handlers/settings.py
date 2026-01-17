@@ -101,7 +101,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 
     # Format notifications status
     notifications_status = (
-        f"* {t.settings.enabled}" if user.notifications_enabled else f"X {t.settings.disabled}"
+        f"✅ {t.settings.enabled}" if user.notifications_enabled else f"❌ {t.settings.disabled}"
     )
 
     # Format calendar status
@@ -112,13 +112,13 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     )
 
     text = f"""
-{t.settings.your_settings} *
+{t.settings.your_settings}
 
-* {t.settings.timezone_label}: `{summary['timezone']}`
-* {t.settings.duration_label}: `{summary['default_duration']} {t.settings.minutes}`
-* {t.settings.reminder_label}: `{reminder_display}`
-* {t.settings.notifications_label}: {notifications_status}
-* {t.settings.google_calendar_label}: {calendar_status}
+📍 {t.settings.timezone_label}: `{summary['timezone']}`
+⏱️ {t.settings.duration_label}: `{summary['default_duration']} {t.settings.minutes}`
+🔔 {t.settings.reminder_label}: `{reminder_display}`
+📬 {t.settings.notifications_label}: {notifications_status}
+📅 {t.settings.google_calendar_label}: {calendar_status}
 
 {t.settings.change_settings}
 /timezone - {t.settings.timezone_label}
@@ -425,7 +425,7 @@ async def reminder_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE)
 
     display = _format_reminder_setting(reminder, t)
     await query.edit_message_text(
-        f"* {t.settings.reminder_set.format(reminder=display)}\n\n{t.settings.reminder_override_hint}",
+        f"✅ {t.settings.reminder_set.format(reminder=display)}\n\n{t.settings.reminder_override_hint}",
         parse_mode="Markdown",
     )
     return ConversationHandler.END
@@ -468,10 +468,10 @@ async def notifications_command(update: Update, _context: ContextTypes.DEFAULT_T
         current_state = user.notifications_enabled
 
     # Show toggle buttons
-    enable_label = f"* {t.settings.enable_button}" + (
+    enable_label = f"✅ {t.settings.enable_button}" + (
         f" {t.settings.current_suffix}" if current_state else ""
     )
-    disable_label = f"X {t.settings.disable_button}" + (
+    disable_label = f"❌ {t.settings.disable_button}" + (
         f" {t.settings.current_suffix}" if not current_state else ""
     )
 
@@ -484,10 +484,10 @@ async def notifications_command(update: Update, _context: ContextTypes.DEFAULT_T
         ]
     )
 
-    status = f"* {t.settings.enabled}" if current_state else f"X {t.settings.disabled}"
+    status = f"✅ {t.settings.enabled}" if current_state else f"❌ {t.settings.disabled}"
 
     await update.message.reply_text(
-        f"{t.settings.notifications_title} *\n\n"
+        f"{t.settings.notifications_title}\n\n"
         f"{t.settings.notifications_status.format(status=status)}\n\n"
         f"{t.settings.notifications_explanation}\n\n"
         f"{t.settings.select_option}",
@@ -523,7 +523,7 @@ async def notifications_callback(update: Update, _context: ContextTypes.DEFAULT_
         await session.commit()
 
     status = t.settings.enabled.lower() if new_state else t.settings.disabled.lower()
-    emoji = "*" if new_state else "X"
+    emoji = "✅" if new_state else "❌"
     follow_up = (
         t.settings.will_receive_reminders if new_state else t.settings.will_not_receive_reminders
     )

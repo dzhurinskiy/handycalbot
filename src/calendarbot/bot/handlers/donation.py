@@ -43,7 +43,7 @@ async def donate_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) ->
     buttons = []
     row = []
     for amount, label in DONATION_OPTIONS:
-        row.append(InlineKeyboardButton(f"* {label}", callback_data=f"donate_{amount}"))
+        row.append(InlineKeyboardButton(f"⭐ {label}", callback_data=f"donate_{amount}"))
         if len(row) == 2:
             buttons.append(row)
             row = []
@@ -52,17 +52,13 @@ async def donate_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) ->
 
     # Add custom amount button
     buttons.append(
-        [
-            InlineKeyboardButton(
-                f"* {t.donation.custom_amount_button}", callback_data="donate_custom"
-            )
-        ]
+        [InlineKeyboardButton(t.donation.custom_amount_button, callback_data="donate_custom")]
     )
 
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.message.reply_text(
-        f"{t.donation.support_title} *\n\n"
+        f"{t.donation.support_title}\n\n"
         f"{t.donation.support_description}\n\n"
         f"{t.donation.support_helps}\n\n"
         f"{t.donation.select_amount}",
@@ -90,23 +86,19 @@ async def donate_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         buttons = []
         row = []
         for amount, label in DONATION_OPTIONS:
-            row.append(InlineKeyboardButton(f"* {label}", callback_data=f"donate_{amount}"))
+            row.append(InlineKeyboardButton(f"⭐ {label}", callback_data=f"donate_{amount}"))
             if len(row) == 2:
                 buttons.append(row)
                 row = []
         if row:
             buttons.append(row)
         buttons.append(
-            [
-                InlineKeyboardButton(
-                    f"* {t.donation.custom_amount_button}", callback_data="donate_custom"
-                )
-            ]
+            [InlineKeyboardButton(t.donation.custom_amount_button, callback_data="donate_custom")]
         )
         keyboard = InlineKeyboardMarkup(buttons)
 
         await query.edit_message_text(
-            f"{t.donation.support_title} *\n\n"
+            f"{t.donation.support_title}\n\n"
             f"{t.donation.support_description}\n\n"
             f"{t.donation.support_helps}\n\n"
             f"{t.donation.select_amount}",
@@ -229,7 +221,7 @@ async def successful_payment_callback(update: Update, _context: ContextTypes.DEF
     await update.message.reply_text(
         f"{t.donation.thank_you}\n\n"
         f"{t.donation.you_donated.format(amount=amount)}\n\n"
-        f"{t.donation.thank_you_running} *",
+        f"{t.donation.thank_you_running}",
         parse_mode="Markdown",
     )
 

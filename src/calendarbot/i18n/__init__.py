@@ -18,18 +18,22 @@ class Language(Enum):
     KO = "ko"  # Korean
     JA = "ja"  # Japanese
     ZH = "zh"  # Chinese
+    ID = "id"  # Indonesian
+    FA = "fa"  # Persian (Farsi)
 
 
-# Language display names (in their native language for UI)
+# Language display names (code | native name format for UI)
 LANGUAGE_NAMES = {
-    "en": "English",
-    "es": "Espanol",
-    "fr": "Francais",
-    "de": "Deutsch",
-    "ru": "Russkij",
-    "ko": "Hangugeo",
-    "ja": "Nihongo",
-    "zh": "Zhongwen",
+    "en": "EN | English",
+    "es": "ES | Español",
+    "fr": "FR | Français",
+    "de": "DE | Deutsch",
+    "ru": "RU | Русский",
+    "ko": "KO | 한국어",
+    "ja": "JA | 日本語",
+    "zh": "ZH | 中文",
+    "id": "ID | Bahasa",
+    "fa": "FA | فارسی",
 }
 
 # Mapping from Telegram language codes to our supported languages
@@ -66,6 +70,12 @@ TELEGRAM_LANGUAGE_MAP = {
     "zh-CN": "zh",
     "zh-TW": "zh",
     "zh-HK": "zh",
+    # Indonesian
+    "id": "id",
+    "id-ID": "id",
+    # Persian (Farsi)
+    "fa": "fa",
+    "fa-IR": "fa",
 }
 
 
@@ -98,13 +108,13 @@ def get_text(language: str = "en") -> "Translations":
     """Get translations for the specified language.
 
     Args:
-        language: Language code (en, es, fr, de, ru, ko, ja, zh)
+        language: Language code (en, es, fr, de, ru, ko, ja, zh, id, fa)
 
     Returns:
         Translations dataclass for the specified language
     """
     # Import translations lazily to avoid circular imports
-    from calendarbot.i18n import de, en, es, fr, ja, ko, ru, zh
+    from calendarbot.i18n import de, en, es, fa, fr, id, ja, ko, ru, zh
 
     translations = {
         "en": en.translations,
@@ -115,6 +125,8 @@ def get_text(language: str = "en") -> "Translations":
         "ko": ko.translations,
         "ja": ja.translations,
         "zh": zh.translations,
+        "id": id.translations,
+        "fa": fa.translations,
     }
 
     return translations.get(language, en.translations)
