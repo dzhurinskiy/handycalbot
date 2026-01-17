@@ -48,12 +48,26 @@ async def meetings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     text = f"{t.meetings.upcoming_meetings}\n\n"
 
     for m in meetings:
-        start = m["start_time"].strftime("%H:%M %d %b")
-        end = m["end_time"].strftime("%H:%M")
+        start_time = m["start_time"]
+        end_time = m["end_time"]
         attendee_count = len(m["attendees"])
 
+        # Format time based on whether it spans multiple days
+        start_date = start_time.date()
+        end_date = end_time.date()
+
+        if start_date == end_date:
+            # Same day: HH:MM - HH:MM DD Mon YYYY
+            time_str = f"{start_time.strftime('%H:%M')} - {end_time.strftime('%H:%M')} {start_time.strftime('%d %b %Y')}"
+        elif (end_date - start_date).days == 1 and end_time.hour < 12:
+            # End is next day but early (overnight meeting): HH:MM - HH:MM(+) DD Mon YYYY
+            time_str = f"{start_time.strftime('%H:%M')} - {end_time.strftime('%H:%M')}(+) {start_time.strftime('%d %b %Y')}"
+        else:
+            # Multi-day event: DD Mon YYYY - DD Mon YYYY
+            time_str = f"{start_time.strftime('%d %b %Y')} - {end_time.strftime('%d %b %Y')}"
+
         text += f"• **{m['title']}**\n"
-        text += f"  🕐 {start} - {end}\n"
+        text += f"  🕐 {time_str}\n"
         if attendee_count > 0:
             text += f"  {t.meetings.attendees_count.format(count=attendee_count)}\n"
         text += "\n"
@@ -153,7 +167,9 @@ async def show_cancel_menu(
     buttons = []
     for idx, m in enumerate(meetings_page):
         global_idx = start_idx + idx  # Index in full list
-        start = m["start_time"].strftime("%H:%M %d %b")
+        start_time = m["start_time"]
+        # Format as HH:MM DD Mon for button (keep short for button text)
+        start = start_time.strftime("%H:%M %d %b")
         title = m["title"][:25] + "..." if len(m["title"]) > 25 else m["title"]
         attendees = len(m.get("attendees", []))
         attendee_str = f" 👥{attendees}" if attendees > 0 else ""

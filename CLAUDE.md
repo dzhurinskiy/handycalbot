@@ -92,7 +92,52 @@ gh run list --limit 5
 
 - All translation files are in `src/calendarbot/i18n/`
 - English (`en.py`) is the reference - all other languages must match its structure
-- **Emoji consistency is CRITICAL**: When English uses emojis (📅, ⚙️, 🔔, 📧, etc.), ALL other language files must use the same emojis in the same positions
-- Example: If English has `add_to_calendar_button="📅 Add to My Calendar"`, then German must have `add_to_calendar_button="📅 Zu meinem Kalender hinzufugen"` - same emoji, localized text
-- When adding new translated strings, always copy emojis from English version
 - Supported languages: en, de, es, fr, ru, ja, ko, zh, id, fa (10 total)
+
+### Emoji Consistency - CRITICAL
+
+**Emojis must be identical across ALL language files.** This is a systemic issue that must be checked.
+
+**Emoji checking algorithm:**
+1. Identify all emojis in the English (`en.py`) file
+2. For each emoji found, note its exact position (which field/string it's in)
+3. Apply the EXACT SAME English emojis to all other language files
+4. Do NOT localize emojis - use the English emoji as-is with localized text
+
+**Example:**
+- English: `add_to_calendar_button="📅 Add to My Calendar"`
+- German: `add_to_calendar_button="📅 Zu meinem Kalender hinzufugen"` (same 📅 emoji)
+- Russian: `add_to_calendar_button="📅 Добавить в мой календарь"` (same 📅 emoji)
+
+**Common emoji locations in English that MUST be present in all languages:**
+- `welcome_message`: 📅, 1️⃣, 2️⃣
+- `help_message`: 📅
+- `your_settings`: ⚙️
+- `notifications_title`: 🔔
+- `privacy_title`: 🔒
+- `select_language`: 🌍
+- `upcoming_meetings`: 📅
+- `attendees_count` / `attendees_label`: 👥
+- `previous_button`: ⬅️
+- `next_button`: ➡️
+- `dont_cancel_button`: ❌
+- `reminder_label` (inline): 🔔
+- `invitations_sent`: 📧
+- `support_title` / `support_button`: ⭐
+- `custom_amount_button` / `custom_amount_prompt`: 💫
+- `thank_you`: 🙏
+- `thank_you_running`: ⭐
+- `meeting_reminder`: 🔔
+- `connect_button`: 🔗
+- `feedback_title`: 📝
+- `add_to_calendar_button`: 📅
+- `pending_invites_note`: ⏳
+- `rate_limit_warning` / `calendar_not_connected_warning` / `no_calendar_users_note`: ⚠️
+- `privacy_disabled_users_note`: 🔒
+- `pending_invites_found`: 🎉
+- `pending_invite_notification`: 📅, 🕐
+
+**When making i18n changes:**
+1. Always add/modify English first
+2. Copy the exact emoji pattern to all other language files
+3. Verify by grepping for emojis: `grep -n "📅\|⚙️\|🔔" src/calendarbot/i18n/*.py`

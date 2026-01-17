@@ -22,7 +22,7 @@ translations = Translations(
     ),
     start=StartTranslations(
         welcome_message="""
-Willkommen bei *HandyCalBot*!
+Willkommen bei *HandyCalBot*! 📅
 
 Ich helfe dir, Besprechungen direkt von Telegram aus zu planen.
 
@@ -54,7 +54,7 @@ Ich helfe dir, Besprechungen direkt von Telegram aus zu planen.
 _Fehlerberichte und Verbesserungsvorschlage sind willkommen!_
 """,
         help_message="""
-*HandyCalBot Hilfe*
+*HandyCalBot Hilfe* 📅
 
 *Besprechungen erstellen (Inline):*
 Gib `@handycalbot` in einem Chat ein, gefolgt von:
@@ -100,7 +100,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         pending_invite_notification="📅 **{title}**\n🕐 {time}\nEingeladen von: {inviter}",
     ),
     settings=SettingsTranslations(
-        your_settings="**Deine Einstellungen**",
+        your_settings="**Deine Einstellungen** ⚙️",
         timezone_label="Zeitzone",
         duration_label="Standarddauer",
         reminder_label="Standard-Erinnerung",
@@ -120,7 +120,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         minutes="Min",
         calendar_already_connected="Google Kalender ist bereits verbunden!\nBenutze /disconnect, um ihn zuerst zu trennen.",
         click_to_connect="Klicke auf den Button unten, um deinen Google Kalender zu verbinden.\n\nDu wirst zu Google weitergeleitet, um den Zugriff zu autorisieren.",
-        connect_button="Google Kalender verbinden",
+        connect_button="🔗 Google Kalender verbinden",
         calendar_disconnected="✅ Google Kalender erfolgreich getrennt.\nBenutze /connect, um ihn wieder zu verbinden.",
         no_calendar_connected="Kein Kalender verbunden.",
         select_timezone="Wahle deine Zeitzone oder gib sie manuell ein (z.B. `Europe/Berlin`):",
@@ -132,7 +132,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         select_reminder="Wahle die Standard-Erinnerung fur neue Besprechungen:\n\n_Du kannst dies pro Besprechung mit `r 10m` in deiner Inline-Anfrage uberschreiben._",
         reminder_set="Standard-Erinnerung gesetzt auf: {reminder}",
         reminder_override_hint="_Benutze `r` in deiner Anfrage, um diesen Standard anzuwenden, oder `r 10m`, um mit einer bestimmten Zeit zu uberschreiben._",
-        notifications_title="**Besprechungs-Benachrichtigungen**",
+        notifications_title="**Besprechungs-Benachrichtigungen** 🔔",
         notifications_status="Status: {status}",
         notifications_explanation="Wenn aktiviert, erhaltst du Telegram-Benachrichtigungen vor deinen Besprechungen (basierend auf den eingestellten Erinnerungszeiten).",
         select_option="Wahle eine Option:",
@@ -142,7 +142,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         notifications_updated="{emoji} Besprechungs-Benachrichtigungen {status}.",
         will_receive_reminders="Du wirst jetzt Erinnerungen vor deinen Besprechungen erhalten.",
         will_not_receive_reminders="Du wirst keine Besprechungserinnerungen mehr erhalten.",
-        select_language="Wahle deine bevorzugte Sprache:",
+        select_language="🌍 Wahle deine bevorzugte Sprache:",
         language_updated="✅ Sprache erfolgreich aktualisiert!",
         privacy_title="**Datenschutzeinstellungen** 🔒",
         privacy_username_invites="@Benutzername-Einladungen erlauben",
@@ -151,16 +151,16 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         privacy_updated="{emoji} Benutzername-Einladungen {status}.",
     ),
     meetings=MeetingsTranslations(
-        upcoming_meetings="**Kommende Besprechungen**",
+        upcoming_meetings="**Kommende Besprechungen** 📅",
         no_upcoming_meetings="Keine kommenden Besprechungen gefunden.",
         use_cancel_hint="_Benutze /cancel, um eine Besprechung abzusagen_",
-        attendees_count="{count} Teilnehmer",
+        attendees_count="👥 {count} Teilnehmer",
         select_meeting_to_cancel="**Wahle eine Besprechung zum Absagen:**",
         page_info="Seite {current}/{total}",
         total_meetings="{count} Besprechungen insgesamt",
-        previous_button="Zuruck",
-        next_button="Weiter",
-        dont_cancel_button="Nichts absagen",
+        previous_button="⬅️ Zuruck",
+        next_button="Weiter ➡️",
+        dont_cancel_button="❌ Nichts absagen",
         no_meeting_cancelled="✅ Keine Besprechung abgesagt.",
         cancelling_meeting="Besprechung wird abgesagt...",
         meeting_cancelled="✅ Besprechung abgesagt: **{title}**",
@@ -180,7 +180,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         parse_error_description='Benutze das Format: 14:30 "Besprechungstitel" emails...',
         parse_error_message='Besprechung konnte nicht analysiert werden. Benutze das Format:\n14:30 "Besprechungstitel" email@beispiel.com\n\nZeit und Titel in Anfuhrungszeichen sind erforderlich.\nFuge r 10m fur Erinnerung hinzu, oder nur r fur Standard.',
         calendar_not_connected_warning="⚠️ Kalender nicht verbunden - zuerst /connect",
-        attendees_label="{count} Teilnehmer",
+        attendees_label="👥 {count} Teilnehmer",
         today="heute",
         create_meeting_button="Besprechung erstellen",
         cancel_button="Abbrechen",
@@ -188,8 +188,8 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         meeting_data_expired="❌ Fehler: Besprechungsdaten abgelaufen. Bitte versuche es erneut.",
         not_your_meeting="❌ Das ist nicht deine Besprechung!",
         meeting_created="Besprechung erstellt!",
-        reminder_label="Erinnerung: {reminder} vorher",
-        invitations_sent="Einladungen gesendet an:",
+        reminder_label="🔔 Erinnerung: {reminder} vorher",
+        invitations_sent="📧 Einladungen gesendet an:",
         attendees_will_receive="_Diese Teilnehmer erhalten automatisch eine Kalendereinladung._",
         add_to_calendar_button="📅 Zu meinem Kalender hinzufugen",
         not_listed_add_calendar="_Nicht aufgelistet? Klicke unten, um zu deinem Kalender hinzuzufugen:_",
@@ -205,21 +205,21 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         register_link_text="Registrieren",
     ),
     donation=DonationTranslations(
-        support_title="**Unterstutze HandyCalBot**",
+        support_title="**Unterstutze HandyCalBot** ⭐",
         support_description="Wenn du diesen Bot nutzlich findest, erwage, seine Entwicklung mit Telegram Stars zu unterstutzen!",
         support_helps="Deine Unterstutzung hilft, den Bot am Laufen zu halten und ermoglicht neue Funktionen.",
         select_amount="Wahle einen Betrag:",
-        custom_amount_button="Benutzerdefinierter Betrag",
-        custom_amount_prompt="**Benutzerdefinierte Spende**\n\nBitte gib die Anzahl der Stars ein, die du spenden mochtest (1-10000):",
+        custom_amount_button="💫 Benutzerdefinierter Betrag",
+        custom_amount_prompt="**Benutzerdefinierte Spende** 💫\n\nBitte gib die Anzahl der Stars ein, die du spenden mochtest (1-10000):",
         invalid_amount="Bitte gib einen gultigen Betrag zwischen 1 und 10000 Stars ein.",
         invalid_number="Bitte gib eine gultige Zahl ein (1-10000).",
         donation_error="Entschuldigung, bei der Verarbeitung deiner Spende ist ein Fehler aufgetreten. Bitte versuche es spater erneut.",
-        thank_you="**Danke fur deine Spende!**",
+        thank_you="**Danke fur deine Spende!** 🙏",
         you_donated="Du hast {amount} Telegram Stars gespendet. Deine Unterstutzung bedeutet uns viel!",
-        thank_you_running="Danke, dass du hilfst, HandyCalBot am Laufen zu halten!",
+        thank_you_running="Danke, dass du hilfst, HandyCalBot am Laufen zu halten! ⭐",
     ),
     reminder=ReminderTranslations(
-        meeting_reminder="*Besprechungserinnerung*",
+        meeting_reminder="🔔 *Besprechungserinnerung*",
         starting_in="Beginnt in {time}",
     ),
     feedback=FeedbackTranslations(

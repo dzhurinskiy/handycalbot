@@ -22,7 +22,7 @@ translations = Translations(
     ),
     start=StartTranslations(
         welcome_message="""
-Добро пожаловать в *HandyCalBot*!
+Добро пожаловать в *HandyCalBot*! 📅
 
 Я помогаю планировать встречи прямо из Telegram.
 
@@ -54,7 +54,7 @@ translations = Translations(
 _Сообщения об ошибках и предложения по улучшению приветствуются!_
 """,
         help_message="""
-*Справка HandyCalBot*
+*Справка HandyCalBot* 📅
 
 *Создание встреч (Inline):*
 Введите `@handycalbot` в любом чате, затем:
@@ -100,7 +100,7 @@ _Сообщения об ошибках и предложения по улуч�
         pending_invite_notification="📅 **{title}**\n🕐 {time}\nПриглашен: {inviter}",
     ),
     settings=SettingsTranslations(
-        your_settings="**Ваши настройки**",
+        your_settings="**Ваши настройки** ⚙️",
         timezone_label="Часовой пояс",
         duration_label="Длительность по умолчанию",
         reminder_label="Напоминание по умолчанию",
@@ -120,7 +120,7 @@ _Сообщения об ошибках и предложения по улуч�
         minutes="мин",
         calendar_already_connected="Google Календарь уже подключен!\nИспользуйте /disconnect, чтобы сначала отключить.",
         click_to_connect="Нажмите кнопку ниже, чтобы подключить Google Календарь.\n\nВы будете перенаправлены в Google для авторизации.",
-        connect_button="Подключить Google Календарь",
+        connect_button="🔗 Подключить Google Календарь",
         calendar_disconnected="✅ Google Календарь успешно отключен.\nИспользуйте /connect для повторного подключения.",
         no_calendar_connected="Календарь не подключен.",
         select_timezone="Выберите часовой пояс или введите вручную (напр., `Europe/Moscow`):",
@@ -132,7 +132,7 @@ _Сообщения об ошибках и предложения по улуч�
         select_reminder="Выберите напоминание по умолчанию для новых встреч:\n\n_Вы можете переопределить это для каждой встречи, используя `r 10m` в inline-запросе._",
         reminder_set="Напоминание по умолчанию: {reminder}",
         reminder_override_hint="_Используйте `r` в запросе для применения по умолчанию, или `r 10m` для конкретного времени._",
-        notifications_title="**Уведомления о встречах**",
+        notifications_title="**Уведомления о встречах** 🔔",
         notifications_status="Статус: {status}",
         notifications_explanation="При включении вы будете получать уведомления Telegram перед встречами (на основе установленных напоминаний).",
         select_option="Выберите опцию:",
@@ -142,7 +142,7 @@ _Сообщения об ошибках и предложения по улуч�
         notifications_updated="{emoji} Уведомления о встречах {status}.",
         will_receive_reminders="Теперь вы будете получать напоминания перед встречами.",
         will_not_receive_reminders="Вы больше не будете получать напоминания о встречах.",
-        select_language="Выберите предпочитаемый язык:",
+        select_language="🌍 Выберите предпочитаемый язык:",
         language_updated="✅ Язык успешно обновлен!",
         privacy_title="**Настройки Конфиденциальности** 🔒",
         privacy_username_invites="Разрешить приглашения по @имени пользователя",
@@ -151,16 +151,16 @@ _Сообщения об ошибках и предложения по улуч�
         privacy_updated="{emoji} Приглашения по имени пользователя {status}.",
     ),
     meetings=MeetingsTranslations(
-        upcoming_meetings="**Предстоящие встречи**",
+        upcoming_meetings="**Предстоящие встречи** 📅",
         no_upcoming_meetings="Предстоящих встреч не найдено.",
         use_cancel_hint="_Используйте /cancel для отмены встречи_",
-        attendees_count="{count} участник(ов)",
+        attendees_count="👥 {count} участник(ов)",
         select_meeting_to_cancel="**Выберите встречу для отмены:**",
         page_info="Страница {current}/{total}",
         total_meetings="{count} всего встреч",
-        previous_button="Назад",
-        next_button="Далее",
-        dont_cancel_button="Не отменять",
+        previous_button="⬅️ Назад",
+        next_button="Далее ➡️",
+        dont_cancel_button="❌ Не отменять",
         no_meeting_cancelled="✅ Встреча не отменена.",
         cancelling_meeting="Отмена встречи...",
         meeting_cancelled="✅ Встреча отменена: **{title}**",
@@ -180,7 +180,7 @@ _Сообщения об ошибках и предложения по улуч�
         parse_error_description='Используйте формат: 14:30 "Название" emails...',
         parse_error_message='Не удалось разобрать встречу. Используйте формат:\n14:30 "Название встречи" email@example.com\n\nВремя и название в кавычках обязательны.\nДобавьте r 10m для напоминания или просто r для значения по умолчанию.',
         calendar_not_connected_warning="⚠️ Календарь не подключен - сначала /connect",
-        attendees_label="{count} участник(ов)",
+        attendees_label="👥 {count} участник(ов)",
         today="сегодня",
         create_meeting_button="Создать встречу",
         cancel_button="Отмена",
@@ -188,8 +188,8 @@ _Сообщения об ошибках и предложения по улуч�
         meeting_data_expired="❌ Ошибка: Данные встречи устарели. Попробуйте снова.",
         not_your_meeting="❌ Это не ваша встреча!",
         meeting_created="Встреча создана!",
-        reminder_label="Напоминание: за {reminder}",
-        invitations_sent="Приглашения отправлены:",
+        reminder_label="🔔 Напоминание: за {reminder}",
+        invitations_sent="📧 Приглашения отправлены:",
         attendees_will_receive="_Эти участники автоматически получат приглашение в календарь._",
         add_to_calendar_button="📅 Добавить в мой календарь",
         not_listed_add_calendar="_Не в списке? Нажмите ниже, чтобы добавить в свой календарь:_",
@@ -205,21 +205,21 @@ _Сообщения об ошибках и предложения по улуч�
         register_link_text="Зарегистрироваться",
     ),
     donation=DonationTranslations(
-        support_title="**Поддержите HandyCalBot**",
+        support_title="**Поддержите HandyCalBot** ⭐",
         support_description="Если бот полезен, поддержите его развитие с помощью Telegram Stars!",
         support_helps="Ваша поддержка помогает поддерживать бота и добавлять новые функции.",
         select_amount="Выберите сумму:",
-        custom_amount_button="Другая сумма",
-        custom_amount_prompt="**Произвольный донат**\n\nВведите количество Stars для пожертвования (1-10000):",
+        custom_amount_button="💫 Другая сумма",
+        custom_amount_prompt="**Произвольный донат** 💫\n\nВведите количество Stars для пожертвования (1-10000):",
         invalid_amount="Введите корректную сумму от 1 до 10000 Stars.",
         invalid_number="Введите корректное число (1-10000).",
         donation_error="Извините, произошла ошибка при обработке пожертвования. Попробуйте позже.",
-        thank_you="**Спасибо за пожертвование!**",
+        thank_you="**Спасибо за пожертвование!** 🙏",
         you_donated="Вы пожертвовали {amount} Telegram Stars. Ваша поддержка очень важна!",
-        thank_you_running="Спасибо за поддержку HandyCalBot!",
+        thank_you_running="Спасибо за поддержку HandyCalBot! ⭐",
     ),
     reminder=ReminderTranslations(
-        meeting_reminder="*Напоминание о встрече*",
+        meeting_reminder="🔔 *Напоминание о встрече*",
         starting_in="Начало через {time}",
     ),
     feedback=FeedbackTranslations(

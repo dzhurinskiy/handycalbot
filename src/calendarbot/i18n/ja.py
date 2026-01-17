@@ -22,7 +22,7 @@ translations = Translations(
     ),
     start=StartTranslations(
         welcome_message="""
-*HandyCalBot*へようこそ!
+*HandyCalBot*へようこそ! 📅
 
 Telegramから直接ミーティングをスケジュールできます。
 
@@ -54,7 +54,7 @@ Telegramから直接ミーティングをスケジュールできます。
 _バグ報告やUI改善のご提案をお待ちしております！_
 """,
         help_message="""
-*HandyCalBot ヘルプ*
+*HandyCalBot ヘルプ* 📅
 
 *ミーティング作成 (インライン):*
 任意のチャットで `@handycalbot` と入力後:
@@ -100,7 +100,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         pending_invite_notification="📅 **{title}**\n🕐 {time}\n招待者: {inviter}",
     ),
     settings=SettingsTranslations(
-        your_settings="**設定**",
+        your_settings="**設定** ⚙️",
         timezone_label="タイムゾーン",
         duration_label="デフォルト時間",
         reminder_label="デフォルトリマインダー",
@@ -120,7 +120,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         minutes="分",
         calendar_already_connected="Googleカレンダーは既に接続されています!\n最初に /disconnect で切断してください。",
         click_to_connect="下のボタンをクリックしてGoogleカレンダーを接続してください。\n\nGoogleにリダイレクトされ、アクセスを承認します。",
-        connect_button="Googleカレンダーを接続",
+        connect_button="🔗 Googleカレンダーを接続",
         calendar_disconnected="✅ Googleカレンダーが切断されました。\n再接続するには /connect を使用してください。",
         no_calendar_connected="接続されたカレンダーはありません。",
         select_timezone="タイムゾーンを選択するか、手動で入力してください (例: `Asia/Tokyo`):",
@@ -132,7 +132,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         select_reminder="新しいミーティングのデフォルトリマインダーを選択:\n\n_インラインクエリで `r 10m` を使用してミーティングごとに上書きできます。_",
         reminder_set="デフォルトリマインダー設定: {reminder}",
         reminder_override_hint="_クエリで `r` を使用してデフォルトを適用するか、`r 10m` で特定の時間を指定してください。_",
-        notifications_title="**ミーティング通知**",
+        notifications_title="**ミーティング通知** 🔔",
         notifications_status="ステータス: {status}",
         notifications_explanation="有効にすると、設定したリマインダー時間に基づいてミーティング前にTelegram通知を受け取ります。",
         select_option="オプションを選択:",
@@ -142,7 +142,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         notifications_updated="{emoji} ミーティング通知 {status}。",
         will_receive_reminders="ミーティング前にリマインダーを受け取るようになりました。",
         will_not_receive_reminders="ミーティングリマインダーを受け取らなくなりました。",
-        select_language="お好みの言語を選択:",
+        select_language="🌍 お好みの言語を選択:",
         language_updated="✅ 言語が正常に更新されました!",
         privacy_title="**プライバシー設定** 🔒",
         privacy_username_invites="@ユーザー名での招待を許可",
@@ -151,16 +151,16 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         privacy_updated="{emoji} ユーザー名招待が{status}になりました。",
     ),
     meetings=MeetingsTranslations(
-        upcoming_meetings="**今後のミーティング**",
+        upcoming_meetings="**今後のミーティング** 📅",
         no_upcoming_meetings="今後のミーティングはありません。",
         use_cancel_hint="_ミーティングをキャンセルするには /cancel を使用_",
-        attendees_count="{count}名の参加者",
+        attendees_count="👥 {count}名の参加者",
         select_meeting_to_cancel="**キャンセルするミーティングを選択:**",
         page_info="ページ {current}/{total}",
         total_meetings="合計 {count} ミーティング",
-        previous_button="前へ",
-        next_button="次へ",
-        dont_cancel_button="キャンセルしない",
+        previous_button="⬅️ 前へ",
+        next_button="次へ ➡️",
+        dont_cancel_button="❌ キャンセルしない",
         no_meeting_cancelled="✅ キャンセルされたミーティングはありません。",
         cancelling_meeting="ミーティングをキャンセル中...",
         meeting_cancelled="✅ ミーティングがキャンセルされました: **{title}**",
@@ -180,7 +180,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         parse_error_description='形式を使用: 14:30 "ミーティングタイトル" emails...',
         parse_error_message='ミーティングを解析できませんでした。形式を使用:\n14:30 "ミーティングタイトル" email@example.com\n\n時間と引用符内のタイトルは必須です。\nリマインダーには r 10m、デフォルトには r のみを追加。',
         calendar_not_connected_warning="⚠️ カレンダー未接続 - 先に /connect",
-        attendees_label="{count}名の参加者",
+        attendees_label="👥 {count}名の参加者",
         today="今日",
         create_meeting_button="ミーティングを作成",
         cancel_button="キャンセル",
@@ -188,8 +188,8 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         meeting_data_expired="❌ エラー: ミーティングデータが期限切れです。もう一度お試しください。",
         not_your_meeting="❌ これはあなたのミーティングではありません!",
         meeting_created="ミーティングが作成されました!",
-        reminder_label="リマインダー: {reminder}前",
-        invitations_sent="招待状を送信:",
+        reminder_label="🔔 リマインダー: {reminder}前",
+        invitations_sent="📧 招待状を送信:",
         attendees_will_receive="_これらの参加者はカレンダー招待を自動的に受け取ります。_",
         add_to_calendar_button="📅 マイカレンダーに追加",
         not_listed_add_calendar="_リストにない場合は下をクリックしてカレンダーに追加:_",
@@ -205,21 +205,21 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         register_link_text="登録する",
     ),
     donation=DonationTranslations(
-        support_title="**HandyCalBotをサポート**",
+        support_title="**HandyCalBotをサポート** ⭐",
         support_description="このボットが役立つと思ったら、Telegram Starsで開発をサポートしてください!",
         support_helps="あなたのサポートはボットの運営と新機能の開発に役立ちます。",
         select_amount="金額を選択:",
-        custom_amount_button="カスタム金額",
-        custom_amount_prompt="**カスタム寄付**\n\n寄付するStarsの数を入力してください (1-10000):",
+        custom_amount_button="💫 カスタム金額",
+        custom_amount_prompt="**カスタム寄付** 💫\n\n寄付するStarsの数を入力してください (1-10000):",
         invalid_amount="1から10000の間の有効な金額を入力してください。",
         invalid_number="有効な数字を入力してください (1-10000)。",
         donation_error="申し訳ありませんが、寄付の処理中にエラーが発生しました。後でもう一度お試しください。",
-        thank_you="**ご寄付ありがとうございます!**",
+        thank_you="**ご寄付ありがとうございます!** 🙏",
         you_donated="{amount} Telegram Starsを寄付していただきました。あなたのサポートに感謝します!",
-        thank_you_running="HandyCalBotの運営をサポートしていただきありがとうございます!",
+        thank_you_running="HandyCalBotの運営をサポートしていただきありがとうございます! ⭐",
     ),
     reminder=ReminderTranslations(
-        meeting_reminder="*ミーティングリマインダー*",
+        meeting_reminder="🔔 *ミーティングリマインダー*",
         starting_in="{time}後に開始",
     ),
     feedback=FeedbackTranslations(

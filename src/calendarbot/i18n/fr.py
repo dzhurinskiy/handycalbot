@@ -22,7 +22,7 @@ translations = Translations(
     ),
     start=StartTranslations(
         welcome_message="""
-Bienvenue sur *HandyCalBot*!
+Bienvenue sur *HandyCalBot*! 📅
 
 Je vous aide a planifier des reunions directement depuis Telegram.
 
@@ -54,7 +54,7 @@ Je vous aide a planifier des reunions directement depuis Telegram.
 _Les rapports de bugs et suggestions d'amelioration sont les bienvenus!_
 """,
         help_message="""
-*Aide HandyCalBot*
+*Aide HandyCalBot* 📅
 
 *Creer des Reunions (Inline):*
 Tapez `@handycalbot` dans n'importe quel chat suivi de:
@@ -100,7 +100,7 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         pending_invite_notification="📅 **{title}**\n🕐 {time}\nInvité par: {inviter}",
     ),
     settings=SettingsTranslations(
-        your_settings="**Vos Parametres**",
+        your_settings="**Vos Parametres** ⚙️",
         timezone_label="Fuseau Horaire",
         duration_label="Duree par Defaut",
         reminder_label="Rappel par Defaut",
@@ -120,7 +120,7 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         minutes="min",
         calendar_already_connected="Google Calendar est deja connecte!\nUtilisez /disconnect pour le deconnecter d'abord.",
         click_to_connect="Cliquez sur le bouton ci-dessous pour connecter votre Google Calendar.\n\nVous serez redirige vers Google pour autoriser l'acces.",
-        connect_button="Connecter Google Calendar",
+        connect_button="🔗 Connecter Google Calendar",
         calendar_disconnected="✅ Google Calendar deconnecte avec succes.\nUtilisez /connect pour le reconnecter.",
         no_calendar_connected="Aucun calendrier connecte.",
         select_timezone="Selectionnez votre fuseau horaire ou tapez-le manuellement (ex., `Europe/Paris`):",
@@ -132,7 +132,7 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         select_reminder="Selectionnez le rappel par defaut pour les nouvelles reunions:\n\n_Vous pouvez le remplacer par reunion en utilisant `r 10m` dans votre requete inline._",
         reminder_set="Rappel par defaut defini sur: {reminder}",
         reminder_override_hint="_Utilisez `r` dans votre requete pour appliquer ce defaut, ou `r 10m` pour remplacer avec un temps specifique._",
-        notifications_title="**Notifications de Reunions**",
+        notifications_title="**Notifications de Reunions** 🔔",
         notifications_status="Statut: {status}",
         notifications_explanation="Lorsqu'activees, vous recevrez des notifications Telegram avant vos reunions (selon les temps de rappel que vous definissez).",
         select_option="Selectionnez une option:",
@@ -142,7 +142,7 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         notifications_updated="{emoji} Notifications de reunions {status}.",
         will_receive_reminders="Vous recevrez maintenant des rappels avant vos reunions.",
         will_not_receive_reminders="Vous ne recevrez plus de rappels de reunions.",
-        select_language="Selectionnez votre langue preferee:",
+        select_language="🌍 Selectionnez votre langue preferee:",
         language_updated="✅ Langue mise a jour avec succes!",
         privacy_title="**Paramètres de Confidentialité** 🔒",
         privacy_username_invites="Autoriser les invitations par @nom d'utilisateur",
@@ -151,16 +151,16 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         privacy_updated="{emoji} Invitations par nom d'utilisateur {status}.",
     ),
     meetings=MeetingsTranslations(
-        upcoming_meetings="**Prochaines Reunions**",
+        upcoming_meetings="**Prochaines Reunions** 📅",
         no_upcoming_meetings="Aucune reunion a venir trouvee.",
         use_cancel_hint="_Utilisez /cancel pour annuler une reunion_",
-        attendees_count="{count} participant(s)",
+        attendees_count="👥 {count} participant(s)",
         select_meeting_to_cancel="**Selectionnez une reunion a annuler:**",
         page_info="Page {current}/{total}",
         total_meetings="{count} reunions au total",
-        previous_button="Precedent",
-        next_button="Suivant",
-        dont_cancel_button="Ne rien annuler",
+        previous_button="⬅️ Precedent",
+        next_button="Suivant ➡️",
+        dont_cancel_button="❌ Ne rien annuler",
         no_meeting_cancelled="✅ Aucune reunion annulee.",
         cancelling_meeting="Annulation de la reunion...",
         meeting_cancelled="✅ Reunion annulee: **{title}**",
@@ -180,7 +180,7 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         parse_error_description='Utilisez le format: 14:30 "Titre de Reunion" emails...',
         parse_error_message="Impossible d'analyser la reunion. Utilisez le format:\n14:30 \"Titre de Reunion\" email@exemple.com\n\nL'heure et le titre entre guillemets sont requis.\nAjoutez r 10m pour un rappel, ou juste r pour le defaut.",
         calendar_not_connected_warning="⚠️ Calendrier non connecte - /connect d'abord",
-        attendees_label="{count} participant(s)",
+        attendees_label="👥 {count} participant(s)",
         today="aujourd'hui",
         create_meeting_button="Creer Reunion",
         cancel_button="Annuler",
@@ -188,8 +188,8 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         meeting_data_expired="❌ Erreur: Donnees de reunion expirees. Veuillez reessayer.",
         not_your_meeting="❌ Ce n'est pas votre reunion!",
         meeting_created="Reunion creee!",
-        reminder_label="Rappel: {reminder} avant",
-        invitations_sent="Invitations envoyees a:",
+        reminder_label="🔔 Rappel: {reminder} avant",
+        invitations_sent="📧 Invitations envoyees a:",
         attendees_will_receive="_Ces participants recevront automatiquement une invitation de calendrier._",
         add_to_calendar_button="📅 Ajouter a Mon Calendrier",
         not_listed_add_calendar="_Pas dans la liste? Cliquez ci-dessous pour ajouter a votre calendrier:_",
@@ -205,21 +205,21 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         register_link_text="S'inscrire",
     ),
     donation=DonationTranslations(
-        support_title="**Soutenez HandyCalBot**",
+        support_title="**Soutenez HandyCalBot** ⭐",
         support_description="Si vous trouvez ce bot utile, considerez soutenir son developpement avec des Telegram Stars!",
         support_helps="Votre soutien aide a maintenir le bot en fonctionnement et permet de nouvelles fonctionnalites.",
         select_amount="Selectionnez un montant:",
-        custom_amount_button="Montant Personnalise",
-        custom_amount_prompt="**Don Personnalise**\n\nVeuillez entrer le nombre de Stars que vous souhaitez donner (1-10000):",
+        custom_amount_button="💫 Montant Personnalise",
+        custom_amount_prompt="**Don Personnalise** 💫\n\nVeuillez entrer le nombre de Stars que vous souhaitez donner (1-10000):",
         invalid_amount="Veuillez entrer un montant valide entre 1 et 10000 Stars.",
         invalid_number="Veuillez entrer un nombre valide (1-10000).",
         donation_error="Desole, une erreur s'est produite lors du traitement de votre don. Veuillez reessayer plus tard.",
-        thank_you="**Merci pour votre don!**",
+        thank_you="**Merci pour votre don!** 🙏",
         you_donated="Vous avez donne {amount} Telegram Stars. Votre soutien compte beaucoup!",
-        thank_you_running="Merci d'aider a maintenir HandyCalBot en fonctionnement!",
+        thank_you_running="Merci d'aider a maintenir HandyCalBot en fonctionnement! ⭐",
     ),
     reminder=ReminderTranslations(
-        meeting_reminder="*Rappel de Reunion*",
+        meeting_reminder="🔔 *Rappel de Reunion*",
         starting_in="Commence dans {time}",
     ),
     feedback=FeedbackTranslations(

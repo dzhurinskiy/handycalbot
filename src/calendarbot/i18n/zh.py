@@ -22,7 +22,7 @@ translations = Translations(
     ),
     start=StartTranslations(
         welcome_message="""
-欢迎使用 *HandyCalBot*!
+欢迎使用 *HandyCalBot*! 📅
 
 我可以帮助您直接从 Telegram 安排会议。
 
@@ -54,7 +54,7 @@ translations = Translations(
 _欢迎提交错误报告和UI改进建议！_
 """,
         help_message="""
-*HandyCalBot 帮助*
+*HandyCalBot 帮助* 📅
 
 *创建会议 (内联):*
 在任意聊天中输入 `@handycalbot` 后跟:
@@ -100,7 +100,7 @@ _欢迎提交错误报告和UI改进建议！_
         pending_invite_notification="📅 **{title}**\n🕐 {time}\n邀请者: {inviter}",
     ),
     settings=SettingsTranslations(
-        your_settings="**您的设置**",
+        your_settings="**您的设置** ⚙️",
         timezone_label="时区",
         duration_label="默认时长",
         reminder_label="默认提醒",
@@ -120,7 +120,7 @@ _欢迎提交错误报告和UI改进建议！_
         minutes="分钟",
         calendar_already_connected="Google 日历已连接!\n请先使用 /disconnect 断开连接。",
         click_to_connect="点击下方按钮连接您的 Google 日历。\n\n您将被重定向到 Google 进行授权。",
-        connect_button="连接 Google 日历",
+        connect_button="🔗 连接 Google 日历",
         calendar_disconnected="✅ Google 日历已成功断开。\n使用 /connect 重新连接。",
         no_calendar_connected="未连接日历。",
         select_timezone="选择您的时区或手动输入 (例如 `Asia/Shanghai`):",
@@ -132,7 +132,7 @@ _欢迎提交错误报告和UI改进建议！_
         select_reminder="选择新会议的默认提醒:\n\n_您可以在内联查询中使用 `r 10m` 覆盖每个会议的设置。_",
         reminder_set="默认提醒已设置: {reminder}",
         reminder_override_hint="_在查询中使用 `r` 应用默认值，或使用 `r 10m` 指定特定时间。_",
-        notifications_title="**会议通知**",
+        notifications_title="**会议通知** 🔔",
         notifications_status="状态: {status}",
         notifications_explanation="启用后，您将根据设置的提醒时间在会议前收到 Telegram 通知。",
         select_option="选择选项:",
@@ -142,7 +142,7 @@ _欢迎提交错误报告和UI改进建议！_
         notifications_updated="{emoji} 会议通知 {status}。",
         will_receive_reminders="您现在将在会议前收到提醒。",
         will_not_receive_reminders="您将不再收到会议提醒。",
-        select_language="选择您的首选语言:",
+        select_language="🌍 选择您的首选语言:",
         language_updated="✅ 语言更新成功!",
         privacy_title="**隐私设置** 🔒",
         privacy_username_invites="允许@用户名邀请",
@@ -151,16 +151,16 @@ _欢迎提交错误报告和UI改进建议！_
         privacy_updated="{emoji} 用户名邀请{status}。",
     ),
     meetings=MeetingsTranslations(
-        upcoming_meetings="**即将到来的会议**",
+        upcoming_meetings="**即将到来的会议** 📅",
         no_upcoming_meetings="未找到即将到来的会议。",
         use_cancel_hint="_使用 /cancel 取消会议_",
-        attendees_count="{count}位参与者",
+        attendees_count="👥 {count}位参与者",
         select_meeting_to_cancel="**选择要取消的会议:**",
         page_info="第 {current}/{total} 页",
         total_meetings="共 {count} 个会议",
-        previous_button="上一页",
-        next_button="下一页",
-        dont_cancel_button="不取消",
+        previous_button="⬅️ 上一页",
+        next_button="下一页 ➡️",
+        dont_cancel_button="❌ 不取消",
         no_meeting_cancelled="✅ 未取消任何会议。",
         cancelling_meeting="正在取消会议...",
         meeting_cancelled="✅ 会议已取消: **{title}**",
@@ -180,7 +180,7 @@ _欢迎提交错误报告和UI改进建议！_
         parse_error_description='使用格式: 14:30 "会议标题" emails...',
         parse_error_message='无法解析会议。使用格式:\n14:30 "会议标题" email@example.com\n\n时间和引号内的标题是必需的。\n添加 r 10m 设置提醒，或仅 r 使用默认值。',
         calendar_not_connected_warning="⚠️ 日历未连接 - 请先 /connect",
-        attendees_label="{count}位参与者",
+        attendees_label="👥 {count}位参与者",
         today="今天",
         create_meeting_button="创建会议",
         cancel_button="取消",
@@ -188,8 +188,8 @@ _欢迎提交错误报告和UI改进建议！_
         meeting_data_expired="❌ 错误：会议数据已过期。请重试。",
         not_your_meeting="❌ 这不是您的会议!",
         meeting_created="会议已创建!",
-        reminder_label="提醒: {reminder}前",
-        invitations_sent="邀请已发送给:",
+        reminder_label="🔔 提醒: {reminder}前",
+        invitations_sent="📧 邀请已发送给:",
         attendees_will_receive="_这些参与者将自动收到日历邀请。_",
         add_to_calendar_button="📅 添加到我的日历",
         not_listed_add_calendar="_不在列表中? 点击下方添加到您的日历:_",
@@ -205,21 +205,21 @@ _欢迎提交错误报告和UI改进建议！_
         register_link_text="注册",
     ),
     donation=DonationTranslations(
-        support_title="**支持 HandyCalBot**",
+        support_title="**支持 HandyCalBot** ⭐",
         support_description="如果您觉得这个机器人有用，请考虑使用 Telegram Stars 支持它的开发!",
         support_helps="您的支持有助于保持机器人运行并开发新功能。",
         select_amount="选择金额:",
-        custom_amount_button="自定义金额",
-        custom_amount_prompt="**自定义捐赠**\n\n请输入您想捐赠的 Stars 数量 (1-10000):",
+        custom_amount_button="💫 自定义金额",
+        custom_amount_prompt="**自定义捐赠** 💫\n\n请输入您想捐赠的 Stars 数量 (1-10000):",
         invalid_amount="请输入1到10000之间的有效金额。",
         invalid_number="请输入有效数字 (1-10000)。",
         donation_error="抱歉，处理您的捐赠时出错。请稍后重试。",
-        thank_you="**感谢您的捐赠!**",
+        thank_you="**感谢您的捐赠!** 🙏",
         you_donated="您捐赠了 {amount} Telegram Stars。感谢您的支持!",
-        thank_you_running="感谢您帮助保持 HandyCalBot 运行!",
+        thank_you_running="感谢您帮助保持 HandyCalBot 运行! ⭐",
     ),
     reminder=ReminderTranslations(
-        meeting_reminder="*会议提醒*",
+        meeting_reminder="🔔 *会议提醒*",
         starting_in="{time}后开始",
     ),
     feedback=FeedbackTranslations(
