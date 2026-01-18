@@ -23,9 +23,7 @@ def upgrade() -> None:
     conn = op.get_bind()
 
     # Create recent_contacts table (idempotent - IF NOT EXISTS)
-    conn.execute(
-        sa.text(
-            """
+    conn.execute(sa.text("""
             CREATE TABLE IF NOT EXISTS recent_contacts (
                 id SERIAL PRIMARY KEY,
                 user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -36,24 +34,16 @@ def upgrade() -> None:
                 last_used TIMESTAMP WITH TIME ZONE DEFAULT now(),
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
             )
-            """
-        )
-    )
+            """))
 
     # Create index for faster lookups by user_id (idempotent)
-    conn.execute(
-        sa.text(
-            """
+    conn.execute(sa.text("""
             CREATE INDEX IF NOT EXISTS idx_recent_contacts_user_id
             ON recent_contacts (user_id)
-            """
-        )
-    )
+            """))
 
     # Create unique constraint on user_id + contact_identifier (idempotent)
-    conn.execute(
-        sa.text(
-            """
+    conn.execute(sa.text("""
             DO $$
             BEGIN
                 IF NOT EXISTS (
@@ -65,9 +55,7 @@ def upgrade() -> None:
                     UNIQUE (user_id, contact_identifier);
                 END IF;
             END $$;
-            """
-        )
-    )
+            """))
 
 
 def downgrade() -> None:
