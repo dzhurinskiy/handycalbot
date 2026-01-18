@@ -182,7 +182,9 @@ class UsernameResolverService:
 
         # Fetch users by usernames
         users = await self.user_repo.get_users_by_usernames(usernames)
-        logger.info(f"Found {len(users)} users for usernames: {[u.telegram_username for u in users]}")
+        logger.info(
+            f"Found {len(users)} users for usernames: {[u.telegram_username for u in users]}"
+        )
 
         # Build username -> user mapping (case-insensitive)
         user_map = {}
