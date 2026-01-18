@@ -230,7 +230,7 @@ class UsernameResolverService:
     async def _get_user_email(self, user_id: int) -> tuple[bool, str | None]:
         """Get user's email from their OAuth token.
 
-        We use the email from the Google OAuth connection.
+        We use the email stored during OAuth connection, or fetch from Google if not stored.
 
         Returns:
             Tuple of (has_calendar_connected, email_or_none)
@@ -247,7 +247,16 @@ class UsernameResolverService:
             return (False, None)
 
         # Token exists, so calendar IS connected
-        # Now try to get the email
+        # First, check if we have the email stored
+        if token.email_encrypted:
+            try:
+                email = self.encryption.decrypt(token.email_encrypted)
+                logger.info(f"Using stored email for user {user_id}")
+                return (True, email)
+            except Exception as e:
+                logger.warning(f"Failed to decrypt stored email for user {user_id}: {e}")
+
+        # No stored email, try to fetch from Google API
         try:
             access_token = self.encryption.decrypt(token.access_token_encrypted)
             refresh_token = self.encryption.decrypt(token.refresh_token_encrypted)
@@ -282,6 +291,19 @@ class UsernameResolverService:
                 refresh_token=refresh_token,
             )
             email = await client.get_user_email()
+
+            # Store the email for future use if we got it
+            if email:
+                logger.info(f"Fetched and storing email for user {user_id}")
+                await self.token_repo.save_token(
+                    user_id=user_id,
+                    provider="google",
+                    access_token_encrypted=self.encryption.encrypt(access_token),
+                    refresh_token_encrypted=self.encryption.encrypt(refresh_token),
+                    expires_at=token.expires_at,
+                    email_encrypted=self.encryption.encrypt(email),
+                )
+
             return (True, email)
         except Exception as e:
             logger.error(f"Failed to get email for user {user_id}: {e}")

@@ -76,6 +76,8 @@ class OAuthToken(Base):
     refresh_token_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     calendar_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # User's email from the OAuth provider (encrypted for privacy)
+    email_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()

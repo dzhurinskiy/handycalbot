@@ -193,6 +193,16 @@ async def google_oauth_callback(
     try:
         encryption = TokenEncryption()
 
+        # Fetch user's email from Google using the fresh tokens
+        from calendarbot.integrations.google import GoogleCalendarClient
+
+        client = GoogleCalendarClient(
+            access_token=tokens["access_token"],
+            refresh_token=tokens["refresh_token"],
+        )
+        user_email = await client.get_user_email()
+        logger.info(f"Fetched email for user {telegram_id}: {user_email}")
+
         async with async_session_factory() as session:
             user_repo = UserRepository(session)
             token_repo = OAuthTokenRepository(session)
@@ -211,6 +221,7 @@ async def google_oauth_callback(
                 refresh_token_encrypted=encryption.encrypt(tokens["refresh_token"]),
                 expires_at=tokens["expires_at"],
                 calendar_id="primary",
+                email_encrypted=encryption.encrypt(user_email) if user_email else None,
             )
             await session.commit()
 
