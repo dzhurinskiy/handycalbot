@@ -1433,7 +1433,7 @@ async def handle_inline_text_input(update: Update, context: ContextTypes.DEFAULT
                 meeting_data = data
                 break
 
-    if not meeting_data:
+    if not meeting_data or not meeting_key:
         return  # No active editing session
 
     result_id = meeting_key.replace("meeting_", "")
