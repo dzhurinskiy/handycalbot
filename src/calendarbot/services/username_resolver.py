@@ -290,10 +290,10 @@ class UsernameResolverService:
                 access_token=access_token,
                 refresh_token=refresh_token,
             )
-            email: str | None = await client.get_user_email()
+            fetched_email = await client.get_user_email()
 
             # Store the email for future use if we got it
-            if email:
+            if fetched_email:
                 logger.info(f"Fetched and storing email for user {user_id}")
                 await self.token_repo.save_token(
                     user_id=user_id,
@@ -301,10 +301,10 @@ class UsernameResolverService:
                     access_token_encrypted=self.encryption.encrypt(access_token),
                     refresh_token_encrypted=self.encryption.encrypt(refresh_token),
                     expires_at=token.expires_at,
-                    email_encrypted=self.encryption.encrypt(email),
+                    email_encrypted=self.encryption.encrypt(fetched_email),
                 )
 
-            return (True, email)
+            return (True, fetched_email)
         except Exception as e:
             logger.error(f"Failed to get email for user {user_id}: {e}")
             # Calendar IS connected, but we couldn't fetch the email
