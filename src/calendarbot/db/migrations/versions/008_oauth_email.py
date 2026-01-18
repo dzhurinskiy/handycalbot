@@ -1,7 +1,7 @@
 """Add email_encrypted column to oauth_tokens.
 
-Revision ID: 007_oauth_email
-Revises: 006_edit_sessions
+Revision ID: 008_oauth_email
+Revises: 007_inline_msg_id
 Create Date: 2026-01-18
 
 """
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "007_oauth_email"
-down_revision: str | None = "006_edit_sessions"
+revision: str = "008_oauth_email"
+down_revision: str | None = "007_inline_msg_id"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
