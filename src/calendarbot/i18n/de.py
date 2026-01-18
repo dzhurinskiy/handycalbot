@@ -231,8 +231,10 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         attendee_added="✅ Teilnehmer hinzugefügt: {attendee}",
         attendee_removed="✅ Teilnehmer entfernt: {attendee}",
         invalid_email_format="❌ Ungültiges Format. Verwenden Sie email@beispiel.com oder @benutzername",
+        no_attendees="Noch keine Teilnehmer",
         # Link
         add_link_title="🔗 *Besprechungslink*",
+        invalid_link_format="❌ Ungültiger Link. Bitte eine URL eingeben, die mit http:// oder https:// beginnt",
         auto_google_meet="🎥 Auto Google Meet",
         paste_custom_link="📋 Eigenen Link einfügen",
         enter_link_prompt="🔗 *Besprechungslink eingeben*\n\nFügen Sie Ihre Meeting-URL ein.",

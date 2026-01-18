@@ -231,8 +231,10 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         attendee_added="✅ Peserta ditambahkan: {attendee}",
         attendee_removed="✅ Peserta dihapus: {attendee}",
         invalid_email_format="❌ Format tidak valid. Gunakan email@contoh.com atau @username",
+        no_attendees="Belum ada peserta",
         # Link
         add_link_title="🔗 *Link Rapat*",
+        invalid_link_format="❌ Link tidak valid. Masukkan URL yang dimulai dengan http:// atau https://",
         auto_google_meet="🎥 Auto Google Meet",
         paste_custom_link="📋 Tempel Link Kustom",
         enter_link_prompt="🔗 *Masukkan link rapat*\n\nTempel URL rapat Anda.",

@@ -204,9 +204,11 @@ class InlineTranslations:
     attendee_added: str
     attendee_removed: str
     invalid_email_format: str
+    no_attendees: str
 
     # Link
     add_link_title: str
+    invalid_link_format: str
     auto_google_meet: str
     paste_custom_link: str
     enter_link_prompt: str

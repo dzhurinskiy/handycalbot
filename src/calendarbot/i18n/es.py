@@ -231,8 +231,10 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         attendee_added="✅ Asistente agregado: {attendee}",
         attendee_removed="✅ Asistente eliminado: {attendee}",
         invalid_email_format="❌ Formato invalido. Usa correo@ejemplo.com o @usuario",
+        no_attendees="Sin participantes aún",
         # Link
         add_link_title="🔗 *Enlace de Reunion*",
+        invalid_link_format="❌ Enlace no válido. Ingresa una URL que comience con http:// o https://",
         auto_google_meet="🎥 Auto Google Meet",
         paste_custom_link="📋 Pegar Enlace Personalizado",
         enter_link_prompt="🔗 *Ingresa enlace de reunion*\n\nPega la URL de tu reunion.",

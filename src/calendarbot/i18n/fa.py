@@ -231,8 +231,10 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         attendee_added="✅ شرکت‌کننده اضافه شد: {attendee}",
         attendee_removed="✅ شرکت‌کننده حذف شد: {attendee}",
         invalid_email_format="❌ فرمت نامعتبر. از email@example.com یا @نام کاربری استفاده کنید",
+        no_attendees="هنوز شرکت‌کننده‌ای نیست",
         # Link
         add_link_title="🔗 *لینک جلسه*",
+        invalid_link_format="❌ لینک نامعتبر است. لطفاً URL که با http:// یا https:// شروع می‌شود وارد کنید",
         auto_google_meet="🎥 Google Meet خودکار",
         paste_custom_link="📋 چسباندن لینک سفارشی",
         enter_link_prompt="🔗 *لینک جلسه را وارد کنید*\n\nURL جلسه خود را بچسبانید.",

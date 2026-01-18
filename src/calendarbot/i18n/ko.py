@@ -231,8 +231,10 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         attendee_added="✅ 참석자 추가됨: {attendee}",
         attendee_removed="✅ 참석자 제거됨: {attendee}",
         invalid_email_format="❌ 잘못된 형식입니다. email@example.com 또는 @사용자명을 사용하세요",
+        no_attendees="아직 참석자가 없습니다",
         # Link
         add_link_title="🔗 *회의 링크*",
+        invalid_link_format="❌ 잘못된 링크입니다. http:// 또는 https://로 시작하는 URL을 입력하세요",
         auto_google_meet="🎥 자동 Google Meet",
         paste_custom_link="📋 사용자 정의 링크 붙여넣기",
         enter_link_prompt="🔗 *회의 링크 입력*\n\n회의 URL을 붙여넣으세요.",

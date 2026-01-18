@@ -19,6 +19,8 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes,
     InlineQueryHandler,
+    MessageHandler,
+    filters,
 )
 
 from calendarbot.db.repository import PendingInviteRepository, RecentContactRepository
@@ -1409,6 +1411,99 @@ async def discard_meeting_callback(update: Update, context: ContextTypes.DEFAULT
     await query.edit_message_text(t.inline.meeting_cancelled)
 
 
+async def handle_inline_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle text input for inline meeting editing (attendees, links, etc.)."""
+    if not update.message or not update.message.text or not update.effective_user:
+        return
+
+    user_id = update.effective_user.id
+    text = update.message.text.strip()
+
+    if not context.bot_data:
+        return
+
+    # Find the meeting this user is editing
+    meeting_key = None
+    meeting_data = None
+    for key, data in context.bot_data.items():
+        if key.startswith("meeting_") and data.get("user_id") == user_id:
+            state = data.get("state", "")
+            if state in ("adding_attendee", "adding_link"):
+                meeting_key = key
+                meeting_data = data
+                break
+
+    if not meeting_data:
+        return  # No active editing session
+
+    result_id = meeting_key.replace("meeting_", "")
+    state = meeting_data.get("state")
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(user_id)
+        t = get_text(user.language if user else "en")
+        user_timezone = user.timezone if user else "UTC"
+
+    m = meeting_data["meeting"]
+
+    if state == "adding_attendee":
+        # Validate and add attendee
+        if text.startswith("@"):
+            # Username
+            username = text[1:]  # Remove @
+            if username:
+                usernames = m.get("usernames", [])
+                if username.lower() not in [u.lower() for u in usernames]:
+                    usernames.append(username)
+                    m["usernames"] = usernames
+                await update.message.reply_text(t.inline.attendee_added)
+        elif "@" in text and "." in text:
+            # Email
+            attendees = m.get("attendees", [])
+            if text.lower() not in [a.lower() for a in attendees]:
+                attendees.append(text)
+                m["attendees"] = attendees
+            await update.message.reply_text(t.inline.attendee_added)
+        else:
+            await update.message.reply_text(t.inline.invalid_email_format)
+            return  # Don't change state, let user try again
+
+        # Return to attendees menu
+        meeting_data["state"] = "edit_menu"
+
+        async with async_session_factory() as session:
+            recent_repo = RecentContactRepository(session)
+            recent_contacts = await recent_repo.get_recent_contacts(user.id if user else 0, limit=5)
+
+        keyboard = _build_attendees_keyboard(result_id, meeting_data, recent_contacts, t)
+        text_msg = t.inline.current_attendees + "\n\n"
+        all_att = m.get("attendees", []) + [f"@{u}" for u in m.get("usernames", [])]
+        if all_att:
+            text_msg += "\n".join(f"• {a}" for a in all_att)
+        else:
+            text_msg += t.inline.no_attendees
+
+        await update.message.reply_text(text_msg, parse_mode="Markdown", reply_markup=keyboard)
+
+    elif state == "adding_link":
+        # Validate link (basic check)
+        if text.startswith("http://") or text.startswith("https://"):
+            m["custom_link"] = text
+            m["meet_link"] = None  # Clear auto Meet if custom set
+            await update.message.reply_text(t.inline.link_added)
+        else:
+            await update.message.reply_text(t.inline.invalid_link_format)
+            return  # Don't change state
+
+        # Return to edit menu
+        meeting_data["state"] = "edit_menu"
+
+        preview = _build_meeting_preview_text(meeting_data, t, user_timezone)
+        keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
+        await update.message.reply_text(preview, parse_mode="Markdown", reply_markup=keyboard)
+
+
 def setup_inline_handlers(app: Application) -> None:
     """Register inline query handlers."""
     app.add_handler(InlineQueryHandler(inline_query))
@@ -1446,3 +1541,9 @@ def setup_inline_handlers(app: Application) -> None:
 
     # No-op handler for display-only buttons
     app.add_handler(CallbackQueryHandler(noop_callback, pattern=r"^noop$"))
+
+    # Text input handler for attendees and custom links
+    # This must be added with a low group number so it doesn't interfere with other handlers
+    app.add_handler(
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_inline_text_input), group=5
+    )

@@ -231,8 +231,10 @@ _Сообщения об ошибках и предложения по улуч�
         attendee_added="✅ Участник добавлен: {attendee}",
         attendee_removed="✅ Участник удалён: {attendee}",
         invalid_email_format="❌ Неверный формат. Используйте email@example.com или @имя_пользователя",
+        no_attendees="Участников пока нет",
         # Link
         add_link_title="🔗 *Ссылка на встречу*",
+        invalid_link_format="❌ Неверная ссылка. Введите URL, начинающийся с http:// или https://",
         auto_google_meet="🎥 Авто Google Meet",
         paste_custom_link="📋 Вставить свою ссылку",
         enter_link_prompt="🔗 *Введите ссылку на встречу*\n\nВставьте URL вашей встречи.",

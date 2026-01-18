@@ -231,8 +231,10 @@ _欢迎提交错误报告和UI改进建议！_
         attendee_added="✅ 已添加参与者: {attendee}",
         attendee_removed="✅ 已移除参与者: {attendee}",
         invalid_email_format="❌ 格式无效。请使用 email@example.com 或 @用户名",
+        no_attendees="暂无参与者",
         # Link
         add_link_title="🔗 *会议链接*",
+        invalid_link_format="❌ 链接无效。请输入以 http:// 或 https:// 开头的URL",
         auto_google_meet="🎥 自动Google Meet",
         paste_custom_link="📋 粘贴自定义链接",
         enter_link_prompt="🔗 *输入会议链接*\n\n粘贴您的会议URL。",

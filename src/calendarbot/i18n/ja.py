@@ -231,8 +231,10 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         attendee_added="✅ 参加者を追加: {attendee}",
         attendee_removed="✅ 参加者を削除: {attendee}",
         invalid_email_format="❌ 無効な形式です。email@example.com または @ユーザー名を使用してください",
+        no_attendees="参加者はまだいません",
         # Link
         add_link_title="🔗 *ミーティングリンク*",
+        invalid_link_format="❌ 無効なリンクです。http:// または https:// で始まるURLを入力してください",
         auto_google_meet="🎥 自動Google Meet",
         paste_custom_link="📋 カスタムリンクを貼り付け",
         enter_link_prompt="🔗 *ミーティングリンクを入力*\n\nミーティングのURLを貼り付けてください。",
