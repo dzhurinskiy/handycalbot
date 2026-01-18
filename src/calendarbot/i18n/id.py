@@ -235,6 +235,8 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         # Link
         add_link_title="🔗 *Link Rapat*",
         invalid_link_format="❌ Link tidak valid. Masukkan URL yang dimulai dengan http:// atau https://",
+        invalid_time_format="❌ Format waktu tidak valid. Coba 14:00, 2pm, atau 14.30",
+        invalid_date_format="❌ Format tanggal tidak valid. Coba besok, Jan 20, atau 20-01",
         auto_google_meet="🎥 Auto Google Meet",
         paste_custom_link="📋 Tempel Link Kustom",
         enter_link_prompt="🔗 *Masukkan link rapat*\n\nTempel URL rapat Anda.",

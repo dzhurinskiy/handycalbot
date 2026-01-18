@@ -255,6 +255,8 @@ Type `@handycalbot` in any chat followed by:
         # Link
         add_link_title="🔗 *Meeting Link*",
         invalid_link_format="❌ Invalid link. Please enter a URL starting with http:// or https://",
+        invalid_time_format="❌ Invalid time format. Try 14:00, 2pm, or 14.30",
+        invalid_date_format="❌ Invalid date format. Try tomorrow, Jan 20, or 20-01",
         auto_google_meet="🎥 Auto Google Meet",
         paste_custom_link="📋 Paste Custom Link",
         enter_link_prompt="🔗 *Enter meeting link*\n\nPaste your meeting URL and send it.",

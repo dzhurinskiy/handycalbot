@@ -235,6 +235,8 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         # Link
         add_link_title="🔗 *ミーティングリンク*",
         invalid_link_format="❌ 無効なリンクです。http:// または https:// で始まるURLを入力してください",
+        invalid_time_format="❌ 無効な時刻形式です。14:00、2pm、または14.30を試してください",
+        invalid_date_format="❌ 無効な日付形式です。明日、Jan 20、または20-01を試してください",
         auto_google_meet="🎥 自動Google Meet",
         paste_custom_link="📋 カスタムリンクを貼り付け",
         enter_link_prompt="🔗 *ミーティングリンクを入力*\n\nミーティングのURLを貼り付けてください。",

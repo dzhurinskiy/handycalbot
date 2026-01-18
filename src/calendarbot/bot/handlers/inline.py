@@ -1412,7 +1412,7 @@ async def discard_meeting_callback(update: Update, context: ContextTypes.DEFAULT
 
 
 async def handle_inline_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle text input for inline meeting editing (attendees, links, etc.)."""
+    """Handle text input for inline meeting editing (title, time, date, attendees, links)."""
     if not update.message or not update.message.text or not update.effective_user:
         return
 
@@ -1422,13 +1422,22 @@ async def handle_inline_text_input(update: Update, context: ContextTypes.DEFAULT
     if not context.bot_data:
         return
 
+    # All states that require text input
+    text_input_states = (
+        "editing_title",
+        "editing_time",
+        "editing_date",
+        "adding_attendee",
+        "adding_link",
+    )
+
     # Find the meeting this user is editing
     meeting_key = None
     meeting_data = None
     for key, data in context.bot_data.items():
         if key.startswith("meeting_") and data.get("user_id") == user_id:
             state = data.get("state", "")
-            if state in ("adding_attendee", "adding_link"):
+            if state in text_input_states:
                 meeting_key = key
                 meeting_data = data
                 break
@@ -1447,7 +1456,91 @@ async def handle_inline_text_input(update: Update, context: ContextTypes.DEFAULT
 
     m = meeting_data["meeting"]
 
-    if state == "adding_attendee":
+    if state == "editing_title":
+        # Update title
+        m["title"] = text
+        meeting_data["state"] = "edit_menu"
+
+        preview = _build_meeting_preview_text(meeting_data, t, user_timezone)
+        keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
+        await update.message.reply_text(
+            t.inline.field_updated + "\n\n" + preview,
+            parse_mode="Markdown",
+            reply_markup=keyboard,
+        )
+
+    elif state == "editing_time":
+        # Parse time input (e.g., "14:00", "2pm", "14.30")
+        try:
+            parsed = MeetingParser.parse_time_only(text)
+            if parsed:
+                # Update time string and recalculate datetimes
+                m["time"] = parsed["time_str"]
+
+                # Recalculate start_datetime preserving the date
+                old_start = datetime.fromisoformat(m["start_datetime"])
+                new_start = old_start.replace(
+                    hour=parsed["hour"], minute=parsed["minute"], second=0, microsecond=0
+                )
+
+                # Calculate duration from old times
+                old_end = datetime.fromisoformat(m["end_datetime"])
+                duration = old_end - old_start
+
+                new_end = new_start + duration
+
+                m["start_datetime"] = new_start.isoformat()
+                m["end_datetime"] = new_end.isoformat()
+
+                meeting_data["state"] = "edit_menu"
+
+                preview = _build_meeting_preview_text(meeting_data, t, user_timezone)
+                keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
+                await update.message.reply_text(
+                    t.inline.field_updated + "\n\n" + preview,
+                    parse_mode="Markdown",
+                    reply_markup=keyboard,
+                )
+            else:
+                await update.message.reply_text(t.inline.invalid_time_format)
+        except Exception:
+            await update.message.reply_text(t.inline.invalid_time_format)
+
+    elif state == "editing_date":
+        # Parse date input (e.g., "tomorrow", "Jan 20", "20.01")
+        try:
+            parsed = MeetingParser.parse_date_only(text, user_timezone)
+            if parsed:
+                m["date"] = parsed["date_str"]
+
+                # Update start and end datetime with new date
+                old_start = datetime.fromisoformat(m["start_datetime"])
+                old_end = datetime.fromisoformat(m["end_datetime"])
+                duration = old_end - old_start
+
+                new_start = old_start.replace(
+                    year=parsed["year"], month=parsed["month"], day=parsed["day"]
+                )
+                new_end = new_start + duration
+
+                m["start_datetime"] = new_start.isoformat()
+                m["end_datetime"] = new_end.isoformat()
+
+                meeting_data["state"] = "edit_menu"
+
+                preview = _build_meeting_preview_text(meeting_data, t, user_timezone)
+                keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
+                await update.message.reply_text(
+                    t.inline.field_updated + "\n\n" + preview,
+                    parse_mode="Markdown",
+                    reply_markup=keyboard,
+                )
+            else:
+                await update.message.reply_text(t.inline.invalid_date_format)
+        except Exception:
+            await update.message.reply_text(t.inline.invalid_date_format)
+
+    elif state == "adding_attendee":
         # Validate and add attendee
         if text.startswith("@"):
             # Username

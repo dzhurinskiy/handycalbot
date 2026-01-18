@@ -235,6 +235,8 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         # Link
         add_link_title="🔗 *Besprechungslink*",
         invalid_link_format="❌ Ungültiger Link. Bitte eine URL eingeben, die mit http:// oder https:// beginnt",
+        invalid_time_format="❌ Ungültiges Zeitformat. Versuche 14:00, 2pm oder 14.30",
+        invalid_date_format="❌ Ungültiges Datumsformat. Versuche morgen, Jan 20 oder 20-01",
         auto_google_meet="🎥 Auto Google Meet",
         paste_custom_link="📋 Eigenen Link einfügen",
         enter_link_prompt="🔗 *Besprechungslink eingeben*\n\nFügen Sie Ihre Meeting-URL ein.",

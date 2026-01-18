@@ -235,6 +235,8 @@ _Сообщения об ошибках и предложения по улуч�
         # Link
         add_link_title="🔗 *Ссылка на встречу*",
         invalid_link_format="❌ Неверная ссылка. Введите URL, начинающийся с http:// или https://",
+        invalid_time_format="❌ Неверный формат времени. Попробуйте 14:00, 2pm или 14.30",
+        invalid_date_format="❌ Неверный формат даты. Попробуйте завтра, Jan 20 или 20-01",
         auto_google_meet="🎥 Авто Google Meet",
         paste_custom_link="📋 Вставить свою ссылку",
         enter_link_prompt="🔗 *Введите ссылку на встречу*\n\nВставьте URL вашей встречи.",

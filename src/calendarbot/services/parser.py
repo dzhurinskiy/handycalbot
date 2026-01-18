@@ -323,3 +323,173 @@ class MeetingParser:
                 invalid.append(email)
 
         return valid, invalid
+
+    @staticmethod
+    def parse_time_only(text: str) -> dict | None:
+        """Parse a time string into hour/minute components.
+
+        Accepts formats: 14:00, 14.00, 2pm, 2:30pm, 14h30
+        Returns dict with 'hour', 'minute', 'time_str' or None if invalid.
+        """
+        text = text.strip().lower()
+
+        # Try HH:MM or HH.MM format
+        match = re.match(r"^(\d{1,2})[:.](\d{2})$", text)
+        if match:
+            hour, minute = int(match.group(1)), int(match.group(2))
+            if 0 <= hour <= 23 and 0 <= minute <= 59:
+                return {"hour": hour, "minute": minute, "time_str": f"{hour:02d}:{minute:02d}"}
+            return None
+
+        # Try HHhMM format (e.g., 14h30)
+        match = re.match(r"^(\d{1,2})h(\d{2})$", text)
+        if match:
+            hour, minute = int(match.group(1)), int(match.group(2))
+            if 0 <= hour <= 23 and 0 <= minute <= 59:
+                return {"hour": hour, "minute": minute, "time_str": f"{hour:02d}:{minute:02d}"}
+            return None
+
+        # Try 12-hour format with am/pm (e.g., 2pm, 2:30pm, 2.30am)
+        match = re.match(r"^(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)$", text)
+        if match:
+            hour = int(match.group(1))
+            minute = int(match.group(2)) if match.group(2) else 0
+            period = match.group(3)
+
+            if hour < 1 or hour > 12 or minute > 59:
+                return None
+
+            # Convert to 24-hour
+            if period == "am":
+                hour = 0 if hour == 12 else hour
+            else:  # pm
+                hour = 12 if hour == 12 else hour + 12
+
+            return {"hour": hour, "minute": minute, "time_str": f"{hour:02d}:{minute:02d}"}
+
+        # Try just hour (e.g., "14" -> 14:00)
+        match = re.match(r"^(\d{1,2})$", text)
+        if match:
+            hour = int(match.group(1))
+            if 0 <= hour <= 23:
+                return {"hour": hour, "minute": 0, "time_str": f"{hour:02d}:00"}
+
+        return None
+
+    @staticmethod
+    def parse_date_only(text: str, timezone: str = "UTC") -> dict | None:
+        """Parse a date string into year/month/day components.
+
+        Accepts formats: tomorrow, 20-01, 20.01, Jan 20, 20 Jan, 20-01-2026
+        Returns dict with 'year', 'month', 'day', 'date_str' or None if invalid.
+        """
+        text = text.strip().lower()
+        now = TimezoneHelper.now_in_tz(timezone)
+
+        # Handle "today"
+        if text == "today":
+            return {
+                "year": now.year,
+                "month": now.month,
+                "day": now.day,
+                "date_str": now.strftime("%d-%m-%Y"),
+            }
+
+        # Handle "tomorrow"
+        if text == "tomorrow":
+            tomorrow = now + timedelta(days=1)
+            return {
+                "year": tomorrow.year,
+                "month": tomorrow.month,
+                "day": tomorrow.day,
+                "date_str": tomorrow.strftime("%d-%m-%Y"),
+            }
+
+        # Try DD-MM-YYYY or DD.MM.YYYY format
+        match = re.match(r"^(\d{1,2})[-./](\d{1,2})[-./](\d{4})$", text)
+        if match:
+            day, month, year = int(match.group(1)), int(match.group(2)), int(match.group(3))
+            if 1 <= day <= 31 and 1 <= month <= 12:
+                return {
+                    "year": year,
+                    "month": month,
+                    "day": day,
+                    "date_str": f"{day:02d}-{month:02d}-{year}",
+                }
+
+        # Try DD-MM or DD.MM format (assume current year)
+        match = re.match(r"^(\d{1,2})[-./](\d{1,2})$", text)
+        if match:
+            day, month = int(match.group(1)), int(match.group(2))
+            year = now.year
+            # If date is in the past, assume next year
+            if month < now.month or (month == now.month and day < now.day):
+                year += 1
+            if 1 <= day <= 31 and 1 <= month <= 12:
+                return {
+                    "year": year,
+                    "month": month,
+                    "day": day,
+                    "date_str": f"{day:02d}-{month:02d}-{year}",
+                }
+
+        # Try month name formats (Jan 20, 20 Jan, January 20)
+        months = {
+            "jan": 1,
+            "january": 1,
+            "feb": 2,
+            "february": 2,
+            "mar": 3,
+            "march": 3,
+            "apr": 4,
+            "april": 4,
+            "may": 5,
+            "jun": 6,
+            "june": 6,
+            "jul": 7,
+            "july": 7,
+            "aug": 8,
+            "august": 8,
+            "sep": 9,
+            "september": 9,
+            "oct": 10,
+            "october": 10,
+            "nov": 11,
+            "november": 11,
+            "dec": 12,
+            "december": 12,
+        }
+
+        # Try "Jan 20" or "January 20"
+        match = re.match(r"^([a-z]+)\s+(\d{1,2})$", text)
+        if match:
+            month_name, day = match.group(1), int(match.group(2))
+            if month_name in months and 1 <= day <= 31:
+                month = months[month_name]
+                year = now.year
+                if month < now.month or (month == now.month and day < now.day):
+                    year += 1
+                return {
+                    "year": year,
+                    "month": month,
+                    "day": day,
+                    "date_str": f"{day:02d}-{month:02d}-{year}",
+                }
+
+        # Try "20 Jan" or "20 January"
+        match = re.match(r"^(\d{1,2})\s+([a-z]+)$", text)
+        if match:
+            day, month_name = int(match.group(1)), match.group(2)
+            if month_name in months and 1 <= day <= 31:
+                month = months[month_name]
+                year = now.year
+                if month < now.month or (month == now.month and day < now.day):
+                    year += 1
+                return {
+                    "year": year,
+                    "month": month,
+                    "day": day,
+                    "date_str": f"{day:02d}-{month:02d}-{year}",
+                }
+
+        return None

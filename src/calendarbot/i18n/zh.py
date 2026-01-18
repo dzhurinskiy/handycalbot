@@ -235,6 +235,8 @@ _欢迎提交错误报告和UI改进建议！_
         # Link
         add_link_title="🔗 *会议链接*",
         invalid_link_format="❌ 链接无效。请输入以 http:// 或 https:// 开头的URL",
+        invalid_time_format="❌ 时间格式无效。请尝试 14:00、2pm 或 14.30",
+        invalid_date_format="❌ 日期格式无效。请尝试 明天、Jan 20 或 20-01",
         auto_google_meet="🎥 自动Google Meet",
         paste_custom_link="📋 粘贴自定义链接",
         enter_link_prompt="🔗 *输入会议链接*\n\n粘贴您的会议URL。",

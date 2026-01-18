@@ -209,6 +209,8 @@ class InlineTranslations:
     # Link
     add_link_title: str
     invalid_link_format: str
+    invalid_time_format: str
+    invalid_date_format: str
     auto_google_meet: str
     paste_custom_link: str
     enter_link_prompt: str

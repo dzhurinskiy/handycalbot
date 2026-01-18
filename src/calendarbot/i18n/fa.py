@@ -235,6 +235,8 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         # Link
         add_link_title="🔗 *لینک جلسه*",
         invalid_link_format="❌ لینک نامعتبر است. لطفاً URL که با http:// یا https:// شروع می‌شود وارد کنید",
+        invalid_time_format="❌ فرمت زمان نامعتبر است. 14:00، 2pm یا 14.30 را امتحان کنید",
+        invalid_date_format="❌ فرمت تاریخ نامعتبر است. فردا، Jan 20 یا 20-01 را امتحان کنید",
         auto_google_meet="🎥 Google Meet خودکار",
         paste_custom_link="📋 چسباندن لینک سفارشی",
         enter_link_prompt="🔗 *لینک جلسه را وارد کنید*\n\nURL جلسه خود را بچسبانید.",

@@ -235,6 +235,8 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         # Link
         add_link_title="🔗 *Enlace de Reunion*",
         invalid_link_format="❌ Enlace no válido. Ingresa una URL que comience con http:// o https://",
+        invalid_time_format="❌ Formato de hora no válido. Prueba 14:00, 2pm o 14.30",
+        invalid_date_format="❌ Formato de fecha no válido. Prueba mañana, Jan 20 o 20-01",
         auto_google_meet="🎥 Auto Google Meet",
         paste_custom_link="📋 Pegar Enlace Personalizado",
         enter_link_prompt="🔗 *Ingresa enlace de reunion*\n\nPega la URL de tu reunion.",

@@ -235,6 +235,8 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         # Link
         add_link_title="🔗 *회의 링크*",
         invalid_link_format="❌ 잘못된 링크입니다. http:// 또는 https://로 시작하는 URL을 입력하세요",
+        invalid_time_format="❌ 잘못된 시간 형식입니다. 14:00, 2pm 또는 14.30을 시도하세요",
+        invalid_date_format="❌ 잘못된 날짜 형식입니다. 내일, Jan 20 또는 20-01을 시도하세요",
         auto_google_meet="🎥 자동 Google Meet",
         paste_custom_link="📋 사용자 정의 링크 붙여넣기",
         enter_link_prompt="🔗 *회의 링크 입력*\n\n회의 URL을 붙여넣으세요.",
