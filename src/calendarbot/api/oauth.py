@@ -422,7 +422,9 @@ async def zoom_oauth_callback(
             user = await user_repo.get_by_telegram_id(telegram_id)
             if not user:
                 return HTMLResponse(
-                    content=ZOOM_ERROR_HTML.format(error="User not found. Please /start the bot first."),
+                    content=ZOOM_ERROR_HTML.format(
+                        error="User not found. Please /start the bot first."
+                    ),
                     status_code=400,
                 )
 

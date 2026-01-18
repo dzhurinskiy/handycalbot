@@ -118,9 +118,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 
     # Format Zoom status
     zoom_status = (
-        t.settings.connected
-        if summary.get("zoom") == "Connected"
-        else t.settings.not_connected
+        t.settings.connected if summary.get("zoom") == "Connected" else t.settings.not_connected
     )
 
     # Format privacy status

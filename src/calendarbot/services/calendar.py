@@ -109,7 +109,9 @@ class CalendarService:
         zoom_client = ZoomClient(access_token=access_token, refresh_token=refresh_token)
 
         # Calculate duration in minutes
-        duration = int((meeting_data.end_datetime - meeting_data.start_datetime).total_seconds() / 60)
+        duration = int(
+            (meeting_data.end_datetime - meeting_data.start_datetime).total_seconds() / 60
+        )
 
         result = await zoom_client.create_meeting(
             topic=meeting_data.title,
