@@ -236,7 +236,7 @@ Type `@handycalbot` in any chat followed by:
         back_button="↩️ Back",
         done_editing_button="✅ Done",
         # Edit prompts
-        enter_new_title="📝 *Enter new title*\n\nCurrent: \"{current}\"\n\nType the new title and send it.",
+        enter_new_title='📝 *Enter new title*\n\nCurrent: "{current}"\n\nType the new title and send it.',
         enter_new_time="🕐 *Enter new time*\n\nCurrent: {current}\n\nType the new time (HH:MM) and send it.",
         enter_new_date="📅 *Enter new date*\n\nCurrent: {current}\n\nType the new date (DD-MM-YYYY) and send it.",
         select_duration="⏱️ *Select Duration*",

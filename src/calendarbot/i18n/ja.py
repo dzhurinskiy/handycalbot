@@ -216,7 +216,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         back_button="↩️ 戻る",
         done_editing_button="✅ 完了",
         # Edit prompts
-        enter_new_title="📝 *新しいタイトルを入力*\n\n現在: \"{current}\"\n\n新しいタイトルを入力して送信してください。",
+        enter_new_title='📝 *新しいタイトルを入力*\n\n現在: "{current}"\n\n新しいタイトルを入力して送信してください。',
         enter_new_time="🕐 *新しい時間を入力*\n\n現在: {current}\n\n新しい時間（HH:MM）を入力して送信してください。",
         enter_new_date="📅 *新しい日付を入力*\n\n現在: {current}\n\n新しい日付（DD-MM-YYYY）を入力して送信してください。",
         select_duration="⏱️ *長さを選択*",

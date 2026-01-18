@@ -216,7 +216,7 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         back_button="↩️ Kembali",
         done_editing_button="✅ Selesai",
         # Edit prompts
-        enter_new_title="📝 *Masukkan judul baru*\n\nSaat ini: \"{current}\"\n\nKetik judul baru dan kirim.",
+        enter_new_title='📝 *Masukkan judul baru*\n\nSaat ini: "{current}"\n\nKetik judul baru dan kirim.',
         enter_new_time="🕐 *Masukkan waktu baru*\n\nSaat ini: {current}\n\nKetik waktu baru (HH:MM) dan kirim.",
         enter_new_date="📅 *Masukkan tanggal baru*\n\nSaat ini: {current}\n\nKetik tanggal baru (DD-MM-YYYY) dan kirim.",
         select_duration="⏱️ *Pilih Durasi*",

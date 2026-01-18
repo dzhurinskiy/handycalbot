@@ -216,7 +216,7 @@ _欢迎提交错误报告和UI改进建议！_
         back_button="↩️ 返回",
         done_editing_button="✅ 完成",
         # Edit prompts
-        enter_new_title="📝 *输入新标题*\n\n当前: \"{current}\"\n\n输入新标题并发送。",
+        enter_new_title='📝 *输入新标题*\n\n当前: "{current}"\n\n输入新标题并发送。',
         enter_new_time="🕐 *输入新时间*\n\n当前: {current}\n\n输入新时间（HH:MM）并发送。",
         enter_new_date="📅 *输入新日期*\n\n当前: {current}\n\n输入新日期（DD-MM-YYYY）并发送。",
         select_duration="⏱️ *选择时长*",

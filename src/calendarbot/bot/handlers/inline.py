@@ -116,22 +116,21 @@ def build_add_to_calendar_url(
 
 def _build_preview_keyboard(result_id: str, t) -> InlineKeyboardMarkup:
     """Build the initial preview keyboard with Create, Edit, Cancel buttons."""
-    return InlineKeyboardMarkup([
+    return InlineKeyboardMarkup(
         [
-            InlineKeyboardButton(
-                f"✅ {t.inline.create_meeting_button}",
-                callback_data=f"create_{result_id}"
-            ),
-            InlineKeyboardButton(
-                f"✏️ {t.inline.edit_button}",
-                callback_data=f"edit_{result_id}"
-            ),
-            InlineKeyboardButton(
-                f"❌ {t.inline.cancel_button}",
-                callback_data=f"discard_{result_id}"
-            ),
+            [
+                InlineKeyboardButton(
+                    f"✅ {t.inline.create_meeting_button}", callback_data=f"create_{result_id}"
+                ),
+                InlineKeyboardButton(
+                    f"✏️ {t.inline.edit_button}", callback_data=f"edit_{result_id}"
+                ),
+                InlineKeyboardButton(
+                    f"❌ {t.inline.cancel_button}", callback_data=f"discard_{result_id}"
+                ),
+            ]
         ]
-    ])
+    )
 
 
 def _build_edit_menu_keyboard(result_id: str, meeting_data: dict, t) -> InlineKeyboardMarkup:
@@ -162,7 +161,7 @@ def _build_edit_menu_keyboard(result_id: str, meeting_data: dict, t) -> InlineKe
         [
             InlineKeyboardButton(
                 f"👥 ({attendee_count})" if attendee_count else t.inline.edit_attendees_button,
-                callback_data=f"em_att_{result_id}"
+                callback_data=f"em_att_{result_id}",
             ),
             InlineKeyboardButton(link_text, callback_data=f"em_link_{result_id}"),
         ],
@@ -224,17 +223,21 @@ def _build_attendees_keyboard(
     # Current attendees with remove buttons
     for i, email in enumerate(m.get("attendees", [])):
         display = email[:20] + "..." if len(email) > 23 else email
-        buttons.append([
-            InlineKeyboardButton(f"📧 {display}", callback_data="noop"),
-            InlineKeyboardButton("🗑️", callback_data=f"att_rem_{result_id}_e{i}"),
-        ])
+        buttons.append(
+            [
+                InlineKeyboardButton(f"📧 {display}", callback_data="noop"),
+                InlineKeyboardButton("🗑️", callback_data=f"att_rem_{result_id}_e{i}"),
+            ]
+        )
 
     for i, username in enumerate(m.get("usernames", [])):
         display = f"@{username}"[:20] + "..." if len(username) > 18 else f"@{username}"
-        buttons.append([
-            InlineKeyboardButton(display, callback_data="noop"),
-            InlineKeyboardButton("🗑️", callback_data=f"att_rem_{result_id}_u{i}"),
-        ])
+        buttons.append(
+            [
+                InlineKeyboardButton(display, callback_data="noop"),
+                InlineKeyboardButton("🗑️", callback_data=f"att_rem_{result_id}_u{i}"),
+            ]
+        )
 
     # Recent contacts (up to 3)
     if recent_contacts:
@@ -243,19 +246,23 @@ def _build_attendees_keyboard(
             display = contact.contact_identifier[:15]
             if contact.contact_type == "username":
                 display = f"@{display}"
-            rc_row.append(
-                InlineKeyboardButton(display, callback_data=f"att_rc_{result_id}_{i}")
-            )
+            rc_row.append(InlineKeyboardButton(display, callback_data=f"att_rc_{result_id}_{i}"))
         if rc_row:
             buttons.append(rc_row)
 
     # Add and Back buttons
-    buttons.append([
-        InlineKeyboardButton(t.inline.type_manually_button, callback_data=f"att_add_{result_id}"),
-    ])
-    buttons.append([
-        InlineKeyboardButton(t.inline.back_button, callback_data=f"edit_{result_id}"),
-    ])
+    buttons.append(
+        [
+            InlineKeyboardButton(
+                t.inline.type_manually_button, callback_data=f"att_add_{result_id}"
+            ),
+        ]
+    )
+    buttons.append(
+        [
+            InlineKeyboardButton(t.inline.back_button, callback_data=f"edit_{result_id}"),
+        ]
+    )
 
     return InlineKeyboardMarkup(buttons)
 
@@ -271,23 +278,35 @@ def _build_link_keyboard(result_id: str, meeting_data: dict, t) -> InlineKeyboar
         link_display = m.get("meet_link") or m.get("custom_link", "")
         short_link = link_display[:30] + "..." if len(link_display) > 33 else link_display
         buttons.append([InlineKeyboardButton(f"🔗 {short_link}", callback_data="noop")])
-        buttons.append([
-            InlineKeyboardButton(t.inline.remove_link_button, callback_data=f"link_rem_{result_id}")
-        ])
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    t.inline.remove_link_button, callback_data=f"link_rem_{result_id}"
+                )
+            ]
+        )
     else:
         # Show add options
-        buttons.append([
-            InlineKeyboardButton(t.inline.auto_google_meet, callback_data=f"link_meet_{result_id}")
-        ])
-        buttons.append([
-            InlineKeyboardButton(
-                t.inline.paste_custom_link, callback_data=f"link_custom_{result_id}"
-            )
-        ])
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    t.inline.auto_google_meet, callback_data=f"link_meet_{result_id}"
+                )
+            ]
+        )
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    t.inline.paste_custom_link, callback_data=f"link_custom_{result_id}"
+                )
+            ]
+        )
 
-    buttons.append([
-        InlineKeyboardButton(t.inline.back_button, callback_data=f"edit_{result_id}"),
-    ])
+    buttons.append(
+        [
+            InlineKeyboardButton(t.inline.back_button, callback_data=f"edit_{result_id}"),
+        ]
+    )
 
     return InlineKeyboardMarkup(buttons)
 
@@ -506,9 +525,7 @@ async def edit_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
 
     await query.edit_message_text(
-        t.inline.edit_menu_title,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.edit_menu_title, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -572,9 +589,7 @@ async def edit_duration_callback(update: Update, context: ContextTypes.DEFAULT_T
 
     keyboard = _build_duration_keyboard(result_id, t)
     await query.edit_message_text(
-        t.inline.select_duration,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.select_duration, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -618,9 +633,7 @@ async def set_duration_callback(update: Update, context: ContextTypes.DEFAULT_TY
     # Return to edit menu
     keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
     await query.edit_message_text(
-        t.inline.edit_menu_title,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.edit_menu_title, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -650,9 +663,7 @@ async def edit_reminder_callback(update: Update, context: ContextTypes.DEFAULT_T
 
     keyboard = _build_reminder_keyboard(result_id, t)
     await query.edit_message_text(
-        t.inline.select_reminder,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.select_reminder, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -696,9 +707,7 @@ async def set_reminder_callback(update: Update, context: ContextTypes.DEFAULT_TY
 
     keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
     await query.edit_message_text(
-        t.inline.edit_menu_title,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.edit_menu_title, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -815,9 +824,7 @@ async def remove_attendee_callback(update: Update, context: ContextTypes.DEFAULT
     await query.edit_message_text(text, parse_mode="Markdown", reply_markup=keyboard)
 
 
-async def add_recent_contact_callback(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def add_recent_contact_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Add a recent contact as attendee."""
     query = update.callback_query
     if not query or not query.data or not update.effective_user:
@@ -894,9 +901,7 @@ async def add_recent_contact_callback(
     await query.edit_message_text(text, parse_mode="Markdown", reply_markup=keyboard)
 
 
-async def add_attendee_start_callback(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def add_attendee_start_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Start adding an attendee manually."""
     query = update.callback_query
     if not query or not query.data or not update.effective_user:
@@ -923,14 +928,12 @@ async def add_attendee_start_callback(
     # Set state to waiting for attendee input
     meeting_data["state"] = "adding_attendee"
 
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"em_att_{result_id}")]
-    ])
+    keyboard = InlineKeyboardMarkup(
+        [[InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"em_att_{result_id}")]]
+    )
 
     await query.edit_message_text(
-        t.inline.add_attendee_prompt,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.add_attendee_prompt, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -960,9 +963,7 @@ async def edit_link_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     keyboard = _build_link_keyboard(result_id, meeting_data, t)
     await query.edit_message_text(
-        t.inline.add_link_title,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.add_link_title, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -997,9 +998,7 @@ async def add_google_meet_callback(update: Update, context: ContextTypes.DEFAULT
     # Return to edit menu
     keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
     await query.edit_message_text(
-        t.inline.edit_menu_title,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.edit_menu_title, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -1031,14 +1030,12 @@ async def add_custom_link_start_callback(
 
     meeting_data["state"] = "adding_link"
 
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"em_link_{result_id}")]
-    ])
+    keyboard = InlineKeyboardMarkup(
+        [[InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"em_link_{result_id}")]]
+    )
 
     await query.edit_message_text(
-        t.inline.enter_link_prompt,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.enter_link_prompt, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -1072,9 +1069,7 @@ async def remove_link_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 
     keyboard = _build_link_keyboard(result_id, meeting_data, t)
     await query.edit_message_text(
-        t.inline.add_link_title,
-        parse_mode="Markdown",
-        reply_markup=keyboard
+        t.inline.add_link_title, parse_mode="Markdown", reply_markup=keyboard
     )
 
 
@@ -1105,14 +1100,14 @@ async def edit_title_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     meeting_data["state"] = "editing_title"
     current_title = meeting_data["meeting"]["title"]
 
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"edit_{result_id}")]
-    ])
+    keyboard = InlineKeyboardMarkup(
+        [[InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"edit_{result_id}")]]
+    )
 
     await query.edit_message_text(
         t.inline.enter_new_title.format(current=current_title),
         parse_mode="Markdown",
-        reply_markup=keyboard
+        reply_markup=keyboard,
     )
 
 
@@ -1143,14 +1138,14 @@ async def edit_time_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     meeting_data["state"] = "editing_time"
     current_time = meeting_data["meeting"]["time"]
 
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"edit_{result_id}")]
-    ])
+    keyboard = InlineKeyboardMarkup(
+        [[InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"edit_{result_id}")]]
+    )
 
     await query.edit_message_text(
         t.inline.enter_new_time.format(current=current_time),
         parse_mode="Markdown",
-        reply_markup=keyboard
+        reply_markup=keyboard,
     )
 
 
@@ -1181,14 +1176,14 @@ async def edit_date_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     meeting_data["state"] = "editing_date"
     current_date = meeting_data["meeting"].get("date") or "today"
 
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"edit_{result_id}")]
-    ])
+    keyboard = InlineKeyboardMarkup(
+        [[InlineKeyboardButton(t.inline.cancel_edit_button, callback_data=f"edit_{result_id}")]]
+    )
 
     await query.edit_message_text(
         t.inline.enter_new_date.format(current=current_date),
         parse_mode="Markdown",
-        reply_markup=keyboard
+        reply_markup=keyboard,
     )
 
 

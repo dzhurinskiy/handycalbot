@@ -216,7 +216,7 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         back_button="↩️ 뒤로",
         done_editing_button="✅ 완료",
         # Edit prompts
-        enter_new_title="📝 *새 제목 입력*\n\n현재: \"{current}\"\n\n새 제목을 입력하고 보내세요.",
+        enter_new_title='📝 *새 제목 입력*\n\n현재: "{current}"\n\n새 제목을 입력하고 보내세요.',
         enter_new_time="🕐 *새 시간 입력*\n\n현재: {current}\n\n새 시간(HH:MM)을 입력하고 보내세요.",
         enter_new_date="📅 *새 날짜 입력*\n\n현재: {current}\n\n새 날짜(DD-MM-YYYY)를 입력하고 보내세요.",
         select_duration="⏱️ *길이 선택*",

@@ -216,7 +216,7 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         back_button="↩️ Retour",
         done_editing_button="✅ Termine",
         # Edit prompts
-        enter_new_title="📝 *Entrez le nouveau titre*\n\nActuel: \"{current}\"\n\nTapez le nouveau titre et envoyez.",
+        enter_new_title='📝 *Entrez le nouveau titre*\n\nActuel: "{current}"\n\nTapez le nouveau titre et envoyez.',
         enter_new_time="🕐 *Entrez la nouvelle heure*\n\nActuelle: {current}\n\nTapez la nouvelle heure (HH:MM) et envoyez.",
         enter_new_date="📅 *Entrez la nouvelle date*\n\nActuelle: {current}\n\nTapez la nouvelle date (JJ-MM-AAAA) et envoyez.",
         select_duration="⏱️ *Selectionnez la Duree*",
