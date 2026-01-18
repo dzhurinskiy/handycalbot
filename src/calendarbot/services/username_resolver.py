@@ -202,13 +202,22 @@ class UsernameResolverService:
                 continue
 
             # Get user's email from OAuth token
-            email = await self._get_user_email(user.id)
-            if email:
+            has_calendar, email = await self._get_user_email(user.id)
+            if not has_calendar:
+                # User hasn't connected calendar
+                no_calendar.append(username)
+            elif email:
+                # Calendar connected and email retrieved
                 emails.append(email)
                 invited.append(username)
             else:
-                # User hasn't connected calendar
-                no_calendar.append(username)
+                # Calendar connected but couldn't fetch email (API error)
+                # Still count as invited since they have calendar
+                invited.append(username)
+                logger.warning(
+                    f"User {username} has calendar but couldn't fetch email - "
+                    "they won't receive calendar invite"
+                )
 
         return MeetingInviteResult(
             invited=invited,
@@ -218,18 +227,23 @@ class UsernameResolverService:
             emails=emails,
         )
 
-    async def _get_user_email(self, user_id: int) -> str | None:
+    async def _get_user_email(self, user_id: int) -> tuple[bool, str | None]:
         """Get user's email from their OAuth token.
 
         We use the email from the Google OAuth connection.
+
+        Returns:
+            Tuple of (has_calendar_connected, email_or_none)
+            - (False, None) - No calendar connected
+            - (True, email) - Calendar connected and email retrieved
+            - (True, None) - Calendar connected but couldn't fetch email (API error)
         """
         token = await self.token_repo.get_token(user_id, "google")
         if not token:
-            return None
+            return (False, None)
 
-        # The email is stored in the access token response from Google
-        # For now, we'll need to make an API call to get it
-        # TODO: Consider caching the email in the user table
+        # Token exists, so calendar IS connected
+        # Now try to get the email
         try:
             from calendarbot.integrations.google import GoogleCalendarClient
 
@@ -240,10 +254,11 @@ class UsernameResolverService:
                 refresh_token=refresh_token,
             )
             email = await client.get_user_email()
-            return email
+            return (True, email)
         except Exception as e:
             logger.error(f"Failed to get email for user {user_id}: {e}")
-            return None
+            # Calendar IS connected, but we couldn't fetch the email
+            return (True, None)
 
     def get_status_icon(self, status: UsernameStatus) -> str:
         """Get display icon for a username status."""
