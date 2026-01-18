@@ -223,14 +223,14 @@ _Сообщения об ошибках и предложения по улуч�
         select_reminder="🔔 *Выберите напоминание*",
         # Attendees
         current_attendees="*Текущие участники:*",
-        add_attendee_prompt="👥 *Добавить участника*\n\nВведите email или @имя_пользователя и отправьте.",
+        add_attendee_prompt="👥 *Добавить участника*\n\nВведите email или @имя\\_пользователя и отправьте.",
         recent_contacts_title="*Недавние контакты:*",
         no_recent_contacts="Нет недавних контактов",
         type_manually_button="✍️ Ввести email/@имя",
         remove_attendee_button="🗑️",
         attendee_added="✅ Участник добавлен: {attendee}",
         attendee_removed="✅ Участник удалён: {attendee}",
-        invalid_email_format="❌ Неверный формат. Используйте email@example.com или @имя_пользователя",
+        invalid_email_format="❌ Неверный формат. Используйте email@example.com или @имя\\_пользователя",
         no_attendees="Участников пока нет",
         # Link
         add_link_title="🔗 *Ссылка на встречу*",
