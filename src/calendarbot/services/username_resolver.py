@@ -290,7 +290,7 @@ class UsernameResolverService:
                 access_token=access_token,
                 refresh_token=refresh_token,
             )
-            email = await client.get_user_email()
+            email: str | None = await client.get_user_email()
 
             # Store the email for future use if we got it
             if email:
