@@ -24,11 +24,13 @@ jobs:
           GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           ADMIN_CHAT_ID: ${{ secrets.ADMIN_CHAT_ID }}
+          ZOOM_CLIENT_ID: ${{ secrets.ZOOM_CLIENT_ID }}
+          ZOOM_CLIENT_SECRET: ${{ secrets.ZOOM_CLIENT_SECRET }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: TELEGRAM_BOT_TOKEN,DB_PASSWORD,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,ENCRYPTION_KEY,GOOGLE_REDIRECT_URI,WEBHOOK_URL,ADMIN_CHAT_ID
+          envs: TELEGRAM_BOT_TOKEN,DB_PASSWORD,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,ENCRYPTION_KEY,GOOGLE_REDIRECT_URI,WEBHOOK_URL,ADMIN_CHAT_ID,ZOOM_CLIENT_ID,ZOOM_CLIENT_SECRET
           script: |
             cd /opt/handycal
 
@@ -53,6 +55,9 @@ jobs:
             DEFAULT_MEETING_DURATION=60
             LOG_LEVEL=INFO
             ADMIN_CHAT_ID=${ADMIN_CHAT_ID}
+            ZOOM_CLIENT_ID=${ZOOM_CLIENT_ID}
+            ZOOM_CLIENT_SECRET=${ZOOM_CLIENT_SECRET}
+            ZOOM_REDIRECT_URI=https://handycal.dzhurinskiy.com/auth/zoom/callback
             ENVEOF
 
             echo ">>> .env generated"
