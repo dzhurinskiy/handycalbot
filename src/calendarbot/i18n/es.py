@@ -40,6 +40,7 @@ Te ayudo a programar reuniones directamente desde Telegram.
 /help - Mostrar ayuda y uso
 /connect - Conectar Google Calendar
 /disconnect - Desconectar calendario
+/connectzoom - Conectar Zoom para enlaces de reuniones
 /meetings - Listar proximas reuniones
 /cancel - Cancelar una reunion
 /settings - Ver tu configuracion
@@ -327,6 +328,7 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         cancel="Cancelar una reunion",
         connect="Conectar Google Calendar",
         disconnect="Desconectar Google Calendar",
+        connectzoom="Conectar Zoom para enlaces de reuniones",
         settings="Ver tu configuracion",
         timezone="Cambiar zona horaria",
         duration="Establecer duracion predeterminada",

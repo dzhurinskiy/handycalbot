@@ -40,6 +40,7 @@ translations = Translations(
 /help - 도움말 및 사용법
 /connect - Google 캘린더 연결
 /disconnect - 캘린더 연결 해제
+/connectzoom - 회의 링크용 Zoom 연결
 /meetings - 예정된 회의 목록
 /cancel - 회의 취소
 /settings - 설정 보기
@@ -328,6 +329,7 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         cancel="회의 취소",
         connect="Google 캘린더 연결",
         disconnect="Google 캘린더 연결 해제",
+        connectzoom="회의 링크용 Zoom 연결",
         settings="설정 보기",
         timezone="시간대 변경",
         duration="기본 시간 설정",

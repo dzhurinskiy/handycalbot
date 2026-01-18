@@ -325,6 +325,7 @@ class CommandTranslations:
     cancel: str
     connect: str
     disconnect: str
+    connectzoom: str
     settings: str
     timezone: str
     duration: str

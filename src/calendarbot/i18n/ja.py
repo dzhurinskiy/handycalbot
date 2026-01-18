@@ -40,6 +40,7 @@ Telegramから直接ミーティングをスケジュールできます。
 /help - ヘルプと使用方法
 /connect - Googleカレンダーを接続
 /disconnect - カレンダーを切断
+/connectzoom - ミーティングリンク用にZoomを接続
 /meetings - 今後のミーティング一覧
 /cancel - ミーティングをキャンセル
 /settings - 設定を表示
@@ -83,6 +84,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
 /help - このヘルプメッセージ
 /connect - Googleカレンダーを接続
 /disconnect - カレンダーを切断
+/connectzoom - ミーティングリンク用にZoomを接続
 /meetings - 今後のミーティングを表示
 /cancel - ミーティングをキャンセル
 /settings - 設定を表示
@@ -327,6 +329,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         cancel="ミーティングをキャンセル",
         connect="Googleカレンダーを接続",
         disconnect="Googleカレンダーを切断",
+        connectzoom="ミーティングリンク用にZoomを接続",
         settings="設定を表示",
         timezone="タイムゾーンを変更",
         duration="デフォルト時間を設定",

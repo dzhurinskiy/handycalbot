@@ -40,6 +40,7 @@ Saya membantu Anda menjadwalkan rapat langsung dari Telegram.
 /help - Tampilkan bantuan dan penggunaan
 /connect - Hubungkan Google Calendar
 /disconnect - Putuskan koneksi kalender
+/connectzoom - Hubungkan Zoom untuk tautan rapat
 /meetings - Daftar rapat mendatang
 /cancel - Batalkan rapat
 /settings - Lihat pengaturan Anda
@@ -83,6 +84,7 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
 /help - Pesan bantuan ini
 /connect - Hubungkan Google Calendar
 /disconnect - Putuskan koneksi kalender
+/connectzoom - Hubungkan Zoom untuk tautan rapat
 /meetings - Tampilkan rapat mendatang
 /cancel - Batalkan rapat
 /settings - Lihat pengaturan Anda
@@ -328,6 +330,7 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         cancel="Batalkan rapat",
         connect="Hubungkan Google Calendar",
         disconnect="Putuskan Google Calendar",
+        connectzoom="Hubungkan Zoom untuk tautan rapat",
         settings="Lihat pengaturan Anda",
         timezone="Ubah zona waktu",
         duration="Atur durasi default",

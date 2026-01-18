@@ -40,6 +40,7 @@ translations = Translations(
 /help - 显示帮助和用法
 /connect - 连接 Google 日历
 /disconnect - 断开日历连接
+/connectzoom - 连接 Zoom 获取会议链接
 /meetings - 列出即将到来的会议
 /cancel - 取消会议
 /settings - 查看设置
@@ -83,6 +84,7 @@ _欢迎提交错误报告和UI改进建议！_
 /help - 此帮助消息
 /connect - 连接 Google 日历
 /disconnect - 断开日历连接
+/connectzoom - 连接 Zoom 获取会议链接
 /meetings - 显示即将到来的会议
 /cancel - 取消会议
 /settings - 查看设置
@@ -327,6 +329,7 @@ _欢迎提交错误报告和UI改进建议！_
         cancel="取消会议",
         connect="连接 Google 日历",
         disconnect="断开 Google 日历",
+        connectzoom="连接 Zoom 获取会议链接",
         settings="查看设置",
         timezone="更改时区",
         duration="设置默认时长",

@@ -40,6 +40,7 @@ Ich helfe dir, Besprechungen direkt von Telegram aus zu planen.
 /help - Hilfe und Nutzung anzeigen
 /connect - Google Kalender verbinden
 /disconnect - Kalender trennen
+/connectzoom - Zoom für Meeting-Links verbinden
 /meetings - Kommende Besprechungen auflisten
 /cancel - Eine Besprechung absagen
 /settings - Deine Einstellungen ansehen
@@ -83,6 +84,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
 /help - Diese Hilfenachricht
 /connect - Google Kalender verbinden
 /disconnect - Kalender trennen
+/connectzoom - Zoom für Meeting-Links verbinden
 /meetings - Kommende Besprechungen anzeigen
 /cancel - Eine Besprechung absagen
 /settings - Deine Einstellungen ansehen
@@ -328,6 +330,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         cancel="Eine Besprechung absagen",
         connect="Google Kalender verbinden",
         disconnect="Google Kalender trennen",
+        connectzoom="Zoom für Meeting-Links verbinden",
         settings="Deine Einstellungen ansehen",
         timezone="Zeitzone andern",
         duration="Standarddauer festlegen",

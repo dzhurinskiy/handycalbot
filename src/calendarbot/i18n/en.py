@@ -41,6 +41,7 @@ I help you schedule meetings directly from Telegram.
 /help - Show help and usage
 /connect - Connect Google Calendar
 /disconnect - Disconnect calendar
+/connectzoom - Connect Zoom for meeting links
 /meetings - List upcoming meetings
 /cancel - Cancel a meeting
 /settings - View your settings
@@ -85,6 +86,7 @@ Type `@handycalbot` in any chat followed by:
 /help - This help message
 /connect - Connect Google Calendar
 /disconnect - Disconnect calendar
+/connectzoom - Connect Zoom for meeting links
 /meetings - Show upcoming meetings
 /cancel - Cancel a meeting
 /settings - View your settings
@@ -347,6 +349,7 @@ Type `@handycalbot` in any chat followed by:
         cancel="Cancel a meeting",
         connect="Connect Google Calendar",
         disconnect="Disconnect Google Calendar",
+        connectzoom="Connect Zoom for meeting links",
         settings="View your current settings",
         timezone="Change your timezone",
         duration="Set default meeting duration",
