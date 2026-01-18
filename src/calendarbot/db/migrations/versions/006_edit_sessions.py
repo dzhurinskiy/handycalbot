@@ -31,9 +31,23 @@ def upgrade() -> None:
                 meeting_data JSONB NOT NULL,
                 chat_id BIGINT,
                 message_id INTEGER,
+                inline_message_id VARCHAR(255),
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
                 expires_at TIMESTAMP WITH TIME ZONE NOT NULL
             )
+            """))
+
+    # Add inline_message_id column if it doesn't exist (for existing tables)
+    conn.execute(sa.text("""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'edit_sessions' AND column_name = 'inline_message_id'
+                ) THEN
+                    ALTER TABLE edit_sessions ADD COLUMN inline_message_id VARCHAR(255);
+                END IF;
+            END $$;
             """))
 
     # Create index for faster lookups by user_id (idempotent)
