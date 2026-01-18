@@ -128,6 +128,12 @@ Type `@handycalbot` in any chat followed by:
         connect_button="🔗 Connect Google Calendar",
         calendar_disconnected="✅ Google Calendar disconnected successfully.\nUse /connect to link it again.",
         no_calendar_connected="No calendar connected.",
+        # Zoom Connect/Disconnect
+        zoom_already_connected="Zoom is already connected!\nUse /disconnectzoom to unlink it first.",
+        click_to_connect_zoom="Click the button below to connect your Zoom account.\n\nYou'll be redirected to Zoom to authorize access.",
+        connect_zoom_button="📹 Connect Zoom",
+        zoom_disconnected="✅ Zoom disconnected successfully.\nUse /connectzoom to link it again.",
+        no_zoom_connected="No Zoom account connected.",
         # Timezone
         select_timezone="Select your timezone or type it manually (e.g., `Europe/Berlin`):",
         timezone_set="✅ Timezone set to: `{timezone}`",

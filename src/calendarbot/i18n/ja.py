@@ -123,6 +123,12 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         connect_button="🔗 Googleカレンダーを接続",
         calendar_disconnected="✅ Googleカレンダーが切断されました。\n再接続するには /connect を使用してください。",
         no_calendar_connected="接続されたカレンダーはありません。",
+        # Zoom Connect/Disconnect
+        zoom_already_connected="Zoomは既に接続されています！\n先に /disconnectzoom で解除してください。",
+        click_to_connect_zoom="下のボタンをクリックしてZoomアカウントを接続してください。\n\nZoomにリダイレクトされ、アクセスを許可します。",
+        connect_zoom_button="📹 Zoomを接続",
+        zoom_disconnected="✅ Zoomの接続が解除されました。\n再度接続するには /connectzoom を使用してください。",
+        no_zoom_connected="Zoomアカウントが接続されていません。",
         select_timezone="タイムゾーンを選択するか、手動で入力してください (例: `Asia/Tokyo`):",
         timezone_set="✅ タイムゾーン設定: `{timezone}`",
         timezone_set_ready='タイムゾーン設定: `{timezone}`\n\n準備完了! ミーティング作成:\n`@handycalbot 14:30 "ミーティングタイトル"`',

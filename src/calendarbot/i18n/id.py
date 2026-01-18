@@ -123,6 +123,13 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         connect_button="🔗 Hubungkan Google Calendar",
         calendar_disconnected="✅ Google Calendar berhasil diputuskan.\nGunakan /connect untuk menghubungkannya lagi.",
         no_calendar_connected="Tidak ada kalender yang terhubung.",
+        # Zoom Connect/Disconnect
+        zoom_already_connected="Zoom sudah terhubung!\nGunakan /disconnectzoom untuk memutuskan koneksi terlebih dahulu.",
+        click_to_connect_zoom="Klik tombol di bawah untuk menghubungkan akun Zoom Anda.\n\nAnda akan dialihkan ke Zoom untuk mengotorisasi akses.",
+        connect_zoom_button="📹 Hubungkan Zoom",
+        zoom_disconnected="✅ Zoom berhasil diputus.\nGunakan /connectzoom untuk menghubungkan kembali.",
+        no_zoom_connected="Tidak ada akun Zoom yang terhubung.",
+        # Timezone
         select_timezone="Pilih zona waktu Anda atau ketik secara manual (mis., `Asia/Jakarta`):",
         timezone_set="✅ Zona waktu diatur ke: `{timezone}`",
         timezone_set_ready='✅ Zona waktu diatur ke: `{timezone}`\n\nAnda siap! Buat rapat menggunakan:\n`@handycalbot 14:30 "Judul Rapat"`',

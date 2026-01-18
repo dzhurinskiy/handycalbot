@@ -123,6 +123,12 @@ _欢迎提交错误报告和UI改进建议！_
         connect_button="🔗 连接 Google 日历",
         calendar_disconnected="✅ Google 日历已成功断开。\n使用 /connect 重新连接。",
         no_calendar_connected="未连接日历。",
+        # Zoom Connect/Disconnect
+        zoom_already_connected="Zoom 已连接！\n请先使用 /disconnectzoom 断开连接。",
+        click_to_connect_zoom="点击下方按钮连接您的 Zoom 账户。\n\n您将被重定向到 Zoom 授权访问。",
+        connect_zoom_button="📹 连接 Zoom",
+        zoom_disconnected="✅ Zoom 已成功断开连接。\n使用 /connectzoom 重新连接。",
+        no_zoom_connected="未连接 Zoom 账户。",
         select_timezone="选择您的时区或手动输入 (例如 `Asia/Shanghai`):",
         timezone_set="✅ 时区已设置: `{timezone}`",
         timezone_set_ready='时区已设置: `{timezone}`\n\n准备就绪! 创建会议:\n`@handycalbot 14:30 "会议标题"`',

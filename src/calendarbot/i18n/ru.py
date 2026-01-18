@@ -123,6 +123,13 @@ _Сообщения об ошибках и предложения по улуч�
         connect_button="🔗 Подключить Google Календарь",
         calendar_disconnected="✅ Google Календарь успешно отключен.\nИспользуйте /connect для повторного подключения.",
         no_calendar_connected="Календарь не подключен.",
+        # Zoom Connect/Disconnect
+        zoom_already_connected="Zoom уже подключен!\nИспользуйте /disconnectzoom, чтобы сначала отключить.",
+        click_to_connect_zoom="Нажмите кнопку ниже, чтобы подключить свой аккаунт Zoom.\n\nВы будете перенаправлены в Zoom для авторизации доступа.",
+        connect_zoom_button="📹 Подключить Zoom",
+        zoom_disconnected="✅ Zoom успешно отключен.\nИспользуйте /connectzoom, чтобы подключить снова.",
+        no_zoom_connected="Zoom аккаунт не подключен.",
+        # Timezone
         select_timezone="Выберите часовой пояс или введите вручную (напр., `Europe/Moscow`):",
         timezone_set="✅ Часовой пояс установлен: `{timezone}`",
         timezone_set_ready='Часовой пояс установлен: `{timezone}`\n\nВсе готово! Создавайте встречи:\n`@handycalbot 14:30 "Название встречи"`',

@@ -123,6 +123,12 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         connect_button="🔗 Connecter Google Calendar",
         calendar_disconnected="✅ Google Calendar deconnecte avec succes.\nUtilisez /connect pour le reconnecter.",
         no_calendar_connected="Aucun calendrier connecte.",
+        # Zoom Connect/Disconnect
+        zoom_already_connected="Zoom est déjà connecté !\nUtilisez /disconnectzoom pour le délier d'abord.",
+        click_to_connect_zoom="Cliquez sur le bouton ci-dessous pour connecter votre compte Zoom.\n\nVous serez redirigé vers Zoom pour autoriser l'accès.",
+        connect_zoom_button="📹 Connecter Zoom",
+        zoom_disconnected="✅ Zoom déconnecté avec succès.\nUtilisez /connectzoom pour le relier à nouveau.",
+        no_zoom_connected="Aucun compte Zoom connecté.",
         select_timezone="Selectionnez votre fuseau horaire ou tapez-le manuellement (ex., `Europe/Paris`):",
         timezone_set="✅ Fuseau horaire defini sur: `{timezone}`",
         timezone_set_ready='Fuseau horaire defini sur: `{timezone}`\n\nVous etes pret! Creez des reunions en utilisant:\n`@handycalbot 14:30 "Titre de Reunion"`',

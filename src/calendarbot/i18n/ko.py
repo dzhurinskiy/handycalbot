@@ -123,6 +123,13 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         connect_button="🔗 Google 캘린더 연결",
         calendar_disconnected="✅ Google 캘린더가 연결 해제되었습니다.\n다시 연결하려면 /connect를 사용하세요.",
         no_calendar_connected="연결된 캘린더가 없습니다.",
+        # Zoom Connect/Disconnect
+        zoom_already_connected="Zoom이 이미 연결되어 있습니다!\n먼저 /disconnectzoom으로 연결을 해제하세요.",
+        click_to_connect_zoom="아래 버튼을 클릭하여 Zoom 계정을 연결하세요.\n\nZoom으로 이동하여 액세스를 승인합니다.",
+        connect_zoom_button="📹 Zoom 연결",
+        zoom_disconnected="✅ Zoom 연결이 해제되었습니다.\n다시 연결하려면 /connectzoom을 사용하세요.",
+        no_zoom_connected="연결된 Zoom 계정이 없습니다.",
+        # Timezone
         select_timezone="시간대를 선택하거나 직접 입력하세요 (예: `Asia/Seoul`):",
         timezone_set="✅ 시간대 설정됨: `{timezone}`",
         timezone_set_ready='시간대 설정됨: `{timezone}`\n\n준비 완료! 회의 만들기:\n`@handycalbot 14:30 "회의 제목"`',

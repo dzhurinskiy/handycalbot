@@ -57,6 +57,13 @@ class SettingsTranslations:
     calendar_disconnected: str
     no_calendar_connected: str
 
+    # Zoom Connect/Disconnect
+    zoom_already_connected: str
+    click_to_connect_zoom: str
+    connect_zoom_button: str
+    zoom_disconnected: str
+    no_zoom_connected: str
+
     # Timezone
     select_timezone: str
     timezone_set: str

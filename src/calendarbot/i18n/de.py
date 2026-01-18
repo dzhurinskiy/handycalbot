@@ -123,6 +123,13 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         connect_button="🔗 Google Kalender verbinden",
         calendar_disconnected="✅ Google Kalender erfolgreich getrennt.\nBenutze /connect, um ihn wieder zu verbinden.",
         no_calendar_connected="Kein Kalender verbunden.",
+        # Zoom Connect/Disconnect
+        zoom_already_connected="Zoom ist bereits verbunden!\nVerwende /disconnectzoom, um es zuerst zu trennen.",
+        click_to_connect_zoom="Klicke auf den Button unten, um dein Zoom-Konto zu verbinden.\n\nDu wirst zu Zoom weitergeleitet, um den Zugriff zu autorisieren.",
+        connect_zoom_button="📹 Zoom verbinden",
+        zoom_disconnected="✅ Zoom erfolgreich getrennt.\nVerwende /connectzoom, um es erneut zu verbinden.",
+        no_zoom_connected="Kein Zoom-Konto verbunden.",
+        # Timezone
         select_timezone="Wahle deine Zeitzone oder gib sie manuell ein (z.B. `Europe/Berlin`):",
         timezone_set="✅ Zeitzone gesetzt auf: `{timezone}`",
         timezone_set_ready='Zeitzone gesetzt auf: `{timezone}`\n\nDu bist bereit! Erstelle Besprechungen mit:\n`@handycalbot 14:30 "Besprechungstitel"`',

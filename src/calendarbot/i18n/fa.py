@@ -123,6 +123,13 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         connect_button="🔗 اتصال تقویم گوگل",
         calendar_disconnected="✅ تقویم گوگل با موفقیت قطع شد.\nاز /connect برای اتصال مجدد استفاده کنید.",
         no_calendar_connected="تقویمی متصل نیست.",
+        # Zoom Connect/Disconnect
+        zoom_already_connected="زوم قبلاً متصل است!\nابتدا از /disconnectzoom برای قطع اتصال استفاده کنید.",
+        click_to_connect_zoom="روی دکمه زیر کلیک کنید تا حساب زوم خود را متصل کنید.\n\nبه زوم هدایت خواهید شد تا دسترسی را تأیید کنید.",
+        connect_zoom_button="📹 اتصال زوم",
+        zoom_disconnected="✅ زوم با موفقیت قطع شد.\nبرای اتصال مجدد از /connectzoom استفاده کنید.",
+        no_zoom_connected="هیچ حساب زومی متصل نیست.",
+        # Timezone
         select_timezone="منطقه زمانی خود را انتخاب کنید یا دستی وارد کنید (مثلاً `Asia/Tehran`):",
         timezone_set="✅ منطقه زمانی تنظیم شد: `{timezone}`",
         timezone_set_ready='✅ منطقه زمانی تنظیم شد: `{timezone}`\n\nآماده‌اید! جلسات بسازید با:\n`@handycalbot 14:30 "عنوان جلسه"`',
