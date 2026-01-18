@@ -238,6 +238,10 @@ class UsernameResolverService:
             - (True, email) - Calendar connected and email retrieved
             - (True, None) - Calendar connected but couldn't fetch email (API error)
         """
+        from datetime import datetime, timedelta
+
+        from calendarbot.integrations.google import GoogleCalendarClient
+
         token = await self.token_repo.get_token(user_id, "google")
         if not token:
             return (False, None)
@@ -245,10 +249,34 @@ class UsernameResolverService:
         # Token exists, so calendar IS connected
         # Now try to get the email
         try:
-            from calendarbot.integrations.google import GoogleCalendarClient
-
             access_token = self.encryption.decrypt(token.access_token_encrypted)
             refresh_token = self.encryption.decrypt(token.refresh_token_encrypted)
+
+            # Check if token is expired or close to expiry (5 min buffer)
+            if datetime.utcnow() >= (token.expires_at - timedelta(minutes=5)):
+                logger.info(f"Token expired for user {user_id} during email fetch, refreshing...")
+                client = GoogleCalendarClient(
+                    access_token=access_token,
+                    refresh_token=refresh_token,
+                )
+                new_tokens = await client.refresh_access_token()
+                if new_tokens:
+                    # Save refreshed token
+                    await self.token_repo.save_token(
+                        user_id=user_id,
+                        provider="google",
+                        access_token_encrypted=self.encryption.encrypt(new_tokens["access_token"]),
+                        refresh_token_encrypted=self.encryption.encrypt(
+                            new_tokens.get("refresh_token") or refresh_token
+                        ),
+                        expires_at=new_tokens["expires_at"],
+                    )
+                    access_token = new_tokens["access_token"]
+                    logger.info(f"Token refreshed successfully for user {user_id}")
+                else:
+                    logger.error(f"Token refresh failed for user {user_id}")
+                    return (True, None)
+
             client = GoogleCalendarClient(
                 access_token=access_token,
                 refresh_token=refresh_token,
