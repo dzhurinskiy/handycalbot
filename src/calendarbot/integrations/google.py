@@ -135,6 +135,7 @@ class GoogleCalendarClient:
         if attendees:
             event_body["attendees"] = [{"email": email} for email in attendees]
             event_body["sendUpdates"] = "all"  # Send invitations
+            logger.info(f"Creating event with attendees: {attendees}")
 
         # Handle reminders
         if reminders is not None:

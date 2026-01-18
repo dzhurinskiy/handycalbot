@@ -167,6 +167,8 @@ class UsernameResolverService:
         Returns:
             MeetingInviteResult with detailed breakdown
         """
+        logger.info(f"get_emails_for_meeting called with usernames: {usernames}")
+
         if not usernames:
             return MeetingInviteResult(
                 invited=[], no_calendar=[], privacy_disabled=[], not_found=[], emails=[]
@@ -180,6 +182,7 @@ class UsernameResolverService:
 
         # Fetch users by usernames
         users = await self.user_repo.get_users_by_usernames(usernames)
+        logger.info(f"Found {len(users)} users for usernames: {[u.telegram_username for u in users]}")
 
         # Build username -> user mapping (case-insensitive)
         user_map = {}
@@ -190,19 +193,30 @@ class UsernameResolverService:
         for username in usernames:
             username_lower = username.lower()
             user = user_map.get(username_lower)  # type: ignore[assignment]
+            logger.info(f"Processing username '{username}': found user={user is not None}")
 
             if not user:
                 # User not found in our system
                 not_found.append(username)
+                logger.info(f"Username '{username}' not found in system")
                 continue
+
+            logger.info(
+                f"User '{username}' (id={user.id}): allow_username_invites={user.allow_username_invites}"
+            )
 
             if not user.allow_username_invites:
                 # User has privacy disabled
                 privacy_disabled.append(username)
+                logger.info(f"Username '{username}' has privacy disabled")
                 continue
 
             # Get user's email from OAuth token
             has_calendar, email = await self._get_user_email(user.id)
+            logger.info(
+                f"User '{username}' (id={user.id}): has_calendar={has_calendar}, email={'***' if email else None}"
+            )
+
             if not has_calendar:
                 # User hasn't connected calendar
                 no_calendar.append(username)
@@ -210,6 +224,7 @@ class UsernameResolverService:
                 # Calendar connected and email retrieved
                 emails.append(email)
                 invited.append(username)
+                logger.info(f"Added email for user '{username}' to invite list")
             else:
                 # Calendar connected but couldn't fetch email (API error)
                 # Still count as invited since they have calendar
@@ -219,13 +234,19 @@ class UsernameResolverService:
                     "they won't receive calendar invite"
                 )
 
-        return MeetingInviteResult(
+        result = MeetingInviteResult(
             invited=invited,
             no_calendar=no_calendar,
             privacy_disabled=privacy_disabled,
             not_found=not_found,
             emails=emails,
         )
+        logger.info(
+            f"get_emails_for_meeting result: invited={result.invited}, "
+            f"no_calendar={result.no_calendar}, privacy_disabled={result.privacy_disabled}, "
+            f"not_found={result.not_found}, emails_count={len(result.emails)}"
+        )
+        return result
 
     async def _get_user_email(self, user_id: int) -> tuple[bool, str | None]:
         """Get user's email from their OAuth token.

@@ -1311,6 +1311,10 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
 
             resolved_emails = resolve_result.emails if resolve_result else []
             all_attendees = m["attendees"] + resolved_emails
+            logger.info(
+                f"Creating meeting: usernames={usernames}, resolved_emails_count={len(resolved_emails)}, "
+                f"direct_attendees={m['attendees']}, all_attendees_count={len(all_attendees)}"
+            )
 
             parsed = ParsedMeeting(
                 time=m["time"],
