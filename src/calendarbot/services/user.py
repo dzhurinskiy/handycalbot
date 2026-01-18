@@ -65,9 +65,19 @@ class UserService:
         """Disconnect calendar provider."""
         return await self.token_repo.delete_token(user.id, provider)
 
+    async def is_zoom_connected(self, user: User) -> bool:
+        """Check if user has connected their Zoom account."""
+        token = await self.token_repo.get_token(user.id, "zoom")
+        return token is not None
+
+    async def disconnect_zoom(self, user: User) -> bool:
+        """Disconnect Zoom account."""
+        return await self.token_repo.delete_token(user.id, "zoom")
+
     async def get_user_summary(self, user: User) -> dict:
         """Get user settings summary."""
         google_connected = await self.is_calendar_connected(user, "google")
+        zoom_connected = await self.is_zoom_connected(user)
 
         return {
             "telegram_id": user.telegram_id,
@@ -75,4 +85,5 @@ class UserService:
             "timezone": user.timezone,
             "default_duration": user.default_duration,
             "google_calendar": "Connected" if google_connected else "Not connected",
+            "zoom": "Connected" if zoom_connected else "Not connected",
         }

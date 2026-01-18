@@ -43,5 +43,6 @@ def create_app() -> FastAPI:
     app.include_router(pages_router)  # Landing, privacy, terms pages
     app.include_router(health_router)
     app.include_router(oauth_router, prefix="/oauth")
+    app.include_router(oauth_router, prefix="/auth")  # Also mount at /auth for Zoom
 
     return app

@@ -139,7 +139,7 @@ def _build_edit_menu_keyboard(result_id: str, meeting_data: dict, t) -> InlineKe
     """Build the edit menu keyboard."""
     m = meeting_data["meeting"]
     attendee_count = len(m.get("attendees", [])) + len(m.get("usernames", []))
-    has_link = m.get("meet_link") or m.get("custom_link")
+    has_link = m.get("meet_link") or m.get("zoom_link") or m.get("custom_link")
 
     # Build link button text
     link_text = t.inline.edit_link_button
@@ -272,12 +272,17 @@ def _build_attendees_keyboard(
 def _build_link_keyboard(result_id: str, meeting_data: dict, t) -> InlineKeyboardMarkup:
     """Build link management keyboard."""
     m = meeting_data["meeting"]
-    has_link = m.get("meet_link") or m.get("custom_link")
+    has_link = m.get("meet_link") or m.get("zoom_link") or m.get("custom_link")
 
     buttons = []
     if has_link:
-        # Show remove option
-        link_display = m.get("meet_link") or m.get("custom_link", "")
+        # Show remove option - determine which link type to display
+        if m.get("meet_link"):
+            link_display = m.get("meet_link") if m.get("meet_link") != "pending" else "Google Meet"
+        elif m.get("zoom_link"):
+            link_display = m.get("zoom_link") if m.get("zoom_link") != "pending" else "Zoom Meeting"
+        else:
+            link_display = m.get("custom_link", "")
         short_link = link_display[:30] + "..." if len(link_display) > 33 else link_display
         buttons.append([InlineKeyboardButton(f"🔗 {short_link}", callback_data="noop")])
         buttons.append(
@@ -293,6 +298,13 @@ def _build_link_keyboard(result_id: str, meeting_data: dict, t) -> InlineKeyboar
             [
                 InlineKeyboardButton(
                     t.inline.auto_google_meet, callback_data=f"link_meet_{result_id}"
+                )
+            ]
+        )
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    t.inline.auto_zoom_meeting, callback_data=f"link_zoom_{result_id}"
                 )
             ]
         )
@@ -350,6 +362,8 @@ def _build_meeting_preview_text(meeting_data: dict, t, _user_timezone: str) -> s
     # Link
     if m.get("meet_link"):
         text += "🎥 Google Meet\n"
+    elif m.get("zoom_link"):
+        text += "📹 Zoom Meeting\n"
     elif m.get("custom_link"):
         text += "🔗 Custom link\n"
 
@@ -470,6 +484,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             "use_default_reminder": meeting.use_default_reminder,
             "duration": duration,
             "meet_link": None,
+            "zoom_link": None,
             "custom_link": None,
         },
     }
@@ -993,6 +1008,50 @@ async def add_google_meet_callback(update: Update, context: ContextTypes.DEFAULT
 
     m = meeting_data["meeting"]
     m["meet_link"] = "pending"  # Will be generated on create
+    m["zoom_link"] = None
+    m["custom_link"] = None
+
+    await query.answer(t.inline.link_added)
+
+    # Return to edit menu
+    keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
+    await query.edit_message_text(
+        t.inline.edit_menu_title, parse_mode="Markdown", reply_markup=keyboard
+    )
+
+
+async def add_zoom_link_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Flag to generate Zoom meeting link on creation."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    result_id = query.data.replace("link_zoom_", "")
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+        t = get_text(user.language if user else "en")
+
+        # Check if user has Zoom connected
+        if user:
+            zoom_connected = await user_service.is_zoom_connected(user)
+            if not zoom_connected:
+                await query.answer(t.inline.zoom_not_connected, show_alert=True)
+                return
+
+    if context.bot_data is None:
+        await query.answer(t.inline.meeting_data_expired, show_alert=True)
+        return
+
+    meeting_data = context.bot_data.get(f"meeting_{result_id}")
+    if not meeting_data:
+        await query.answer(t.inline.meeting_data_expired, show_alert=True)
+        return
+
+    m = meeting_data["meeting"]
+    m["zoom_link"] = "pending"  # Will be generated on create
+    m["meet_link"] = None
     m["custom_link"] = None
 
     await query.answer(t.inline.link_added)
@@ -1065,6 +1124,7 @@ async def remove_link_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 
     m = meeting_data["meeting"]
     m["meet_link"] = None
+    m["zoom_link"] = None
     m["custom_link"] = None
 
     await query.answer(t.inline.link_removed)
@@ -1264,8 +1324,9 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 use_default_reminder=m.get("use_default_reminder", False),
             )
 
-            # Determine if we need to generate Meet link
+            # Determine if we need to generate Meet or Zoom link
             generate_meet_link = m.get("meet_link") == "pending"
+            generate_zoom_link = m.get("zoom_link") == "pending"
             custom_link = m.get("custom_link")
 
             calendar_service = CalendarService(session)
@@ -1273,6 +1334,7 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 user,
                 parsed,
                 generate_meet_link=generate_meet_link,
+                generate_zoom_link=generate_zoom_link,
                 custom_link=custom_link,
             )
 
@@ -1316,9 +1378,11 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 reminder_text = _format_reminders(reminders, t)
                 text += f"{t.inline.reminder_label.format(reminder=reminder_text)}\n"
 
-            # Show Meet link if generated
+            # Show Meet/Zoom link if generated
             if result.get("meet_link"):
                 text += f"🎥 [Google Meet]({result['meet_link']})\n"
+            elif result.get("zoom_link"):
+                text += f"📹 [Zoom Meeting]({result['zoom_link']})\n"
             elif result.get("custom_link"):
                 text += f"🔗 {result['custom_link']}\n"
 
@@ -1629,6 +1693,7 @@ def setup_inline_handlers(app: Application) -> None:
     # Link management
     # Note: link_custom_ is now handled by edit_session.py for private chat redirect
     app.add_handler(CallbackQueryHandler(add_google_meet_callback, pattern=r"^link_meet_"))
+    app.add_handler(CallbackQueryHandler(add_zoom_link_callback, pattern=r"^link_zoom_"))
     app.add_handler(CallbackQueryHandler(remove_link_callback, pattern=r"^link_rem_"))
 
     # No-op handler for display-only buttons

@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from calendarbot.db.models import User
 from calendarbot.db.repository import MeetingRepository, OAuthTokenRepository
 from calendarbot.integrations.google import GoogleCalendarClient
+from calendarbot.integrations.zoom import ZoomClient
 from calendarbot.services.parser import ParsedMeeting
 from calendarbot.utils.encryption import TokenEncryption
 from calendarbot.utils.timezone import TimezoneHelper
@@ -88,11 +89,74 @@ class CalendarService:
             return await retry_func()
         return result
 
+    async def _get_zoom_link(
+        self,
+        user: User,
+        meeting_data: ParsedMeeting,
+    ) -> str | None:
+        """Create a Zoom meeting and return the join URL.
+
+        Returns the Zoom join URL or None if failed.
+        """
+        token = await self.token_repo.get_token(user.id, "zoom")
+        if not token:
+            logger.warning(f"No Zoom token for user {user.id}")
+            return None
+
+        access_token = self.encryption.decrypt(token.access_token_encrypted)
+        refresh_token = self.encryption.decrypt(token.refresh_token_encrypted)
+
+        zoom_client = ZoomClient(access_token=access_token, refresh_token=refresh_token)
+
+        # Calculate duration in minutes
+        duration = int((meeting_data.end_datetime - meeting_data.start_datetime).total_seconds() / 60)
+
+        result = await zoom_client.create_meeting(
+            topic=meeting_data.title,
+            start_time=meeting_data.start_datetime,
+            duration=duration,
+            timezone=user.timezone,
+        )
+
+        if "error" in result:
+            # Try token refresh on 401
+            if result.get("code") == 401:
+                logger.info(f"Zoom token expired for user {user.id}, refreshing...")
+                new_tokens = await zoom_client.refresh_access_token()
+                if new_tokens:
+                    await self.token_repo.save_token(
+                        user_id=user.id,
+                        provider="zoom",
+                        access_token_encrypted=self.encryption.encrypt(new_tokens["access_token"]),
+                        refresh_token_encrypted=self.encryption.encrypt(
+                            new_tokens.get("refresh_token") or refresh_token
+                        ),
+                        expires_at=new_tokens["expires_at"],
+                    )
+                    # Retry with new token
+                    zoom_client = ZoomClient(
+                        access_token=new_tokens["access_token"],
+                        refresh_token=new_tokens.get("refresh_token") or refresh_token,
+                    )
+                    result = await zoom_client.create_meeting(
+                        topic=meeting_data.title,
+                        start_time=meeting_data.start_datetime,
+                        duration=duration,
+                        timezone=user.timezone,
+                    )
+
+            if "error" in result:
+                logger.error(f"Failed to create Zoom meeting for user {user.id}: {result}")
+                return None
+
+        return result.get("join_url")
+
     async def create_meeting(
         self,
         user: User,
         meeting_data: ParsedMeeting,
         generate_meet_link: bool = False,
+        generate_zoom_link: bool = False,
         custom_link: str | None = None,
     ) -> dict:
         """Create a meeting on user's calendar.
@@ -101,10 +165,19 @@ class CalendarService:
             user: The user creating the meeting.
             meeting_data: Parsed meeting data.
             generate_meet_link: If True, auto-generate a Google Meet link.
+            generate_zoom_link: If True, create a Zoom meeting and add the link.
             custom_link: Custom meeting link to add to the event.
 
         Returns dict with meeting details or error.
         """
+        # Generate Zoom link first if requested (before creating calendar event)
+        zoom_link = None
+        if generate_zoom_link:
+            zoom_link = await self._get_zoom_link(user, meeting_data)
+            if zoom_link:
+                # Use Zoom link as custom link in the calendar event
+                custom_link = zoom_link
+
         client_result = await self._get_valid_client(user)
         if isinstance(client_result, dict):
             return client_result  # Error
@@ -176,7 +249,8 @@ class CalendarService:
             "attendees": meeting_data.attendees,
             "reminders": reminders,
             "meet_link": meet_link,
-            "custom_link": custom_link,
+            "zoom_link": zoom_link,
+            "custom_link": custom_link if not zoom_link else None,
         }
 
     def _resolve_reminders(self, user: User, meeting_data: ParsedMeeting) -> list[int] | None:

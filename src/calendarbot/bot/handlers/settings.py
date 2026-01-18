@@ -18,6 +18,7 @@ from calendarbot.bot.commands import set_user_commands
 from calendarbot.db.session import async_session_factory
 from calendarbot.i18n import LANGUAGE_NAMES, get_text
 from calendarbot.integrations.google import GoogleOAuthFlow
+from calendarbot.integrations.zoom import ZoomOAuthFlow
 from calendarbot.services.user import UserService
 from calendarbot.utils.timezone import TimezoneHelper
 
@@ -115,6 +116,13 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
         else t.settings.not_connected
     )
 
+    # Format Zoom status
+    zoom_status = (
+        t.settings.connected
+        if summary.get("zoom") == "Connected"
+        else t.settings.not_connected
+    )
+
     # Format privacy status
     privacy_status = f"✅ {t.settings.enabled}" if privacy_enabled else f"❌ {t.settings.disabled}"
 
@@ -127,6 +135,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 📬 {t.settings.notifications_label}: {notifications_status}
 🔒 {t.settings.privacy_username_invites}: {privacy_status}
 📅 {t.settings.google_calendar_label}: {calendar_status}
+📹 Zoom: {zoom_status}
 
 {t.settings.change_settings}
 /timezone - {t.settings.timezone_label}
@@ -136,7 +145,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 /privacy - {t.settings.privacy_username_invites}
 /language - Language
 /connect - {t.settings.google_calendar_label}
-/disconnect - {t.settings.google_calendar_label}
+/connectzoom - Zoom
 """
 
     await update.message.reply_text(text, parse_mode="Markdown")
@@ -207,6 +216,73 @@ async def disconnect_command(update: Update, _context: ContextTypes.DEFAULT_TYPE
         await session.commit()
 
     await update.message.reply_text(t.settings.calendar_disconnected)
+
+
+async def connectzoom_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /connectzoom command - initiate Zoom OAuth."""
+    if not update.effective_user or not update.message:
+        return
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await update.message.reply_text(t.common.please_start_first)
+            return
+
+        t = get_text(user.language)
+
+        # Check if already connected
+        if await user_service.is_zoom_connected(user):
+            await update.message.reply_text(t.settings.zoom_already_connected)
+            return
+
+    # Generate OAuth state
+    state = f"{update.effective_user.id}:{secrets.token_urlsafe(16)}"
+
+    # Store state in context for verification
+    if context.bot_data is None:
+        context.bot_data = {}
+    context.bot_data[f"zoom_oauth_state_{update.effective_user.id}"] = state
+
+    # Generate auth URL
+    oauth = ZoomOAuthFlow()
+    auth_url = oauth.get_authorization_url(state)
+
+    keyboard = [[InlineKeyboardButton(t.settings.connect_zoom_button, url=auth_url)]]
+
+    await update.message.reply_text(
+        t.settings.click_to_connect_zoom,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+
+async def disconnectzoom_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /disconnectzoom command."""
+    if not update.effective_user or not update.message:
+        return
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await update.message.reply_text(t.common.please_start_first)
+            return
+
+        t = get_text(user.language)
+
+        if not await user_service.is_zoom_connected(user):
+            await update.message.reply_text(t.settings.no_zoom_connected)
+            return
+
+        await user_service.disconnect_zoom(user)
+        await session.commit()
+
+    await update.message.reply_text(t.settings.zoom_disconnected)
 
 
 async def timezone_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -705,6 +781,8 @@ def setup_settings_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("settings", settings_command))
     app.add_handler(CommandHandler("connect", connect_command))
     app.add_handler(CommandHandler("disconnect", disconnect_command))
+    app.add_handler(CommandHandler("connectzoom", connectzoom_command))
+    app.add_handler(CommandHandler("disconnectzoom", disconnectzoom_command))
     app.add_handler(CommandHandler("notifications", notifications_command))
     app.add_handler(CommandHandler("language", language_command))
     app.add_handler(CommandHandler("privacy", privacy_command))

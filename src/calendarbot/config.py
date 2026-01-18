@@ -27,6 +27,11 @@ class Settings(BaseSettings):
     google_client_secret: str = ""
     google_redirect_uri: str = "https://handycal.dzhurinskiy.com/oauth/google/callback"
 
+    # Zoom OAuth
+    zoom_client_id: str = ""
+    zoom_client_secret: str = ""
+    zoom_redirect_uri: str = "https://handycal.dzhurinskiy.com/auth/zoom/callback"
+
     # Security
     encryption_key: str = ""
 

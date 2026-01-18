@@ -212,12 +212,15 @@ class InlineTranslations:
     invalid_time_format: str
     invalid_date_format: str
     auto_google_meet: str
+    auto_zoom_meeting: str
     paste_custom_link: str
     enter_link_prompt: str
     link_added: str
     link_removed: str
     remove_link_button: str
     google_meet_label: str
+    zoom_meeting_label: str
+    zoom_not_connected: str
     custom_link_label: str
 
     # Updates
