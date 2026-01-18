@@ -487,9 +487,7 @@ class EditSessionRepository:
 
     async def get(self, session_id: str) -> EditSession | None:
         """Get an edit session by ID."""
-        result = await self.session.execute(
-            select(EditSession).where(EditSession.id == session_id)
-        )
+        result = await self.session.execute(select(EditSession).where(EditSession.id == session_id))
         return result.scalar_one_or_none()
 
     async def get_active_for_user(self, user_id: int) -> EditSession | None:
@@ -505,9 +503,7 @@ class EditSessionRepository:
 
     async def update_meeting_data(self, session_id: str, meeting_data: dict) -> None:
         """Update the meeting data for an edit session."""
-        result = await self.session.execute(
-            select(EditSession).where(EditSession.id == session_id)
-        )
+        result = await self.session.execute(select(EditSession).where(EditSession.id == session_id))
         edit_session = result.scalar_one_or_none()
         if edit_session:
             edit_session.meeting_data = meeting_data
@@ -515,9 +511,7 @@ class EditSessionRepository:
 
     async def delete(self, session_id: str) -> None:
         """Delete an edit session."""
-        result = await self.session.execute(
-            select(EditSession).where(EditSession.id == session_id)
-        )
+        result = await self.session.execute(select(EditSession).where(EditSession.id == session_id))
         edit_session = result.scalar_one_or_none()
         if edit_session:
             await self.session.delete(edit_session)
