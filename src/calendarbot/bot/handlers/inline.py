@@ -753,7 +753,7 @@ async def edit_attendees_callback(update: Update, context: ContextTypes.DEFAULT_
         for email in m.get("attendees", []):
             text += f"• {email}\n"
         for username in m.get("usernames", []):
-            text += f"• @{username}\n"
+            text += f"• @{_escape_markdown(username)}\n"
 
     if recent_contacts:
         text += f"\n{t.inline.recent_contacts_title}\n"
@@ -817,7 +817,7 @@ async def remove_attendee_callback(update: Update, context: ContextTypes.DEFAULT
         for email in m.get("attendees", []):
             text += f"• {email}\n"
         for username in m.get("usernames", []):
-            text += f"• @{username}\n"
+            text += f"• @{_escape_markdown(username)}\n"
 
     if recent_contacts:
         text += f"\n{t.inline.recent_contacts_title}\n"
@@ -894,7 +894,7 @@ async def add_recent_contact_callback(update: Update, context: ContextTypes.DEFA
         for email in m.get("attendees", []):
             text += f"• {email}\n"
         for username in m.get("usernames", []):
-            text += f"• @{username}\n"
+            text += f"• @{_escape_markdown(username)}\n"
 
     if recent_contacts:
         text += f"\n{t.inline.recent_contacts_title}\n"
