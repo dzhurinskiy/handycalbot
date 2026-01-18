@@ -334,7 +334,7 @@ def _build_meeting_preview_text(meeting_data: dict, t, _user_timezone: str) -> s
     attendees = m.get("attendees", [])
     usernames = m.get("usernames", [])
     if attendees or usernames:
-        all_att = attendees + [f"@{u}" for u in usernames]
+        all_att = attendees + [f"@{_escape_markdown(u)}" for u in usernames]
         text += f"👥 {len(all_att)}: {', '.join(all_att[:3])}"
         if len(all_att) > 3:
             text += f" +{len(all_att) - 3}"
