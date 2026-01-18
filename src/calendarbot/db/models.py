@@ -158,3 +158,32 @@ class UsernameLookup(Base):
 
     def __repr__(self) -> str:
         return f"<UsernameLookup(id={self.id}, requester={self.requester_telegram_id})>"
+
+
+class RecentContact(Base):
+    """Recent contacts for quick attendee selection."""
+
+    __tablename__ = "recent_contacts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    # Email address or @username
+    contact_identifier: Mapped[str] = mapped_column(String(255), nullable=False)
+    # "email" or "username"
+    contact_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    # Optional display name
+    display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # How many times this contact has been used
+    use_count: Mapped[int] = mapped_column(Integer, default=1)
+    last_used: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        Index("idx_recent_contacts_user_id", "user_id"),
+        Index("uq_recent_contacts_user_identifier", "user_id", "contact_identifier", unique=True),
+    )
+
+    def __repr__(self) -> str:
+        return f"<RecentContact(id={self.id}, contact={self.contact_identifier})>"

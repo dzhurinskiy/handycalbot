@@ -88,8 +88,20 @@ class CalendarService:
             return await retry_func()
         return result
 
-    async def create_meeting(self, user: User, meeting_data: ParsedMeeting) -> dict:
+    async def create_meeting(
+        self,
+        user: User,
+        meeting_data: ParsedMeeting,
+        generate_meet_link: bool = False,
+        custom_link: str | None = None,
+    ) -> dict:
         """Create a meeting on user's calendar.
+
+        Args:
+            user: The user creating the meeting.
+            meeting_data: Parsed meeting data.
+            generate_meet_link: If True, auto-generate a Google Meet link.
+            custom_link: Custom meeting link to add to the event.
 
         Returns dict with meeting details or error.
         """
@@ -114,6 +126,8 @@ class CalendarService:
                 timezone=user.timezone,
                 calendar_id=calendar_id,
                 reminders=reminders,
+                generate_meet_link=generate_meet_link,
+                custom_link=custom_link,
             )
 
         result = await do_create()
@@ -124,6 +138,14 @@ class CalendarService:
 
         if "error" in result:
             return result
+
+        # Extract Meet link from conference data if present
+        meet_link = None
+        if "conferenceData" in result:
+            for entry_point in result["conferenceData"].get("entryPoints", []):
+                if entry_point.get("entryPointType") == "video":
+                    meet_link = entry_point.get("uri")
+                    break
 
         # Convert to UTC for local cache storage (naive datetime for PostgreSQL)
         start_utc = TimezoneHelper.to_utc(meeting_data.start_datetime, user.timezone)
@@ -153,6 +175,8 @@ class CalendarService:
             "end": meeting_data.end_datetime,
             "attendees": meeting_data.attendees,
             "reminders": reminders,
+            "meet_link": meet_link,
+            "custom_link": custom_link,
         }
 
     def _resolve_reminders(self, user: User, meeting_data: ParsedMeeting) -> list[int] | None:

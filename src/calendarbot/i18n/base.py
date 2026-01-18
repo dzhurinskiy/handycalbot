@@ -174,6 +174,73 @@ class InlineTranslations:
     privacy_disabled_users_note: str
     register_link_text: str
 
+    # Edit menu
+    edit_button: str
+    edit_menu_title: str
+    edit_title_button: str
+    edit_time_button: str
+    edit_date_button: str
+    edit_duration_button: str
+    edit_reminder_button: str
+    edit_attendees_button: str
+    edit_link_button: str
+    back_button: str
+    done_editing_button: str
+
+    # Edit prompts
+    enter_new_title: str
+    enter_new_time: str
+    enter_new_date: str
+    select_duration: str
+    select_reminder: str
+
+    # Attendees
+    current_attendees: str
+    add_attendee_prompt: str
+    recent_contacts_title: str
+    no_recent_contacts: str
+    type_manually_button: str
+    remove_attendee_button: str
+    attendee_added: str
+    attendee_removed: str
+    invalid_email_format: str
+
+    # Link
+    add_link_title: str
+    auto_google_meet: str
+    paste_custom_link: str
+    enter_link_prompt: str
+    link_added: str
+    link_removed: str
+    remove_link_button: str
+    google_meet_label: str
+    custom_link_label: str
+
+    # Updates
+    field_updated: str
+    meeting_updated: str
+
+    # Duration options
+    duration_15_min: str
+    duration_30_min: str
+    duration_45_min: str
+    duration_1_hour: str
+    duration_1_5_hours: str
+    duration_2_hours: str
+
+    # Reminder options
+    reminder_none: str
+    reminder_5_min: str
+    reminder_10_min: str
+    reminder_15_min: str
+    reminder_30_min: str
+    reminder_1_hour: str
+    reminder_1_day: str
+
+    # Cancel edit
+    cancel_edit_button: str
+    edit_cancelled: str
+
 
 @dataclass(frozen=True)
 class DonationTranslations:

@@ -1,6 +1,7 @@
 """Google Calendar API integration."""
 
 import logging
+import uuid
 from datetime import datetime, timedelta
 
 import httpx
@@ -98,14 +99,18 @@ class GoogleCalendarClient:
         timezone: str = "UTC",
         calendar_id: str = "primary",
         reminders: list[int] | None = None,
+        generate_meet_link: bool = False,
+        custom_link: str | None = None,
     ) -> dict:
         """Create a calendar event.
 
         Args:
             reminders: List of reminder times in minutes before the event.
                        None means use calendar default, empty list means no reminders.
+            generate_meet_link: If True, auto-generate a Google Meet link.
+            custom_link: Custom meeting link to add to description.
         """
-        event_body = {
+        event_body: dict = {
             "summary": summary,
             "start": {
                 "dateTime": start_time.isoformat(),
@@ -117,11 +122,18 @@ class GoogleCalendarClient:
             },
         }
 
-        if description:
+        # Handle description with optional custom link
+        if custom_link:
+            link_text = f"Meeting Link: {custom_link}"
+            if description:
+                event_body["description"] = f"{description}\n\n{link_text}"
+            else:
+                event_body["description"] = link_text
+        elif description:
             event_body["description"] = description
 
         if attendees:
-            event_body["attendees"] = [{"email": email} for email in attendees]  # type: ignore[misc]
+            event_body["attendees"] = [{"email": email} for email in attendees]
             event_body["sendUpdates"] = "all"  # Send invitations
 
         # Handle reminders
@@ -137,8 +149,19 @@ class GoogleCalendarClient:
                 event_body["reminders"] = {"useDefault": False, "overrides": []}
         # If reminders is None, don't set it - use calendar default
 
+        # Add Google Meet conference data if requested
+        if generate_meet_link:
+            event_body["conferenceData"] = {
+                "createRequest": {
+                    "requestId": str(uuid.uuid4()),
+                    "conferenceSolutionKey": {"type": "hangoutsMeet"},
+                }
+            }
+
         url = f"{GOOGLE_CALENDAR_API}/calendars/{calendar_id}/events"
-        return await self._request("POST", url, json=event_body)
+        # Add conferenceDataVersion param if generating Meet link
+        params = {"conferenceDataVersion": "1"} if generate_meet_link else None
+        return await self._request("POST", url, json=event_body, params=params)
 
     async def get_event(self, event_id: str, calendar_id: str = "primary") -> dict:
         """Get a single event."""

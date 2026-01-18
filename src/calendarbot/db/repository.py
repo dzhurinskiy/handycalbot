@@ -6,7 +6,14 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from calendarbot.db.models import Meeting, OAuthToken, PendingInvite, User, UsernameLookup
+from calendarbot.db.models import (
+    Meeting,
+    OAuthToken,
+    PendingInvite,
+    RecentContact,
+    User,
+    UsernameLookup,
+)
 
 # Sentinel value to distinguish "not provided" from None
 _UNSET: Any = object()
@@ -374,3 +381,68 @@ class UsernameLookupRepository:
             return self.RATE_LIMIT
 
         return max(0, self.RATE_LIMIT - lookup.lookup_count)
+
+
+class RecentContactRepository:
+    """Recent contact data access."""
+
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def get_recent_contacts(self, user_id: int, limit: int = 10) -> list[RecentContact]:
+        """Get recent contacts for a user, ordered by use count and last used."""
+        result = await self.session.execute(
+            select(RecentContact)
+            .where(RecentContact.user_id == user_id)
+            .order_by(RecentContact.use_count.desc(), RecentContact.last_used.desc())
+            .limit(limit)
+        )
+        return list(result.scalars().all())
+
+    async def add_or_update_contact(
+        self,
+        user_id: int,
+        identifier: str,
+        contact_type: str,
+        display_name: str | None = None,
+    ) -> RecentContact:
+        """Add a new contact or update existing one (increment use count)."""
+        result = await self.session.execute(
+            select(RecentContact).where(
+                RecentContact.user_id == user_id,
+                RecentContact.contact_identifier == identifier,
+            )
+        )
+        contact = result.scalar_one_or_none()
+
+        if contact:
+            contact.use_count += 1
+            contact.last_used = datetime.now(tz=UTC)
+            if display_name:
+                contact.display_name = display_name
+        else:
+            contact = RecentContact(
+                user_id=user_id,
+                contact_identifier=identifier,
+                contact_type=contact_type,
+                display_name=display_name,
+            )
+            self.session.add(contact)
+
+        await self.session.flush()
+        return contact
+
+    async def remove_contact(self, user_id: int, identifier: str) -> bool:
+        """Remove a contact by identifier. Returns True if deleted."""
+        result = await self.session.execute(
+            select(RecentContact).where(
+                RecentContact.user_id == user_id,
+                RecentContact.contact_identifier == identifier,
+            )
+        )
+        contact = result.scalar_one_or_none()
+
+        if contact:
+            await self.session.delete(contact)
+            return True
+        return False
