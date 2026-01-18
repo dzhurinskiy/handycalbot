@@ -204,8 +204,12 @@ class GoogleCalendarClient:
         """Get the user's email from their Google account."""
         result = await self._request("GET", GOOGLE_USERINFO_API)
         if "error" in result:
+            logger.error(f"Failed to get user email: {result}")
             return None
-        return result.get("email")
+        email = result.get("email")
+        if not email:
+            logger.warning(f"Userinfo response missing email field: {result}")
+        return email
 
 
 class GoogleOAuthFlow:
