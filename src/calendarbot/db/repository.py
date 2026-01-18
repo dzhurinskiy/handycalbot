@@ -465,6 +465,7 @@ class EditSessionRepository:
         meeting_data: dict,
         chat_id: int | None = None,
         message_id: int | None = None,
+        inline_message_id: str | None = None,
     ) -> EditSession:
         """Create a new edit session."""
         from datetime import timedelta
@@ -479,6 +480,7 @@ class EditSessionRepository:
             meeting_data=meeting_data,
             chat_id=chat_id,
             message_id=message_id,
+            inline_message_id=inline_message_id,
             expires_at=expires_at,
         )
         self.session.add(edit_session)

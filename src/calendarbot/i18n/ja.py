@@ -270,7 +270,8 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         continue_in_private="これを編集するには、プライベートチャットで続けてください：",
         open_private_chat="💬 プライベートチャットを開く",
         session_expired_restart="セッションが期限切れです。元のメッセージから編集を再開してください。",
-        edit_complete_return="完了！グループチャットに戻って更新されたプレビューを確認してください。",
+        edit_complete_return="✅ 完了！メッセージが更新されました。",
+        back_to_chat_button="↩️ チャットに戻る",
         # Time selection grid
         select_time_title="🕐 *時間を選択*",
         time_morning="午前",

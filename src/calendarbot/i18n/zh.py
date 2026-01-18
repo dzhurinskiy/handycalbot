@@ -270,7 +270,8 @@ _欢迎提交错误报告和UI改进建议！_
         continue_in_private="要编辑此内容，请在私聊中继续：",
         open_private_chat="💬 打开私聊",
         session_expired_restart="会话已过期。请从原始消息重新开始编辑。",
-        edit_complete_return="完成！返回群聊查看更新后的预览。",
+        edit_complete_return="✅ 完成！消息已更新。",
+        back_to_chat_button="↩️ 返回聊天",
         # Time selection grid
         select_time_title="🕐 *选择时间*",
         time_morning="上午",

@@ -1,5 +1,6 @@
 """Edit session handlers for private chat editing flow."""
 
+import contextlib
 import logging
 import uuid
 from datetime import UTC, datetime, timedelta
@@ -20,6 +21,46 @@ from calendarbot.services.parser import MeetingParser
 from calendarbot.services.user import UserService
 
 logger = logging.getLogger(__name__)
+
+
+def _escape_markdown(text: str) -> str:
+    """Escape special Markdown characters in text."""
+    special_chars = ["_", "*", "`", "["]
+    for char in special_chars:
+        text = text.replace(char, f"\\{char}")
+    return text
+
+
+def _build_edit_menu_keyboard_simple(result_id: str, t) -> InlineKeyboardMarkup:
+    """Build a simple edit menu keyboard for inline message updates."""
+    buttons = [
+        [
+            InlineKeyboardButton(t.inline.edit_title_button, callback_data=f"em_title_{result_id}"),
+            InlineKeyboardButton(t.inline.edit_time_button, callback_data=f"em_time_{result_id}"),
+        ],
+        [
+            InlineKeyboardButton(t.inline.edit_date_button, callback_data=f"em_date_{result_id}"),
+            InlineKeyboardButton(
+                t.inline.edit_duration_button, callback_data=f"em_dur_{result_id}"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                t.inline.edit_attendees_button, callback_data=f"em_att_{result_id}"
+            ),
+            InlineKeyboardButton(
+                t.inline.edit_reminder_button, callback_data=f"em_rem_{result_id}"
+            ),
+        ],
+        [
+            InlineKeyboardButton(t.inline.edit_link_button, callback_data=f"em_link_{result_id}"),
+        ],
+        [
+            InlineKeyboardButton(t.inline.back_button, callback_data=f"em_back_{result_id}"),
+        ],
+    ]
+    return InlineKeyboardMarkup(buttons)
+
 
 # Time presets for the time selection grid
 TIME_PRESETS_MORNING = ["08:00", "09:00", "10:00", "11:00"]
@@ -101,6 +142,7 @@ async def create_edit_session(
     meeting_data: dict,
     chat_id: int | None = None,
     message_id: int | None = None,
+    inline_message_id: str | None = None,
 ) -> str:
     """Create an edit session and return the session ID."""
     session_id = str(uuid.uuid4())[:8]
@@ -114,6 +156,7 @@ async def create_edit_session(
             meeting_data=meeting_data,
             chat_id=chat_id,
             message_id=message_id,
+            inline_message_id=inline_message_id,
         )
         await session.commit()
 
@@ -387,14 +430,46 @@ async def handle_private_edit_text(update: Update, context: ContextTypes.DEFAULT
             if context.bot_data and result_id and f"meeting_{result_id}" in context.bot_data:
                 context.bot_data[f"meeting_{result_id}"] = meeting_data
 
+            # Get inline_message_id and chat_id before deleting session
+            inline_message_id = edit_session.inline_message_id
+            original_chat_id = edit_session.chat_id
+
             # Clean up session
             await repo.delete(session_id)
             await session.commit()
 
             context.user_data.pop("edit_session_id", None)
 
-            # Confirm and instruct to return
-            await update.message.reply_text(t.inline.edit_complete_return)
+            # Try to update the original inline message with the edit menu
+            if inline_message_id and result_id:
+                with contextlib.suppress(Exception):
+                    # Build edit menu keyboard
+                    keyboard = _build_edit_menu_keyboard_simple(result_id, t)
+                    await context.bot.edit_message_text(
+                        text=t.inline.edit_menu_title,
+                        inline_message_id=inline_message_id,
+                        parse_mode="Markdown",
+                        reply_markup=keyboard,
+                    )
+
+            # Confirm with a link back to the chat if possible
+            if original_chat_id:
+                # Create a link to open the chat
+                keyboard = InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                t.inline.back_to_chat_button,
+                                url=f"tg://openmessage?chat_id={original_chat_id}",
+                            )
+                        ]
+                    ]
+                )
+                await update.message.reply_text(
+                    t.inline.edit_complete_return, reply_markup=keyboard
+                )
+            else:
+                await update.message.reply_text(t.inline.edit_complete_return)
 
 
 async def cancel_edit_session_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -543,6 +618,7 @@ async def time_custom_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         meeting_data=meeting_data,
         chat_id=update.effective_chat.id if update.effective_chat else None,
         message_id=update.effective_message.message_id if update.effective_message else None,
+        inline_message_id=query.inline_message_id,
     )
 
     await query.answer()
@@ -701,6 +777,7 @@ async def date_custom_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         meeting_data=meeting_data,
         chat_id=update.effective_chat.id if update.effective_chat else None,
         message_id=update.effective_message.message_id if update.effective_message else None,
+        inline_message_id=query.inline_message_id,
     )
 
     await query.answer()
@@ -758,6 +835,7 @@ async def title_private_chat_callback(update: Update, context: ContextTypes.DEFA
         meeting_data=meeting_data,
         chat_id=update.effective_chat.id if update.effective_chat else None,
         message_id=update.effective_message.message_id if update.effective_message else None,
+        inline_message_id=query.inline_message_id,
     )
 
     await query.answer()
@@ -817,6 +895,7 @@ async def attendee_private_chat_callback(
         meeting_data=meeting_data,
         chat_id=update.effective_chat.id if update.effective_chat else None,
         message_id=update.effective_message.message_id if update.effective_message else None,
+        inline_message_id=query.inline_message_id,
     )
 
     await query.answer()
@@ -874,6 +953,7 @@ async def link_private_chat_callback(update: Update, context: ContextTypes.DEFAU
         meeting_data=meeting_data,
         chat_id=update.effective_chat.id if update.effective_chat else None,
         message_id=update.effective_message.message_id if update.effective_message else None,
+        inline_message_id=query.inline_message_id,
     )
 
     await query.answer()

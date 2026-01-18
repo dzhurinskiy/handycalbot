@@ -270,7 +270,8 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         continue_in_private="Untuk mengedit ini, lanjutkan di chat pribadi:",
         open_private_chat="💬 Buka Chat Pribadi",
         session_expired_restart="Sesi kedaluwarsa. Silakan mulai mengedit lagi dari pesan asli.",
-        edit_complete_return="Selesai! Kembali ke chat grup untuk melihat pratinjau yang diperbarui.",
+        edit_complete_return="✅ Selesai! Pesan telah diperbarui.",
+        back_to_chat_button="↩️ Kembali ke Chat",
         # Time selection grid
         select_time_title="🕐 *Pilih Waktu*",
         time_morning="Pagi",

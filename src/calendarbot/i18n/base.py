@@ -250,6 +250,7 @@ class InlineTranslations:
     open_private_chat: str
     session_expired_restart: str
     edit_complete_return: str
+    back_to_chat_button: str
 
     # Time selection grid
     select_time_title: str

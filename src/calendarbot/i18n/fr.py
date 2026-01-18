@@ -270,7 +270,8 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         continue_in_private="Pour modifier ceci, continuez en chat privé:",
         open_private_chat="💬 Ouvrir Chat Privé",
         session_expired_restart="Session expirée. Veuillez recommencer l'édition depuis le message original.",
-        edit_complete_return="Terminé! Retournez au chat de groupe pour voir l'aperçu mis à jour.",
+        edit_complete_return="✅ Terminé! Le message a été mis à jour.",
+        back_to_chat_button="↩️ Retour au Chat",
         # Time selection grid
         select_time_title="🕐 *Sélectionner l'Heure*",
         time_morning="Matin",

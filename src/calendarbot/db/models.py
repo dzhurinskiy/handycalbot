@@ -206,6 +206,8 @@ class EditSession(Base):
     chat_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     # Original message ID (for reference)
     message_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # Inline message ID (for inline query results)
+    inline_message_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 

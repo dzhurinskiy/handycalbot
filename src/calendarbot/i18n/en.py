@@ -290,7 +290,8 @@ Type `@handycalbot` in any chat followed by:
         continue_in_private="To edit this, continue in private chat:",
         open_private_chat="💬 Open Private Chat",
         session_expired_restart="Session expired. Please start editing again from the original message.",
-        edit_complete_return="Done! Return to the group chat to see the updated preview.",
+        edit_complete_return="✅ Done! The message has been updated.",
+        back_to_chat_button="↩️ Back to Chat",
         # Time selection grid
         select_time_title="🕐 *Select Time*",
         time_morning="Morning",

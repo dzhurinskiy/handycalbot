@@ -270,7 +270,8 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         continue_in_private="برای ویرایش این مورد، در چت خصوصی ادامه دهید:",
         open_private_chat="💬 باز کردن چت خصوصی",
         session_expired_restart="نشست منقضی شده. لطفا ویرایش را دوباره از پیام اصلی شروع کنید.",
-        edit_complete_return="تمام شد! به چت گروهی برگردید تا پیش‌نمایش به‌روز شده را ببینید.",
+        edit_complete_return="✅ تمام شد! پیام به‌روز شد.",
+        back_to_chat_button="↩️ بازگشت به چت",
         # Time selection grid
         select_time_title="🕐 *انتخاب زمان*",
         time_morning="صبح",
