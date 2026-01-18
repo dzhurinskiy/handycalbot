@@ -266,6 +266,24 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         # Cancel edit
         cancel_edit_button="❌ Abbrechen",
         edit_cancelled="Bearbeitung abgebrochen",
+        # Private chat prompts (for text input redirect)
+        continue_in_private="Um dies zu bearbeiten, fahren Sie im privaten Chat fort:",
+        open_private_chat="💬 Privaten Chat öffnen",
+        session_expired_restart="Sitzung abgelaufen. Bitte starten Sie die Bearbeitung erneut von der ursprünglichen Nachricht.",
+        edit_complete_return="Fertig! Kehren Sie zum Gruppenchat zurück, um die aktualisierte Vorschau zu sehen.",
+        # Time selection grid
+        select_time_title="🕐 *Uhrzeit auswählen*",
+        time_morning="Vormittag",
+        time_afternoon="Nachmittag",
+        custom_time_button="⌨️ Manuell",
+        # Date selection grid
+        select_date_title="📅 *Datum auswählen*",
+        date_today="Heute",
+        date_tomorrow="Morgen",
+        date_day_after="Übermorgen",
+        date_in_3_days="In 3 Tagen",
+        date_in_a_week="In einer Woche",
+        custom_date_button="⌨️ Manuell",
     ),
     donation=DonationTranslations(
         support_title="**Unterstutze HandyCalBot** ⭐",

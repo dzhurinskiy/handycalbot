@@ -266,6 +266,24 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         # Cancel edit
         cancel_edit_button="❌ Cancelar",
         edit_cancelled="Edicion cancelada",
+        # Private chat prompts (for text input redirect)
+        continue_in_private="Para editar esto, continúa en el chat privado:",
+        open_private_chat="💬 Abrir Chat Privado",
+        session_expired_restart="Sesión expirada. Por favor, comienza a editar de nuevo desde el mensaje original.",
+        edit_complete_return="¡Listo! Vuelve al chat del grupo para ver la vista previa actualizada.",
+        # Time selection grid
+        select_time_title="🕐 *Seleccionar Hora*",
+        time_morning="Mañana",
+        time_afternoon="Tarde",
+        custom_time_button="⌨️ Personalizado",
+        # Date selection grid
+        select_date_title="📅 *Seleccionar Fecha*",
+        date_today="Hoy",
+        date_tomorrow="Mañana",
+        date_day_after="Pasado mañana",
+        date_in_3_days="En 3 días",
+        date_in_a_week="En una semana",
+        custom_date_button="⌨️ Personalizado",
     ),
     donation=DonationTranslations(
         support_title="**Apoya a HandyCalBot** ⭐",

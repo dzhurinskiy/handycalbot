@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from calendarbot.db.models import (
+    EditSession,
     Meeting,
     OAuthToken,
     PendingInvite,
@@ -446,3 +447,88 @@ class RecentContactRepository:
             await self.session.delete(contact)
             return True
         return False
+
+
+class EditSessionRepository:
+    """Edit session data access for private chat editing flow."""
+
+    SESSION_TTL_MINUTES = 15
+
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def create(
+        self,
+        session_id: str,
+        user_id: int,
+        edit_type: str,
+        meeting_data: dict,
+        chat_id: int | None = None,
+        message_id: int | None = None,
+    ) -> EditSession:
+        """Create a new edit session."""
+        from datetime import timedelta
+
+        now = datetime.now(tz=UTC)
+        expires_at = now + timedelta(minutes=self.SESSION_TTL_MINUTES)
+
+        edit_session = EditSession(
+            id=session_id,
+            user_id=user_id,
+            edit_type=edit_type,
+            meeting_data=meeting_data,
+            chat_id=chat_id,
+            message_id=message_id,
+            expires_at=expires_at,
+        )
+        self.session.add(edit_session)
+        await self.session.flush()
+        return edit_session
+
+    async def get(self, session_id: str) -> EditSession | None:
+        """Get an edit session by ID."""
+        result = await self.session.execute(
+            select(EditSession).where(EditSession.id == session_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def get_active_for_user(self, user_id: int) -> EditSession | None:
+        """Get the active (non-expired) edit session for a user."""
+        now = datetime.now(tz=UTC)
+        result = await self.session.execute(
+            select(EditSession).where(
+                EditSession.user_id == user_id,
+                EditSession.expires_at > now,
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def update_meeting_data(self, session_id: str, meeting_data: dict) -> None:
+        """Update the meeting data for an edit session."""
+        result = await self.session.execute(
+            select(EditSession).where(EditSession.id == session_id)
+        )
+        edit_session = result.scalar_one_or_none()
+        if edit_session:
+            edit_session.meeting_data = meeting_data
+            await self.session.flush()
+
+    async def delete(self, session_id: str) -> None:
+        """Delete an edit session."""
+        result = await self.session.execute(
+            select(EditSession).where(EditSession.id == session_id)
+        )
+        edit_session = result.scalar_one_or_none()
+        if edit_session:
+            await self.session.delete(edit_session)
+
+    async def cleanup_expired(self) -> int:
+        """Delete expired sessions. Returns count deleted."""
+        now = datetime.now(tz=UTC)
+        result = await self.session.execute(
+            select(EditSession).where(EditSession.expires_at <= now)
+        )
+        expired = list(result.scalars().all())
+        for session in expired:
+            await self.session.delete(session)
+        return len(expired)

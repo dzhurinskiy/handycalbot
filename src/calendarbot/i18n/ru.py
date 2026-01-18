@@ -266,6 +266,24 @@ _Сообщения об ошибках и предложения по улуч�
         # Cancel edit
         cancel_edit_button="❌ Отмена",
         edit_cancelled="Редактирование отменено",
+        # Private chat prompts (for text input redirect)
+        continue_in_private="Чтобы отредактировать это, продолжите в личном чате:",
+        open_private_chat="💬 Открыть личный чат",
+        session_expired_restart="Сессия истекла. Пожалуйста, начните редактирование заново из исходного сообщения.",
+        edit_complete_return="Готово! Вернитесь в групповой чат, чтобы увидеть обновлённый предпросмотр.",
+        # Time selection grid
+        select_time_title="🕐 *Выберите время*",
+        time_morning="Утро",
+        time_afternoon="После полудня",
+        custom_time_button="⌨️ Вручную",
+        # Date selection grid
+        select_date_title="📅 *Выберите дату*",
+        date_today="Сегодня",
+        date_tomorrow="Завтра",
+        date_day_after="Послезавтра",
+        date_in_3_days="Через 3 дня",
+        date_in_a_week="Через неделю",
+        custom_date_button="⌨️ Вручную",
     ),
     donation=DonationTranslations(
         support_title="**Поддержите HandyCalBot** ⭐",

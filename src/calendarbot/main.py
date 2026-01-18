@@ -12,6 +12,7 @@ from calendarbot.api.app import create_app
 from calendarbot.bot.commands import get_bot_commands
 from calendarbot.bot.handlers import (
     setup_donation_handlers,
+    setup_edit_session_handlers,
     setup_feedback_handlers,
     setup_inline_handlers,
     setup_meeting_handlers,
@@ -83,6 +84,7 @@ def create_bot_application() -> Application:
     setup_settings_handlers(app)
     setup_meeting_handlers(app)
     setup_inline_handlers(app)
+    setup_edit_session_handlers(app)  # Must come after inline for proper handler ordering
     setup_donation_handlers(app)
     setup_feedback_handlers(app)
 

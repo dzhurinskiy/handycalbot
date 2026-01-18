@@ -266,6 +266,24 @@ _欢迎提交错误报告和UI改进建议！_
         # Cancel edit
         cancel_edit_button="❌ 取消",
         edit_cancelled="编辑已取消",
+        # Private chat prompts (for text input redirect)
+        continue_in_private="要编辑此内容，请在私聊中继续：",
+        open_private_chat="💬 打开私聊",
+        session_expired_restart="会话已过期。请从原始消息重新开始编辑。",
+        edit_complete_return="完成！返回群聊查看更新后的预览。",
+        # Time selection grid
+        select_time_title="🕐 *选择时间*",
+        time_morning="上午",
+        time_afternoon="下午",
+        custom_time_button="⌨️ 自定义",
+        # Date selection grid
+        select_date_title="📅 *选择日期*",
+        date_today="今天",
+        date_tomorrow="明天",
+        date_day_after="后天",
+        date_in_3_days="3天后",
+        date_in_a_week="一周后",
+        custom_date_button="⌨️ 自定义",
     ),
     donation=DonationTranslations(
         support_title="**支持 HandyCalBot** ⭐",

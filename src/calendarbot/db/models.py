@@ -187,3 +187,32 @@ class RecentContact(Base):
 
     def __repr__(self) -> str:
         return f"<RecentContact(id={self.id}, contact={self.contact_identifier})>"
+
+
+class EditSession(Base):
+    """Temporary edit sessions for private chat flow."""
+
+    __tablename__ = "edit_sessions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    # Type of edit: "title", "attendee", "link", "time", "date"
+    edit_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    # Full meeting data dict
+    meeting_data: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    # Original chat where edit was initiated (for reference)
+    chat_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    # Original message ID (for reference)
+    message_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    __table_args__ = (
+        Index("ix_edit_sessions_user_id", "user_id"),
+        Index("ix_edit_sessions_expires", "expires_at"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<EditSession(id={self.id}, user_id={self.user_id}, edit_type={self.edit_type})>"

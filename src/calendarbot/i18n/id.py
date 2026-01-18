@@ -266,6 +266,24 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         # Cancel edit
         cancel_edit_button="❌ Batal",
         edit_cancelled="Edit dibatalkan",
+        # Private chat prompts (for text input redirect)
+        continue_in_private="Untuk mengedit ini, lanjutkan di chat pribadi:",
+        open_private_chat="💬 Buka Chat Pribadi",
+        session_expired_restart="Sesi kedaluwarsa. Silakan mulai mengedit lagi dari pesan asli.",
+        edit_complete_return="Selesai! Kembali ke chat grup untuk melihat pratinjau yang diperbarui.",
+        # Time selection grid
+        select_time_title="🕐 *Pilih Waktu*",
+        time_morning="Pagi",
+        time_afternoon="Siang",
+        custom_time_button="⌨️ Kustom",
+        # Date selection grid
+        select_date_title="📅 *Pilih Tanggal*",
+        date_today="Hari ini",
+        date_tomorrow="Besok",
+        date_day_after="Lusa",
+        date_in_3_days="Dalam 3 hari",
+        date_in_a_week="Dalam seminggu",
+        custom_date_button="⌨️ Kustom",
     ),
     donation=DonationTranslations(
         support_title="**Dukung HandyCalBot** ⭐",

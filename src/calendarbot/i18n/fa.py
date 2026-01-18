@@ -266,6 +266,24 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         # Cancel edit
         cancel_edit_button="❌ لغو",
         edit_cancelled="ویرایش لغو شد",
+        # Private chat prompts (for text input redirect)
+        continue_in_private="برای ویرایش این مورد، در چت خصوصی ادامه دهید:",
+        open_private_chat="💬 باز کردن چت خصوصی",
+        session_expired_restart="نشست منقضی شده. لطفا ویرایش را دوباره از پیام اصلی شروع کنید.",
+        edit_complete_return="تمام شد! به چت گروهی برگردید تا پیش‌نمایش به‌روز شده را ببینید.",
+        # Time selection grid
+        select_time_title="🕐 *انتخاب زمان*",
+        time_morning="صبح",
+        time_afternoon="بعدازظهر",
+        custom_time_button="⌨️ سفارشی",
+        # Date selection grid
+        select_date_title="📅 *انتخاب تاریخ*",
+        date_today="امروز",
+        date_tomorrow="فردا",
+        date_day_after="پس‌فردا",
+        date_in_3_days="۳ روز دیگر",
+        date_in_a_week="یک هفته دیگر",
+        custom_date_button="⌨️ سفارشی",
     ),
     donation=DonationTranslations(
         support_title="**حمایت از HandyCalBot** ⭐",

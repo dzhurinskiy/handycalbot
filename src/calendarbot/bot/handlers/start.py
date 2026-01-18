@@ -22,6 +22,14 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     if not update.effective_user or not update.message:
         return
 
+    # Check for edit session deep link parameter
+    if context.args and context.args[0].startswith("edit_"):
+        session_id = context.args[0].replace("edit_", "")
+        from calendarbot.bot.handlers.edit_session import handle_edit_session_start
+
+        await handle_edit_session_start(update, context, session_id)
+        return
+
     # Guess timezone from Telegram language setting
     guessed_timezone = guess_timezone_from_language(update.effective_user.language_code)
     # Detect language from Telegram settings

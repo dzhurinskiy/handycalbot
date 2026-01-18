@@ -286,6 +286,24 @@ Type `@handycalbot` in any chat followed by:
         # Cancel edit
         cancel_edit_button="❌ Cancel",
         edit_cancelled="Edit cancelled",
+        # Private chat prompts (for text input redirect)
+        continue_in_private="To edit this, continue in private chat:",
+        open_private_chat="💬 Open Private Chat",
+        session_expired_restart="Session expired. Please start editing again from the original message.",
+        edit_complete_return="Done! Return to the group chat to see the updated preview.",
+        # Time selection grid
+        select_time_title="🕐 *Select Time*",
+        time_morning="Morning",
+        time_afternoon="Afternoon",
+        custom_time_button="⌨️ Custom",
+        # Date selection grid
+        select_date_title="📅 *Select Date*",
+        date_today="Today",
+        date_tomorrow="Tomorrow",
+        date_day_after="Day after tomorrow",
+        date_in_3_days="In 3 days",
+        date_in_a_week="In a week",
+        custom_date_button="⌨️ Custom",
     ),
     donation=DonationTranslations(
         support_title="**Support HandyCalBot** ⭐",

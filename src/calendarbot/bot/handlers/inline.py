@@ -1610,9 +1610,8 @@ def setup_inline_handlers(app: Application) -> None:
     app.add_handler(CallbackQueryHandler(back_to_preview_callback, pattern=r"^em_back_"))
 
     # Edit field callbacks
-    app.add_handler(CallbackQueryHandler(edit_title_callback, pattern=r"^em_title_"))
-    app.add_handler(CallbackQueryHandler(edit_time_callback, pattern=r"^em_time_"))
-    app.add_handler(CallbackQueryHandler(edit_date_callback, pattern=r"^em_date_"))
+    # Note: em_title_, em_time_, em_date_ are now handled by edit_session.py
+    # which provides button grids and private chat redirect for custom input
     app.add_handler(CallbackQueryHandler(edit_duration_callback, pattern=r"^em_dur_"))
     app.add_handler(CallbackQueryHandler(edit_reminder_callback, pattern=r"^em_rem_"))
     app.add_handler(CallbackQueryHandler(edit_attendees_callback, pattern=r"^em_att_"))
@@ -1623,13 +1622,13 @@ def setup_inline_handlers(app: Application) -> None:
     app.add_handler(CallbackQueryHandler(set_reminder_callback, pattern=r"^rem_"))
 
     # Attendee management
-    app.add_handler(CallbackQueryHandler(add_attendee_start_callback, pattern=r"^att_add_"))
+    # Note: att_add_ is now handled by edit_session.py for private chat redirect
     app.add_handler(CallbackQueryHandler(remove_attendee_callback, pattern=r"^att_rem_"))
     app.add_handler(CallbackQueryHandler(add_recent_contact_callback, pattern=r"^att_rc_"))
 
     # Link management
+    # Note: link_custom_ is now handled by edit_session.py for private chat redirect
     app.add_handler(CallbackQueryHandler(add_google_meet_callback, pattern=r"^link_meet_"))
-    app.add_handler(CallbackQueryHandler(add_custom_link_start_callback, pattern=r"^link_custom_"))
     app.add_handler(CallbackQueryHandler(remove_link_callback, pattern=r"^link_rem_"))
 
     # No-op handler for display-only buttons

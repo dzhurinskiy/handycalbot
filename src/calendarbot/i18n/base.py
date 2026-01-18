@@ -245,6 +245,27 @@ class InlineTranslations:
     cancel_edit_button: str
     edit_cancelled: str
 
+    # Private chat prompts (for text input redirect)
+    continue_in_private: str
+    open_private_chat: str
+    session_expired_restart: str
+    edit_complete_return: str
+
+    # Time selection grid
+    select_time_title: str
+    time_morning: str
+    time_afternoon: str
+    custom_time_button: str
+
+    # Date selection grid
+    select_date_title: str
+    date_today: str
+    date_tomorrow: str
+    date_day_after: str
+    date_in_3_days: str
+    date_in_a_week: str
+    custom_date_button: str
+
 
 @dataclass(frozen=True)
 class DonationTranslations:

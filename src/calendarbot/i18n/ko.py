@@ -266,6 +266,24 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         # Cancel edit
         cancel_edit_button="❌ 취소",
         edit_cancelled="편집 취소됨",
+        # Private chat prompts (for text input redirect)
+        continue_in_private="이것을 편집하려면 비공개 채팅에서 계속하세요:",
+        open_private_chat="💬 비공개 채팅 열기",
+        session_expired_restart="세션이 만료되었습니다. 원본 메시지에서 편집을 다시 시작하세요.",
+        edit_complete_return="완료! 그룹 채팅으로 돌아가서 업데이트된 미리보기를 확인하세요.",
+        # Time selection grid
+        select_time_title="🕐 *시간 선택*",
+        time_morning="오전",
+        time_afternoon="오후",
+        custom_time_button="⌨️ 사용자 정의",
+        # Date selection grid
+        select_date_title="📅 *날짜 선택*",
+        date_today="오늘",
+        date_tomorrow="내일",
+        date_day_after="모레",
+        date_in_3_days="3일 후",
+        date_in_a_week="일주일 후",
+        custom_date_button="⌨️ 사용자 정의",
     ),
     donation=DonationTranslations(
         support_title="**HandyCalBot 후원하기** ⭐",
