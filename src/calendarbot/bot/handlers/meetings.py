@@ -228,6 +228,10 @@ async def meeting_detail_callback(update: Update, context: ContextTypes.DEFAULT_
                 attendee_list += f" (+{len(attendees) - 5})"
             text += f"👥 {attendee_list}\n"
 
+        link = m.get("link")
+        if link:
+            text += f"🔗 [Join Meeting]({link})\n"
+
         # Store current meeting index for edit operations
         context.bot_data[f"current_meeting_{stored_user_id}"] = meeting_idx
 

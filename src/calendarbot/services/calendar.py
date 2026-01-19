@@ -348,6 +348,14 @@ class CalendarService:
 
             attendees = [a.get("email", "") for a in event.get("attendees", [])]
 
+            # Extract meet link
+            meet_link = event.get("hangoutLink")
+            if not meet_link and "conferenceData" in event:
+                for entry_point in event["conferenceData"].get("entryPoints", []):
+                    if entry_point.get("entryPointType") == "video":
+                        meet_link = entry_point.get("uri")
+                        break
+
             meetings.append(
                 {
                     "id": event.get("id"),
@@ -356,6 +364,7 @@ class CalendarService:
                     "start_time": start_time,
                     "end_time": end_time,
                     "attendees": attendees,
+                    "link": meet_link,
                 }
             )
 
@@ -384,6 +393,7 @@ class CalendarService:
                     "start_time": start_time,
                     "end_time": end_time,
                     "attendees": attendees,
+                    "link": None,  # Link not stored in local DB
                 }
             )
 
