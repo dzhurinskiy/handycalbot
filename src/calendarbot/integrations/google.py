@@ -170,9 +170,7 @@ class GoogleCalendarClient:
         else:
             event_id = result.get("id", "unknown")
             created_attendees = [a.get("email") for a in result.get("attendees", [])]
-            logger.info(
-                f"Event created: id={event_id}, attendees_in_response={created_attendees}"
-            )
+            logger.info(f"Event created: id={event_id}, attendees_in_response={created_attendees}")
 
         return result
 
