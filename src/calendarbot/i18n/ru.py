@@ -41,8 +41,8 @@ translations = Translations(
 /connect - Подключить Google Календарь
 /disconnect - Отключить календарь
 /connectzoom - Подключить Zoom для ссылок на встречи
-/meetings - Список предстоящих встреч
-/cancel - Отменить встречу
+/disconnectzoom - Отключить Zoom
+/meetings - Просмотр и управление встречами
 /settings - Посмотреть настройки
 /timezone - Изменить часовой пояс
 /duration - Установить длительность по умолчанию
@@ -85,8 +85,8 @@ _Сообщения об ошибках и предложения по улуч�
 /connect - Подключить Google Календарь
 /disconnect - Отключить календарь
 /connectzoom - Подключить Zoom для ссылок на встречи
-/meetings - Показать предстоящие встречи
-/cancel - Отменить встречу
+/disconnectzoom - Отключить Zoom
+/meetings - Просмотр и управление встречами
 /settings - Посмотреть настройки
 /timezone - Установить часовой пояс
 /duration - Установить длительность по умолчанию
@@ -137,6 +137,13 @@ _Сообщения об ошибках и предложения по улуч�
         connect_privacy_mode_button="🔒 Режим конфиденциальности",
         connect_full_access_desc="_Полный доступ: Создание встреч и просмотр календаря (/meetings показывает все события)_",
         connect_privacy_mode_desc="_Режим конфиденциальности: Только создание встреч, без чтения календаря (/meetings показывает только события, созданные ботом)_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**Google Calendar Подключён** ✅\n\nТекущий режим: {mode}\n\nВы можете сменить режим или отключить ниже:",
+        current_mode_full="📅 Полный доступ",
+        current_mode_privacy="🔒 Режим конфиденциальности",
+        switch_to_full_button="📅 Переключить на Полный доступ",
+        switch_to_privacy_button="🔒 Переключить на Режим конфиденциальности",
+        disconnect_button="❌ Отключить",
         # Timezone
         select_timezone="Выберите часовой пояс или введите вручную (напр., `Europe/Moscow`):",
         timezone_set="✅ Часовой пояс установлен: `{timezone}`",

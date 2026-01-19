@@ -150,7 +150,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 
 
 async def connect_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /connect command - show connection mode selection."""
+    """Handle /connect command - show connection mode selection or current status."""
     if not update.effective_user or not update.message:
         return
 
@@ -167,10 +167,44 @@ async def connect_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -
 
         # Check if already connected
         if await user_service.is_calendar_connected(user):
-            await update.message.reply_text(t.settings.calendar_already_connected)
+            # Get current mode
+            from calendarbot.db.repository import OAuthTokenRepository
+
+            token_repo = OAuthTokenRepository(session)
+            token = await token_repo.get_token(user.id, "google")
+            is_privacy = token.privacy_mode if token else False
+
+            current_mode = (
+                t.settings.current_mode_privacy if is_privacy else t.settings.current_mode_full
+            )
+
+            # Show current status with options to switch or disconnect
+            keyboard = [
+                [
+                    InlineKeyboardButton(
+                        (
+                            t.settings.switch_to_full_button
+                            if is_privacy
+                            else t.settings.switch_to_privacy_button
+                        ),
+                        callback_data="connect_full" if is_privacy else "connect_privacy",
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        t.settings.disconnect_button, callback_data="disconnect_calendar"
+                    )
+                ],
+            ]
+
+            await update.message.reply_text(
+                t.settings.calendar_connected_status.format(mode=current_mode),
+                reply_markup=InlineKeyboardMarkup(keyboard),
+                parse_mode="Markdown",
+            )
             return
 
-    # Show mode selection buttons
+    # Not connected - show mode selection buttons
     keyboard = [
         [InlineKeyboardButton(t.settings.connect_full_access_button, callback_data="connect_full")],
         [
@@ -228,6 +262,35 @@ async def connect_mode_callback(update: Update, context: ContextTypes.DEFAULT_TY
         t.settings.click_to_connect,
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
+
+
+async def disconnect_calendar_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle disconnect button from /connect menu."""
+    query = update.callback_query
+    if not query or not update.effective_user:
+        return
+
+    await query.answer()
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await query.edit_message_text(t.common.error_user_not_found)
+            return
+
+        t = get_text(user.language)
+
+        if not await user_service.is_calendar_connected(user):
+            await query.edit_message_text(t.settings.no_calendar_connected)
+            return
+
+        await user_service.disconnect_calendar(user)
+        await session.commit()
+
+    await query.edit_message_text(t.settings.calendar_disconnected)
 
 
 async def disconnect_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -828,6 +891,11 @@ def setup_settings_handlers(app: Application) -> None:
     # Connect mode callback (full access vs privacy mode)
     app.add_handler(
         CallbackQueryHandler(connect_mode_callback, pattern=r"^connect_(full|privacy)$")
+    )
+
+    # Disconnect calendar callback (from /connect menu)
+    app.add_handler(
+        CallbackQueryHandler(disconnect_calendar_callback, pattern=r"^disconnect_calendar$")
     )
 
     # Notifications callback

@@ -42,8 +42,8 @@ I help you schedule meetings directly from Telegram.
 /connect - Connect Google Calendar
 /disconnect - Disconnect calendar
 /connectzoom - Connect Zoom for meeting links
-/meetings - List upcoming meetings
-/cancel - Cancel a meeting
+/disconnectzoom - Disconnect Zoom
+/meetings - View and manage meetings
 /settings - View your settings
 /timezone - Change timezone
 /duration - Set default duration
@@ -87,8 +87,8 @@ Type `@handycalbot` in any chat followed by:
 /connect - Connect Google Calendar
 /disconnect - Disconnect calendar
 /connectzoom - Connect Zoom for meeting links
-/meetings - Show upcoming meetings
-/cancel - Cancel a meeting
+/disconnectzoom - Disconnect Zoom
+/meetings - View and manage meetings
 /settings - View your settings
 /timezone - Set your timezone
 /duration - Set default meeting duration
@@ -142,6 +142,13 @@ Type `@handycalbot` in any chat followed by:
         connect_privacy_mode_button="🔒 Privacy Mode",
         connect_full_access_desc="_Full Access: Create meetings and view your calendar (/meetings shows all events)_",
         connect_privacy_mode_desc="_Privacy Mode: Create meetings only, no calendar reading (/meetings shows only bot-created events)_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**Google Calendar Connected** ✅\n\nCurrent mode: {mode}\n\nYou can switch modes or disconnect below:",
+        current_mode_full="📅 Full Access",
+        current_mode_privacy="🔒 Privacy Mode",
+        switch_to_full_button="📅 Switch to Full Access",
+        switch_to_privacy_button="🔒 Switch to Privacy Mode",
+        disconnect_button="❌ Disconnect",
         # Timezone
         select_timezone="Select your timezone or type it manually (e.g., `Europe/Berlin`):",
         timezone_set="✅ Timezone set to: `{timezone}`",

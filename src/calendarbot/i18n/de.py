@@ -41,8 +41,8 @@ Ich helfe dir, Besprechungen direkt von Telegram aus zu planen.
 /connect - Google Kalender verbinden
 /disconnect - Kalender trennen
 /connectzoom - Zoom für Meeting-Links verbinden
-/meetings - Kommende Besprechungen auflisten
-/cancel - Eine Besprechung absagen
+/disconnectzoom - Zoom trennen
+/meetings - Termine anzeigen und verwalten
 /settings - Deine Einstellungen ansehen
 /timezone - Zeitzone andern
 /duration - Standarddauer festlegen
@@ -85,8 +85,8 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
 /connect - Google Kalender verbinden
 /disconnect - Kalender trennen
 /connectzoom - Zoom für Meeting-Links verbinden
-/meetings - Kommende Besprechungen anzeigen
-/cancel - Eine Besprechung absagen
+/disconnectzoom - Zoom trennen
+/meetings - Termine anzeigen und verwalten
 /settings - Deine Einstellungen ansehen
 /timezone - Deine Zeitzone festlegen
 /duration - Standard-Besprechungsdauer festlegen
@@ -137,6 +137,13 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         connect_privacy_mode_button="🔒 Datenschutzmodus",
         connect_full_access_desc="_Vollzugriff: Termine erstellen und Kalender ansehen (/meetings zeigt alle Termine)_",
         connect_privacy_mode_desc="_Datenschutzmodus: Nur Termine erstellen, kein Kalenderzugriff (/meetings zeigt nur Bot-erstellte Termine)_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**Google Calendar Verbunden** ✅\n\nAktueller Modus: {mode}\n\nSie können den Modus wechseln oder die Verbindung trennen:",
+        current_mode_full="📅 Vollzugriff",
+        current_mode_privacy="🔒 Datenschutzmodus",
+        switch_to_full_button="📅 Zu Vollzugriff wechseln",
+        switch_to_privacy_button="🔒 Zu Datenschutzmodus wechseln",
+        disconnect_button="❌ Trennen",
         # Timezone
         select_timezone="Wahle deine Zeitzone oder gib sie manuell ein (z.B. `Europe/Berlin`):",
         timezone_set="✅ Zeitzone gesetzt auf: `{timezone}`",

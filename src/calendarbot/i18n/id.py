@@ -41,8 +41,8 @@ Saya membantu Anda menjadwalkan rapat langsung dari Telegram.
 /connect - Hubungkan Google Calendar
 /disconnect - Putuskan koneksi kalender
 /connectzoom - Hubungkan Zoom untuk tautan rapat
-/meetings - Daftar rapat mendatang
-/cancel - Batalkan rapat
+/disconnectzoom - Putuskan Zoom
+/meetings - Lihat dan kelola rapat
 /settings - Lihat pengaturan Anda
 /timezone - Ubah zona waktu
 /duration - Atur durasi default
@@ -85,8 +85,8 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
 /connect - Hubungkan Google Calendar
 /disconnect - Putuskan koneksi kalender
 /connectzoom - Hubungkan Zoom untuk tautan rapat
-/meetings - Tampilkan rapat mendatang
-/cancel - Batalkan rapat
+/disconnectzoom - Putuskan Zoom
+/meetings - Lihat dan kelola rapat
 /settings - Lihat pengaturan Anda
 /timezone - Atur zona waktu Anda
 /duration - Atur durasi rapat default
@@ -137,6 +137,13 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         connect_privacy_mode_button="🔒 Mode Privasi",
         connect_full_access_desc="_Akses Penuh: Buat rapat dan lihat kalender (/meetings menampilkan semua acara)_",
         connect_privacy_mode_desc="_Mode Privasi: Hanya buat rapat, tanpa akses baca kalender (/meetings hanya menampilkan acara yang dibuat bot)_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**Google Calendar Terhubung** ✅\n\nMode saat ini: {mode}\n\nAnda dapat mengubah mode atau memutuskan koneksi di bawah:",
+        current_mode_full="📅 Akses Penuh",
+        current_mode_privacy="🔒 Mode Privasi",
+        switch_to_full_button="📅 Beralih ke Akses Penuh",
+        switch_to_privacy_button="🔒 Beralih ke Mode Privasi",
+        disconnect_button="❌ Putuskan",
         # Timezone
         select_timezone="Pilih zona waktu Anda atau ketik secara manual (mis., `Asia/Jakarta`):",
         timezone_set="✅ Zona waktu diatur ke: `{timezone}`",

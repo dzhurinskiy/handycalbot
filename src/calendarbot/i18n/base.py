@@ -71,6 +71,14 @@ class SettingsTranslations:
     connect_full_access_desc: str
     connect_privacy_mode_desc: str
 
+    # Calendar connected status (mode switching)
+    calendar_connected_status: str
+    current_mode_full: str
+    current_mode_privacy: str
+    switch_to_full_button: str
+    switch_to_privacy_button: str
+    disconnect_button: str
+
     # Timezone
     select_timezone: str
     timezone_set: str

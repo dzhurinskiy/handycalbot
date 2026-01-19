@@ -41,8 +41,8 @@ translations = Translations(
 /connect - اتصال تقویم گوگل
 /disconnect - قطع اتصال تقویم
 /connectzoom - اتصال زوم برای لینک‌های جلسه
-/meetings - لیست جلسات آینده
-/cancel - لغو جلسه
+/disconnectzoom - قطع اتصال Zoom
+/meetings - مشاهده و مدیریت جلسات
 /settings - مشاهده تنظیمات
 /timezone - تغییر منطقه زمانی
 /duration - تنظیم مدت پیش‌فرض
@@ -85,8 +85,8 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
 /connect - اتصال تقویم گوگل
 /disconnect - قطع اتصال تقویم
 /connectzoom - اتصال زوم برای لینک‌های جلسه
-/meetings - نمایش جلسات آینده
-/cancel - لغو جلسه
+/disconnectzoom - قطع اتصال Zoom
+/meetings - مشاهده و مدیریت جلسات
 /settings - مشاهده تنظیمات
 /timezone - تنظیم منطقه زمانی
 /duration - تنظیم مدت پیش‌فرض جلسه
@@ -137,6 +137,13 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         connect_privacy_mode_button="🔒 حالت حریم خصوصی",
         connect_full_access_desc="_دسترسی کامل: ایجاد جلسات و مشاهده تقویم (/meetings همه رویدادها را نشان می‌دهد)_",
         connect_privacy_mode_desc="_حالت حریم خصوصی: فقط ایجاد جلسات، بدون خواندن تقویم (/meetings فقط رویدادهای ایجاد شده توسط ربات را نشان می‌دهد)_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**تقویم گوگل متصل شد** ✅\n\nحالت فعلی: {mode}\n\nمی‌توانید حالت را تغییر دهید یا قطع کنید:",
+        current_mode_full="📅 دسترسی کامل",
+        current_mode_privacy="🔒 حالت حریم خصوصی",
+        switch_to_full_button="📅 تغییر به دسترسی کامل",
+        switch_to_privacy_button="🔒 تغییر به حالت حریم خصوصی",
+        disconnect_button="❌ قطع اتصال",
         # Timezone
         select_timezone="منطقه زمانی خود را انتخاب کنید یا دستی وارد کنید (مثلاً `Asia/Tehran`):",
         timezone_set="✅ منطقه زمانی تنظیم شد: `{timezone}`",

@@ -41,8 +41,8 @@ Te ayudo a programar reuniones directamente desde Telegram.
 /connect - Conectar Google Calendar
 /disconnect - Desconectar calendario
 /connectzoom - Conectar Zoom para enlaces de reuniones
-/meetings - Listar proximas reuniones
-/cancel - Cancelar una reunion
+/disconnectzoom - Desconectar Zoom
+/meetings - Ver y gestionar reuniones
 /settings - Ver tu configuracion
 /timezone - Cambiar zona horaria
 /duration - Establecer duracion predeterminada
@@ -84,8 +84,9 @@ Escribe `@handycalbot` en cualquier chat seguido de:
 /help - Este mensaje de ayuda
 /connect - Conectar Google Calendar
 /disconnect - Desconectar calendario
-/meetings - Mostrar proximas reuniones
-/cancel - Cancelar una reunion
+/connectzoom - Conectar Zoom para enlaces de reuniones
+/disconnectzoom - Desconectar Zoom
+/meetings - Ver y gestionar reuniones
 /settings - Ver tu configuracion
 /timezone - Establecer zona horaria
 /duration - Establecer duracion predeterminada
@@ -136,6 +137,13 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         connect_privacy_mode_button="🔒 Modo Privacidad",
         connect_full_access_desc="_Acceso Completo: Crear reuniones y ver tu calendario (/meetings muestra todos los eventos)_",
         connect_privacy_mode_desc="_Modo Privacidad: Solo crear reuniones, sin lectura del calendario (/meetings muestra solo eventos creados por el bot)_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**Google Calendar Conectado** ✅\n\nModo actual: {mode}\n\nPuedes cambiar de modo o desconectar abajo:",
+        current_mode_full="📅 Acceso Completo",
+        current_mode_privacy="🔒 Modo Privacidad",
+        switch_to_full_button="📅 Cambiar a Acceso Completo",
+        switch_to_privacy_button="🔒 Cambiar a Modo Privacidad",
+        disconnect_button="❌ Desconectar",
         select_timezone="Selecciona tu zona horaria o escribela manualmente (ej., `Europe/Madrid`):",
         timezone_set="✅ Zona horaria establecida: `{timezone}`",
         timezone_set_ready='Zona horaria establecida: `{timezone}`\n\nTodo listo! Crea reuniones usando:\n`@handycalbot 14:30 "Titulo de Reunion"`',

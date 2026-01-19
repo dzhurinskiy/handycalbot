@@ -41,8 +41,8 @@ translations = Translations(
 /connect - 连接 Google 日历
 /disconnect - 断开日历连接
 /connectzoom - 连接 Zoom 获取会议链接
-/meetings - 列出即将到来的会议
-/cancel - 取消会议
+/disconnectzoom - 断开Zoom连接
+/meetings - 查看和管理会议
 /settings - 查看设置
 /timezone - 更改时区
 /duration - 设置默认时长
@@ -85,8 +85,8 @@ _欢迎提交错误报告和UI改进建议！_
 /connect - 连接 Google 日历
 /disconnect - 断开日历连接
 /connectzoom - 连接 Zoom 获取会议链接
-/meetings - 显示即将到来的会议
-/cancel - 取消会议
+/disconnectzoom - 断开Zoom连接
+/meetings - 查看和管理会议
 /settings - 查看设置
 /timezone - 设置时区
 /duration - 设置默认会议时长
@@ -137,6 +137,13 @@ _欢迎提交错误报告和UI改进建议！_
         connect_privacy_mode_button="🔒 隐私模式",
         connect_full_access_desc="_完全访问：创建会议并查看日历（/meetings 显示所有事件）_",
         connect_privacy_mode_desc="_隐私模式：仅创建会议，不读取日历（/meetings 仅显示机器人创建的事件）_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**Google日历已连接** ✅\n\n当前模式: {mode}\n\n您可以在下方切换模式或断开连接:",
+        current_mode_full="📅 完全访问",
+        current_mode_privacy="🔒 隐私模式",
+        switch_to_full_button="📅 切换到完全访问",
+        switch_to_privacy_button="🔒 切换到隐私模式",
+        disconnect_button="❌ 断开连接",
         select_timezone="选择您的时区或手动输入 (例如 `Asia/Shanghai`):",
         timezone_set="✅ 时区已设置: `{timezone}`",
         timezone_set_ready='时区已设置: `{timezone}`\n\n准备就绪! 创建会议:\n`@handycalbot 14:30 "会议标题"`',

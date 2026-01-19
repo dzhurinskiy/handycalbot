@@ -41,8 +41,8 @@ Telegramから直接ミーティングをスケジュールできます。
 /connect - Googleカレンダーを接続
 /disconnect - カレンダーを切断
 /connectzoom - ミーティングリンク用にZoomを接続
-/meetings - 今後のミーティング一覧
-/cancel - ミーティングをキャンセル
+/disconnectzoom - Zoomを切断
+/meetings - 予定の表示と管理
 /settings - 設定を表示
 /timezone - タイムゾーンを変更
 /duration - デフォルト時間を設定
@@ -85,8 +85,8 @@ _バグ報告やUI改善のご提案をお待ちしております！_
 /connect - Googleカレンダーを接続
 /disconnect - カレンダーを切断
 /connectzoom - ミーティングリンク用にZoomを接続
-/meetings - 今後のミーティングを表示
-/cancel - ミーティングをキャンセル
+/disconnectzoom - Zoomを切断
+/meetings - 予定の表示と管理
 /settings - 設定を表示
 /timezone - タイムゾーンを設定
 /duration - デフォルトミーティング時間を設定
@@ -137,6 +137,13 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         connect_privacy_mode_button="🔒 プライバシーモード",
         connect_full_access_desc="_フルアクセス：予定の作成とカレンダーの閲覧が可能（/meetingsですべての予定を表示）_",
         connect_privacy_mode_desc="_プライバシーモード：予定の作成のみ、カレンダーの読み取り不可（/meetingsではボットが作成した予定のみ表示）_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**Googleカレンダー接続済み** ✅\n\n現在のモード: {mode}\n\n以下でモードを切り替えるか、接続解除できます:",
+        current_mode_full="📅 フルアクセス",
+        current_mode_privacy="🔒 プライバシーモード",
+        switch_to_full_button="📅 フルアクセスに切り替え",
+        switch_to_privacy_button="🔒 プライバシーモードに切り替え",
+        disconnect_button="❌ 接続解除",
         select_timezone="タイムゾーンを選択するか、手動で入力してください (例: `Asia/Tokyo`):",
         timezone_set="✅ タイムゾーン設定: `{timezone}`",
         timezone_set_ready='タイムゾーン設定: `{timezone}`\n\n準備完了! ミーティング作成:\n`@handycalbot 14:30 "ミーティングタイトル"`',

@@ -41,8 +41,8 @@ translations = Translations(
 /connect - Google 캘린더 연결
 /disconnect - 캘린더 연결 해제
 /connectzoom - 회의 링크용 Zoom 연결
-/meetings - 예정된 회의 목록
-/cancel - 회의 취소
+/disconnectzoom - Zoom 연결 해제
+/meetings - 일정 보기 및 관리
 /settings - 설정 보기
 /timezone - 시간대 변경
 /duration - 기본 시간 설정
@@ -84,8 +84,9 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
 /help - 이 도움말
 /connect - Google 캘린더 연결
 /disconnect - 캘린더 연결 해제
-/meetings - 예정된 회의 보기
-/cancel - 회의 취소
+/connectzoom - 회의 링크용 Zoom 연결
+/disconnectzoom - Zoom 연결 해제
+/meetings - 일정 보기 및 관리
 /settings - 설정 보기
 /timezone - 시간대 설정
 /duration - 기본 회의 시간 설정
@@ -136,6 +137,13 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         connect_privacy_mode_button="🔒 개인정보 보호 모드",
         connect_full_access_desc="_전체 액세스: 일정 생성 및 캘린더 보기 (/meetings에서 모든 일정 표시)_",
         connect_privacy_mode_desc="_개인정보 보호 모드: 일정 생성만 가능, 캘린더 읽기 불가 (/meetings에서 봇이 만든 일정만 표시)_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**Google 캘린더 연결됨** ✅\n\n현재 모드: {mode}\n\n아래에서 모드를 변경하거나 연결을 해제할 수 있습니다:",
+        current_mode_full="📅 전체 액세스",
+        current_mode_privacy="🔒 개인정보 보호 모드",
+        switch_to_full_button="📅 전체 액세스로 전환",
+        switch_to_privacy_button="🔒 개인정보 보호 모드로 전환",
+        disconnect_button="❌ 연결 해제",
         # Timezone
         select_timezone="시간대를 선택하거나 직접 입력하세요 (예: `Asia/Seoul`):",
         timezone_set="✅ 시간대 설정됨: `{timezone}`",

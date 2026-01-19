@@ -41,8 +41,8 @@ Je vous aide a planifier des reunions directement depuis Telegram.
 /connect - Connecter Google Calendar
 /disconnect - Deconnecter le calendrier
 /connectzoom - Connecter Zoom pour les liens de reunion
-/meetings - Lister les prochaines reunions
-/cancel - Annuler une reunion
+/disconnectzoom - Déconnecter Zoom
+/meetings - Voir et gérer les réunions
 /settings - Voir vos parametres
 /timezone - Changer le fuseau horaire
 /duration - Definir la duree par defaut
@@ -85,8 +85,8 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
 /connect - Connecter Google Calendar
 /disconnect - Deconnecter le calendrier
 /connectzoom - Connecter Zoom pour les liens de reunion
-/meetings - Afficher les prochaines reunions
-/cancel - Annuler une reunion
+/disconnectzoom - Déconnecter Zoom
+/meetings - Voir et gérer les réunions
 /settings - Voir vos parametres
 /timezone - Definir votre fuseau horaire
 /duration - Definir la duree par defaut
@@ -137,6 +137,13 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         connect_privacy_mode_button="🔒 Mode Confidentialité",
         connect_full_access_desc="_Accès Complet : Créer des réunions et voir votre calendrier (/meetings affiche tous les événements)_",
         connect_privacy_mode_desc="_Mode Confidentialité : Créer des réunions uniquement, sans lecture du calendrier (/meetings affiche uniquement les événements créés par le bot)_",
+        # Calendar connected status (mode switching)
+        calendar_connected_status="**Google Calendar Connecté** ✅\n\nMode actuel : {mode}\n\nVous pouvez changer de mode ou vous déconnecter ci-dessous :",
+        current_mode_full="📅 Accès Complet",
+        current_mode_privacy="🔒 Mode Confidentialité",
+        switch_to_full_button="📅 Passer en Accès Complet",
+        switch_to_privacy_button="🔒 Passer en Mode Confidentialité",
+        disconnect_button="❌ Déconnecter",
         select_timezone="Selectionnez votre fuseau horaire ou tapez-le manuellement (ex., `Europe/Paris`):",
         timezone_set="✅ Fuseau horaire defini sur: `{timezone}`",
         timezone_set_ready='Fuseau horaire defini sur: `{timezone}`\n\nVous etes pret! Creez des reunions en utilisant:\n`@handycalbot 14:30 "Titre de Reunion"`',
