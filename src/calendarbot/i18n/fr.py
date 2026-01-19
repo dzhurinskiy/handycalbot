@@ -330,6 +330,7 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         connect="Connecter Google Calendar",
         disconnect="Deconnecter Google Calendar",
         connectzoom="Connecter Zoom pour les liens de reunion",
+        disconnectzoom="Deconnecter le compte Zoom",
         settings="Voir vos parametres",
         timezone="Changer le fuseau horaire",
         duration="Definir la duree par defaut",

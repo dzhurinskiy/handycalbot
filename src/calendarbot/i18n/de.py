@@ -331,6 +331,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         connect="Google Kalender verbinden",
         disconnect="Google Kalender trennen",
         connectzoom="Zoom für Meeting-Links verbinden",
+        disconnectzoom="Zoom-Konto trennen",
         settings="Deine Einstellungen ansehen",
         timezone="Zeitzone andern",
         duration="Standarddauer festlegen",

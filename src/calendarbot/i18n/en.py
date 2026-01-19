@@ -350,6 +350,7 @@ Type `@handycalbot` in any chat followed by:
         connect="Connect Google Calendar",
         disconnect="Disconnect Google Calendar",
         connectzoom="Connect Zoom for meeting links",
+        disconnectzoom="Disconnect Zoom account",
         settings="View your current settings",
         timezone="Change your timezone",
         duration="Set default meeting duration",

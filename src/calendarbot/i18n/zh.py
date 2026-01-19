@@ -330,6 +330,7 @@ _欢迎提交错误报告和UI改进建议！_
         connect="连接 Google 日历",
         disconnect="断开 Google 日历",
         connectzoom="连接 Zoom 获取会议链接",
+        disconnectzoom="断开 Zoom 账户",
         settings="查看设置",
         timezone="更改时区",
         duration="设置默认时长",

@@ -331,6 +331,7 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         connect="Hubungkan Google Calendar",
         disconnect="Putuskan Google Calendar",
         connectzoom="Hubungkan Zoom untuk tautan rapat",
+        disconnectzoom="Putuskan akun Zoom",
         settings="Lihat pengaturan Anda",
         timezone="Ubah zona waktu",
         duration="Atur durasi default",

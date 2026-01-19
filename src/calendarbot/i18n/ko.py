@@ -330,6 +330,7 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         connect="Google 캘린더 연결",
         disconnect="Google 캘린더 연결 해제",
         connectzoom="회의 링크용 Zoom 연결",
+        disconnectzoom="Zoom 계정 연결 해제",
         settings="설정 보기",
         timezone="시간대 변경",
         duration="기본 시간 설정",

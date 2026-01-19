@@ -1,5 +1,6 @@
 """Bot command handlers."""
 
+from calendarbot.bot.handlers.admin import setup_admin_handlers
 from calendarbot.bot.handlers.donation import setup_donation_handlers
 from calendarbot.bot.handlers.edit_session import setup_edit_session_handlers
 from calendarbot.bot.handlers.feedback import setup_feedback_handlers
@@ -16,4 +17,5 @@ __all__ = [
     "setup_edit_session_handlers",
     "setup_donation_handlers",
     "setup_feedback_handlers",
+    "setup_admin_handlers",
 ]

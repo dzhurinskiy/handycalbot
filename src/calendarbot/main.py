@@ -11,6 +11,7 @@ from telegram.ext import Application
 from calendarbot.api.app import create_app
 from calendarbot.bot.commands import get_bot_commands
 from calendarbot.bot.handlers import (
+    setup_admin_handlers,
     setup_donation_handlers,
     setup_edit_session_handlers,
     setup_feedback_handlers,
@@ -87,6 +88,7 @@ def create_bot_application() -> Application:
     setup_edit_session_handlers(app)  # Must come after inline for proper handler ordering
     setup_donation_handlers(app)
     setup_feedback_handlers(app)
+    setup_admin_handlers(app)
 
     return app
 

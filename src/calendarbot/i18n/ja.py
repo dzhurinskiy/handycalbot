@@ -330,6 +330,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         connect="Googleカレンダーを接続",
         disconnect="Googleカレンダーを切断",
         connectzoom="ミーティングリンク用にZoomを接続",
+        disconnectzoom="Zoomアカウントを切断",
         settings="設定を表示",
         timezone="タイムゾーンを変更",
         duration="デフォルト時間を設定",
