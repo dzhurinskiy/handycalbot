@@ -2,6 +2,7 @@
 
 import logging
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -443,7 +444,7 @@ class CalendarService:
         # Update local cache if exists
         if title or start_time or end_time or attendees:
             # Convert times to UTC for local storage
-            local_updates = {}
+            local_updates: dict[str, Any] = {}
             if title:
                 local_updates["title"] = title
             if start_time:

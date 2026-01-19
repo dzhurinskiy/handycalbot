@@ -907,7 +907,9 @@ async def meeting_edit_link_callback(update: Update, _context: ContextTypes.DEFA
             from calendarbot.db.repository import OAuthTokenRepository
 
             token_repo = OAuthTokenRepository(session)
-            zoom_connected = await token_repo.get_token(user.id, "zoom") is not None
+            zoom_connected = (
+                await token_repo.get_token(user.id, "zoom") is not None if user else False
+            )
 
         text = t.inline.add_link_title
 
