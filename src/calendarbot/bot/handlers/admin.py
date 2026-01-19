@@ -1,7 +1,7 @@
 """Admin command handlers for bot statistics."""
 
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 
 from sqlalchemy import func, select
 from telegram import Update
@@ -28,7 +28,8 @@ async def stats_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     async with async_session_factory() as session:
-        now = datetime.now(tz=UTC)
+        # Use naive datetime for comparison with database columns
+        now = datetime.utcnow()
         day_ago = now - timedelta(days=1)
         week_ago = now - timedelta(days=7)
         month_ago = now - timedelta(days=30)
