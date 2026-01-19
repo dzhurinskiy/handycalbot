@@ -388,6 +388,92 @@ class CalendarService:
 
         return meetings
 
+    async def update_meeting(
+        self,
+        user: User,
+        event_id: str,
+        title: str | None = None,
+        start_time: datetime | None = None,
+        end_time: datetime | None = None,
+        attendees: list[str] | None = None,
+        custom_link: str | None = None,
+        generate_meet_link: bool = False,
+    ) -> dict:
+        """Update an existing meeting.
+
+        Args:
+            user: The user updating the meeting.
+            event_id: Google Calendar event ID.
+            title: New title (or None to keep existing).
+            start_time: New start time in user's timezone (or None to keep).
+            end_time: New end time in user's timezone (or None to keep).
+            attendees: New attendee list (or None to keep).
+            custom_link: Custom meeting link (or None to keep).
+            generate_meet_link: If True, add Google Meet link.
+
+        Returns dict with updated meeting details or error.
+        """
+        client_result = await self._get_valid_client(user)
+        if isinstance(client_result, dict):
+            return client_result  # Error
+        client, calendar_id = client_result
+
+        async def do_update():
+            return await client.update_event(
+                event_id=event_id,
+                calendar_id=calendar_id,
+                summary=title,
+                start_time=start_time,
+                end_time=end_time,
+                timezone=user.timezone,
+                attendees=attendees,
+                custom_link=custom_link,
+                generate_meet_link=generate_meet_link,
+            )
+
+        result = await do_update()
+
+        # Retry on 401
+        if result.get("code") == 401:
+            result = await self._handle_api_error(result, user, do_update)
+
+        if "error" in result:
+            return result
+
+        # Update local cache if exists
+        if title or start_time or end_time or attendees:
+            # Convert times to UTC for local storage
+            local_updates = {}
+            if title:
+                local_updates["title"] = title
+            if start_time:
+                start_utc = TimezoneHelper.to_utc(start_time, user.timezone)
+                local_updates["start_time"] = start_utc.replace(tzinfo=None)
+            if end_time:
+                end_utc = TimezoneHelper.to_utc(end_time, user.timezone)
+                local_updates["end_time"] = end_utc.replace(tzinfo=None)
+            if attendees is not None:
+                local_updates["attendees"] = {"emails": attendees}
+
+            await self.meeting_repo.update_by_external_id(
+                user.id, event_id, "google", **local_updates
+            )
+
+        # Extract Meet link from response if present
+        meet_link = None
+        if "conferenceData" in result:
+            for entry_point in result["conferenceData"].get("entryPoints", []):
+                if entry_point.get("entryPointType") == "video":
+                    meet_link = entry_point.get("uri")
+                    break
+
+        return {
+            "success": True,
+            "event_id": result.get("id"),
+            "title": result.get("summary", "(No title)"),
+            "meet_link": meet_link,
+        }
+
     async def cancel_meeting(self, user: User, event_id: str) -> dict:
         """Cancel a meeting by Google event ID."""
         client_result = await self._get_valid_client(user)

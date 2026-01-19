@@ -184,6 +184,86 @@ class GoogleCalendarClient:
         url = f"{GOOGLE_CALENDAR_API}/calendars/{calendar_id}/events/{event_id}"
         return await self._request("DELETE", url)
 
+    async def update_event(
+        self,
+        event_id: str,
+        calendar_id: str = "primary",
+        summary: str | None = None,
+        start_time: datetime | None = None,
+        end_time: datetime | None = None,
+        timezone: str = "UTC",
+        attendees: list[str] | None = None,
+        description: str | None = None,
+        custom_link: str | None = None,
+        generate_meet_link: bool = False,
+    ) -> dict:
+        """Update an existing calendar event.
+
+        Only provided fields will be updated (partial update via PATCH).
+        """
+        # First get the existing event to merge changes
+        existing = await self.get_event(event_id, calendar_id)
+        if "error" in existing:
+            return existing
+
+        event_body: dict = {}
+
+        if summary is not None:
+            event_body["summary"] = summary
+
+        if start_time is not None:
+            event_body["start"] = {
+                "dateTime": start_time.isoformat(),
+                "timeZone": timezone,
+            }
+
+        if end_time is not None:
+            event_body["end"] = {
+                "dateTime": end_time.isoformat(),
+                "timeZone": timezone,
+            }
+
+        if attendees is not None:
+            event_body["attendees"] = [{"email": email} for email in attendees]
+
+        # Handle description/custom link
+        if custom_link is not None:
+            link_text = f"Meeting Link: {custom_link}"
+            if description:
+                event_body["description"] = f"{description}\n\n{link_text}"
+            else:
+                event_body["description"] = link_text
+        elif description is not None:
+            event_body["description"] = description
+
+        # Handle Google Meet link generation
+        params = {}
+        if generate_meet_link and "conferenceData" not in existing:
+            event_body["conferenceData"] = {
+                "createRequest": {
+                    "requestId": str(uuid.uuid4()),
+                    "conferenceSolutionKey": {"type": "hangoutsMeet"},
+                }
+            }
+            params["conferenceDataVersion"] = "1"
+
+        if not event_body:
+            # Nothing to update
+            return existing
+
+        url = f"{GOOGLE_CALENDAR_API}/calendars/{calendar_id}/events/{event_id}"
+        # Use sendUpdates=all to notify attendees of changes
+        params["sendUpdates"] = "all"
+
+        result = await self._request("PATCH", url, json=event_body, params=params)
+
+        if "error" in result:
+            logger.error(f"Google Calendar update error: {result}")
+        else:
+            logger.info(f"Event updated: id={event_id}")
+
+        return result
+
     async def list_events(
         self,
         calendar_id: str = "primary",

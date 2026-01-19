@@ -181,6 +181,21 @@ Type `@handycalbot` in any chat followed by:
         use_cancel_hint="_Use /cancel to cancel a meeting_",
         attendees_count="👥 {count} attendee(s)",
         privacy_mode_note="_🔒 Privacy mode: Showing only bot-created meetings_",
+        # Meeting list and detail view
+        close_button="✖️ Close",
+        edit_button="✏️ Edit",
+        cancel_meeting_button="🗑️ Cancel",
+        back_to_list_button="↩️ Back to List",
+        closed="Meeting list closed.",
+        # Edit menu
+        edit_menu_title="✏️ **Edit Meeting**\n\nSelect a field to edit:",
+        edit_title_btn="📝 Title",
+        edit_time_btn="🕐 Time",
+        edit_date_btn="📅 Date",
+        edit_duration_btn="⏱️ Duration",
+        edit_attendees_btn="👥 Attendees",
+        edit_link_btn="🔗 Link",
+        field_updated="✅ {field} updated",
         # Cancel menu
         select_meeting_to_cancel="**Select a meeting to cancel:**",
         page_info="Page {current}/{total}",

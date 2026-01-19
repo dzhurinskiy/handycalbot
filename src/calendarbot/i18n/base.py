@@ -120,7 +120,24 @@ class MeetingsTranslations:
     attendees_count: str
     privacy_mode_note: str
 
-    # Cancel menu
+    # Meeting list and detail view
+    close_button: str
+    edit_button: str
+    cancel_meeting_button: str
+    back_to_list_button: str
+    closed: str
+
+    # Edit menu
+    edit_menu_title: str
+    edit_title_btn: str
+    edit_time_btn: str
+    edit_date_btn: str
+    edit_duration_btn: str
+    edit_attendees_btn: str
+    edit_link_btn: str
+    field_updated: str
+
+    # Cancel menu (legacy, keeping for compatibility)
     select_meeting_to_cancel: str
     page_info: str
     total_meetings: str

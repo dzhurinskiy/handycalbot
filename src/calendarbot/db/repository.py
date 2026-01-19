@@ -248,6 +248,37 @@ class MeetingRepository:
             meeting.reminders_sent = ",".join(sorted(sent, key=int))
             await self.session.flush()
 
+    async def update_by_external_id(
+        self,
+        user_id: int,
+        external_id: str,
+        provider: str,
+        **kwargs,
+    ) -> bool:
+        """Update meeting by external ID.
+
+        Args:
+            user_id: User ID.
+            external_id: External calendar event ID.
+            provider: Calendar provider (e.g., 'google').
+            **kwargs: Fields to update (title, start_time, end_time, attendees).
+        """
+        result = await self.session.execute(
+            select(Meeting).where(
+                Meeting.user_id == user_id,
+                Meeting.external_id == external_id,
+                Meeting.provider == provider,
+            )
+        )
+        meeting = result.scalar_one_or_none()
+        if meeting:
+            for key, value in kwargs.items():
+                if hasattr(meeting, key):
+                    setattr(meeting, key, value)
+            await self.session.flush()
+            return True
+        return False
+
     async def delete_by_external_id(self, user_id: int, external_id: str, provider: str) -> bool:
         """Delete meeting by external ID."""
         result = await self.session.execute(
