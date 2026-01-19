@@ -128,6 +128,7 @@ class OAuthTokenRepository:
         expires_at: datetime,
         calendar_id: str | None = None,
         email_encrypted: str | None = None,
+        privacy_mode: bool = False,
     ) -> OAuthToken:
         """Save or update OAuth token."""
         token = await self.get_token(user_id, provider)
@@ -136,6 +137,7 @@ class OAuthTokenRepository:
             token.access_token_encrypted = access_token_encrypted
             token.refresh_token_encrypted = refresh_token_encrypted
             token.expires_at = expires_at
+            token.privacy_mode = privacy_mode
             if calendar_id:
                 token.calendar_id = calendar_id
             if email_encrypted:
@@ -149,6 +151,7 @@ class OAuthTokenRepository:
                 expires_at=expires_at,
                 calendar_id=calendar_id,
                 email_encrypted=email_encrypted,
+                privacy_mode=privacy_mode,
             )
             self.session.add(token)
 

@@ -136,6 +136,12 @@ Type `@handycalbot` in any chat followed by:
         connect_zoom_button="📹 Connect Zoom",
         zoom_disconnected="✅ Zoom disconnected successfully.\nUse /connectzoom to link it again.",
         no_zoom_connected="No Zoom account connected.",
+        # Privacy mode selection
+        connect_mode_title="**Connect Google Calendar**\n\nChoose connection mode:",
+        connect_full_access_button="📅 Full Access",
+        connect_privacy_mode_button="🔒 Privacy Mode",
+        connect_full_access_desc="_Full Access: Create meetings and view your calendar (/meetings shows all events)_",
+        connect_privacy_mode_desc="_Privacy Mode: Create meetings only, no calendar reading (/meetings shows only bot-created events)_",
         # Timezone
         select_timezone="Select your timezone or type it manually (e.g., `Europe/Berlin`):",
         timezone_set="✅ Timezone set to: `{timezone}`",
@@ -174,6 +180,7 @@ Type `@handycalbot` in any chat followed by:
         no_upcoming_meetings="No upcoming meetings found.",
         use_cancel_hint="_Use /cancel to cancel a meeting_",
         attendees_count="👥 {count} attendee(s)",
+        privacy_mode_note="_🔒 Privacy mode: Showing only bot-created meetings_",
         # Cancel menu
         select_meeting_to_cancel="**Select a meeting to cancel:**",
         page_info="Page {current}/{total}",

@@ -130,6 +130,12 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         connect_zoom_button="📹 Zoom 연결",
         zoom_disconnected="✅ Zoom 연결이 해제되었습니다.\n다시 연결하려면 /connectzoom을 사용하세요.",
         no_zoom_connected="연결된 Zoom 계정이 없습니다.",
+        # Privacy mode selection
+        connect_mode_title="**Google Calendar 연결**\n\n연결 모드를 선택하세요:",
+        connect_full_access_button="📅 전체 액세스",
+        connect_privacy_mode_button="🔒 개인정보 보호 모드",
+        connect_full_access_desc="_전체 액세스: 일정 생성 및 캘린더 보기 (/meetings에서 모든 일정 표시)_",
+        connect_privacy_mode_desc="_개인정보 보호 모드: 일정 생성만 가능, 캘린더 읽기 불가 (/meetings에서 봇이 만든 일정만 표시)_",
         # Timezone
         select_timezone="시간대를 선택하거나 직접 입력하세요 (예: `Asia/Seoul`):",
         timezone_set="✅ 시간대 설정됨: `{timezone}`",
@@ -163,6 +169,7 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         no_upcoming_meetings="예정된 회의가 없습니다.",
         use_cancel_hint="_회의를 취소하려면 /cancel 사용_",
         attendees_count="👥 {count}명 참석자",
+        privacy_mode_note="_🔒 개인정보 보호 모드: 봇이 만든 일정만 표시됩니다_",
         select_meeting_to_cancel="**취소할 회의 선택:**",
         page_info="페이지 {current}/{total}",
         total_meetings="총 {count}개 회의",

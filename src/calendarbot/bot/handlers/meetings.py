@@ -39,10 +39,13 @@ async def meetings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
             return
 
         calendar_service = CalendarService(session)
-        meetings = await calendar_service.get_upcoming_meetings(user, limit=10)
+        meetings, is_privacy_mode = await calendar_service.get_upcoming_meetings(user, limit=10)
 
     if not meetings:
-        await update.message.reply_text(t.meetings.no_upcoming_meetings)
+        no_meetings_text = t.meetings.no_upcoming_meetings
+        if is_privacy_mode:
+            no_meetings_text += f"\n\n{t.meetings.privacy_mode_note}"
+        await update.message.reply_text(no_meetings_text, parse_mode="Markdown")
         return
 
     text = f"{t.meetings.upcoming_meetings}\n\n"
@@ -73,6 +76,9 @@ async def meetings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
         text += "\n"
 
     text += t.meetings.use_cancel_hint
+
+    if is_privacy_mode:
+        text += f"\n\n{t.meetings.privacy_mode_note}"
 
     await update.message.reply_text(text, parse_mode="Markdown")
 
@@ -131,15 +137,21 @@ async def show_cancel_menu(
 
             calendar_service = CalendarService(session)
             # Fetch more meetings to enable pagination
-            all_meetings = await calendar_service.get_upcoming_meetings(user, limit=50)
+            all_meetings, is_privacy_mode = await calendar_service.get_upcoming_meetings(user, limit=50)
     except Exception as e:
         logger.exception(f"Error fetching meetings for cancel: {e}")
         await send_message(f"Error fetching meetings: {str(e)}")
         return
 
     if not all_meetings:
-        await send_message(t.meetings.no_upcoming_meetings)
+        no_meetings_text = t.meetings.no_upcoming_meetings
+        if is_privacy_mode:
+            no_meetings_text += f"\n\n{t.meetings.privacy_mode_note}"
+        await send_message(no_meetings_text)
         return
+
+    # Note: In privacy mode, users can only cancel bot-created meetings
+    # This is fine because that's all that's returned from get_upcoming_meetings
 
     # Store meeting IDs in context.bot_data with short keys
     # (Google Calendar event IDs can be very long, exceeding Telegram's 64-byte callback_data limit)

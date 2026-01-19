@@ -131,6 +131,12 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         connect_zoom_button="📹 Hubungkan Zoom",
         zoom_disconnected="✅ Zoom berhasil diputus.\nGunakan /connectzoom untuk menghubungkan kembali.",
         no_zoom_connected="Tidak ada akun Zoom yang terhubung.",
+        # Privacy mode selection
+        connect_mode_title="**Hubungkan Google Calendar**\n\nPilih mode koneksi:",
+        connect_full_access_button="📅 Akses Penuh",
+        connect_privacy_mode_button="🔒 Mode Privasi",
+        connect_full_access_desc="_Akses Penuh: Buat rapat dan lihat kalender (/meetings menampilkan semua acara)_",
+        connect_privacy_mode_desc="_Mode Privasi: Hanya buat rapat, tanpa akses baca kalender (/meetings hanya menampilkan acara yang dibuat bot)_",
         # Timezone
         select_timezone="Pilih zona waktu Anda atau ketik secara manual (mis., `Asia/Jakarta`):",
         timezone_set="✅ Zona waktu diatur ke: `{timezone}`",
@@ -164,6 +170,7 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         no_upcoming_meetings="Tidak ada rapat mendatang ditemukan.",
         use_cancel_hint="_Gunakan /cancel untuk membatalkan rapat_",
         attendees_count="👥 {count} peserta",
+        privacy_mode_note="_🔒 Mode privasi: Hanya menampilkan rapat yang dibuat oleh bot_",
         select_meeting_to_cancel="**Pilih rapat untuk dibatalkan:**",
         page_info="Halaman {current}/{total}",
         total_meetings="{count} total rapat",

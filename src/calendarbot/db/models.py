@@ -78,6 +78,8 @@ class OAuthToken(Base):
     calendar_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     # User's email from the OAuth provider (encrypted for privacy)
     email_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Privacy mode: True = limited scopes (create only), False = full access (read+write)
+    privacy_mode: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()

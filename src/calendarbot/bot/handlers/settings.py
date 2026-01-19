@@ -149,8 +149,8 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     await update.message.reply_text(text, parse_mode="Markdown")
 
 
-async def connect_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /connect command - initiate Google OAuth."""
+async def connect_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /connect command - show connection mode selection."""
     if not update.effective_user or not update.message:
         return
 
@@ -170,21 +170,61 @@ async def connect_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             await update.message.reply_text(t.settings.calendar_already_connected)
             return
 
-    # Generate OAuth state
-    state = f"{update.effective_user.id}:{secrets.token_urlsafe(16)}"
+    # Show mode selection buttons
+    keyboard = [
+        [InlineKeyboardButton(t.settings.connect_full_access_button, callback_data="connect_full")],
+        [
+            InlineKeyboardButton(
+                t.settings.connect_privacy_mode_button, callback_data="connect_privacy"
+            )
+        ],
+    ]
+
+    await update.message.reply_text(
+        f"{t.settings.connect_mode_title}\n\n"
+        f"{t.settings.connect_full_access_desc}\n\n"
+        f"{t.settings.connect_privacy_mode_desc}",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="Markdown",
+    )
+
+
+async def connect_mode_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle connection mode selection (full or privacy)."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    await query.answer()
+
+    privacy_mode = query.data == "connect_privacy"
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await query.edit_message_text(t.common.error_user_not_found)
+            return
+
+        t = get_text(user.language)
+
+    # Generate OAuth state with privacy mode flag
+    state = f"{update.effective_user.id}:{secrets.token_urlsafe(16)}:{'privacy' if privacy_mode else 'full'}"
 
     # Store state in context for verification
     if context.bot_data is None:
         context.bot_data = {}
     context.bot_data[f"oauth_state_{update.effective_user.id}"] = state
 
-    # Generate auth URL
+    # Generate auth URL with appropriate scopes
     oauth = GoogleOAuthFlow()
-    auth_url = oauth.get_authorization_url(state)
+    auth_url = oauth.get_authorization_url(state, privacy_mode=privacy_mode)
 
     keyboard = [[InlineKeyboardButton(t.settings.connect_button, url=auth_url)]]
 
-    await update.message.reply_text(
+    await query.edit_message_text(
         t.settings.click_to_connect,
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
@@ -784,6 +824,9 @@ def setup_settings_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("notifications", notifications_command))
     app.add_handler(CommandHandler("language", language_command))
     app.add_handler(CommandHandler("privacy", privacy_command))
+
+    # Connect mode callback (full access vs privacy mode)
+    app.add_handler(CallbackQueryHandler(connect_mode_callback, pattern=r"^connect_(full|privacy)$"))
 
     # Notifications callback
     app.add_handler(CallbackQueryHandler(notifications_callback, pattern=r"^notif_"))

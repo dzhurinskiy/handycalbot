@@ -276,11 +276,33 @@ class CalendarService:
             # No 'r' in request - no reminders
             return []
 
-    async def get_upcoming_meetings(self, user: User, limit: int = 10) -> list[dict]:
-        """Get upcoming meetings from Google Calendar."""
+    async def is_privacy_mode(self, user: User) -> bool:
+        """Check if user is connected in privacy mode (no calendar read access)."""
+        token = await self.token_repo.get_token(user.id, "google")
+        return token is not None and token.privacy_mode
+
+    async def get_upcoming_meetings(
+        self, user: User, limit: int = 10
+    ) -> tuple[list[dict], bool]:
+        """Get upcoming meetings.
+
+        In privacy mode: returns only bot-created meetings from local DB.
+        In full access mode: returns meetings from Google Calendar API.
+
+        Returns:
+            Tuple of (meetings list, is_privacy_mode flag)
+        """
+        # Check if user is in privacy mode
+        privacy_mode = await self.is_privacy_mode(user)
+
+        if privacy_mode:
+            # Privacy mode: fetch from local database only
+            return await self._get_local_meetings(user, limit), True
+
+        # Full access mode: fetch from Google Calendar
         client_result = await self._get_valid_client(user)
         if isinstance(client_result, dict):
-            return []  # No calendar connected or token error
+            return [], False  # No calendar connected or token error
         client, calendar_id = client_result
 
         async def do_list():
@@ -298,7 +320,7 @@ class CalendarService:
 
         if "error" in result:
             logger.error(f"Failed to list events for user {user.id}: {result}")
-            return []
+            return [], False
 
         events = result.get("items", [])
         meetings = []
@@ -332,6 +354,34 @@ class CalendarService:
                     "id": event.get("id"),
                     "external_id": event.get("id"),
                     "title": event.get("summary", "(No title)"),
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "attendees": attendees,
+                }
+            )
+
+        return meetings, False
+
+    async def _get_local_meetings(self, user: User, limit: int = 10) -> list[dict]:
+        """Get upcoming meetings from local database cache (for privacy mode)."""
+        meetings_db = await self.meeting_repo.get_upcoming(user.id, limit=limit)
+
+        meetings = []
+        for meeting in meetings_db:
+            # Convert stored UTC times to user's timezone for display
+            start_time = TimezoneHelper.from_utc(meeting.start_time, user.timezone)
+            end_time = TimezoneHelper.from_utc(meeting.end_time, user.timezone)
+
+            # Parse attendees from JSON
+            attendees = []
+            if meeting.attendees and isinstance(meeting.attendees, dict):
+                attendees = meeting.attendees.get("emails", [])
+
+            meetings.append(
+                {
+                    "id": meeting.external_id,
+                    "external_id": meeting.external_id,
+                    "title": meeting.title or "(No title)",
                     "start_time": start_time,
                     "end_time": end_time,
                     "attendees": attendees,

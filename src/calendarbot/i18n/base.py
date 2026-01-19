@@ -64,6 +64,13 @@ class SettingsTranslations:
     zoom_disconnected: str
     no_zoom_connected: str
 
+    # Privacy mode selection
+    connect_mode_title: str
+    connect_full_access_button: str
+    connect_privacy_mode_button: str
+    connect_full_access_desc: str
+    connect_privacy_mode_desc: str
+
     # Timezone
     select_timezone: str
     timezone_set: str
@@ -111,6 +118,7 @@ class MeetingsTranslations:
     no_upcoming_meetings: str
     use_cancel_hint: str
     attendees_count: str
+    privacy_mode_note: str
 
     # Cancel menu
     select_meeting_to_cancel: str

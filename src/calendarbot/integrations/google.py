@@ -226,9 +226,15 @@ class GoogleCalendarClient:
 class GoogleOAuthFlow:
     """Handle Google OAuth2 flow."""
 
-    SCOPES = [
+    # Full access: create events + read calendar
+    SCOPES_FULL = [
         "https://www.googleapis.com/auth/calendar.events",
         "https://www.googleapis.com/auth/calendar.readonly",
+        "https://www.googleapis.com/auth/userinfo.email",
+    ]
+    # Privacy mode: create events only, no read access
+    SCOPES_PRIVACY = [
+        "https://www.googleapis.com/auth/calendar.events",
         "https://www.googleapis.com/auth/userinfo.email",
     ]
     AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
@@ -236,13 +242,19 @@ class GoogleOAuthFlow:
     def __init__(self):
         self.settings = get_settings()
 
-    def get_authorization_url(self, state: str) -> str:
-        """Generate OAuth authorization URL."""
+    def get_authorization_url(self, state: str, privacy_mode: bool = False) -> str:
+        """Generate OAuth authorization URL.
+
+        Args:
+            state: OAuth state parameter for security
+            privacy_mode: If True, use limited scopes (create only, no read)
+        """
+        scopes = self.SCOPES_PRIVACY if privacy_mode else self.SCOPES_FULL
         params = {
             "client_id": self.settings.google_client_id,
             "redirect_uri": self.settings.google_redirect_uri,
             "response_type": "code",
-            "scope": " ".join(self.SCOPES),
+            "scope": " ".join(scopes),
             "access_type": "offline",
             "prompt": "consent",
             "state": state,

@@ -169,11 +169,14 @@ async def google_oauth_callback(
             status_code=400,
         )
 
-    # Parse state to get telegram user ID
+    # Parse state to get telegram user ID and privacy mode
+    # State format: "telegram_id:random_token:mode" where mode is "privacy" or "full"
     try:
-        telegram_id_str, _ = state.split(":", 1)
-        telegram_id = int(telegram_id_str)
-    except (ValueError, AttributeError):
+        parts = state.split(":")
+        telegram_id = int(parts[0])
+        # Privacy mode is indicated by "privacy" at the end of state
+        privacy_mode = len(parts) >= 3 and parts[-1] == "privacy"
+    except (ValueError, AttributeError, IndexError):
         return HTMLResponse(
             content=ERROR_HTML.format(error="Invalid state parameter"),
             status_code=400,
@@ -222,20 +225,26 @@ async def google_oauth_callback(
                 expires_at=tokens["expires_at"],
                 calendar_id="primary",
                 email_encrypted=encryption.encrypt(user_email) if user_email else None,
+                privacy_mode=privacy_mode,
             )
             await session.commit()
+
+            logger.info(f"Google Calendar connected for user {telegram_id} (privacy_mode={privacy_mode})")
 
             # Get user's current timezone for the message
             user_timezone = user.timezone
 
-        logger.info(f"Google Calendar connected for user {telegram_id}")
-
         # Send timezone confirmation message to user
+        privacy_note = (
+            "\n\n🔒 _Privacy mode: Your calendar won't be read. /meetings will show only bot-created events._"
+            if privacy_mode
+            else ""
+        )
         timezone_message = (
             "✅ *Google Calendar connected successfully!*\n\n"
             f"📍 Your current timezone is set to: `{user_timezone}`\n\n"
             "Please confirm this is correct, or choose a different timezone.\n"
-            "_Correct timezone is important for scheduling meetings at the right time._"
+            f"_Correct timezone is important for scheduling meetings at the right time._{privacy_note}"
         )
 
         # Build inline keyboard with timezone options

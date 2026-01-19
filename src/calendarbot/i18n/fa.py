@@ -131,6 +131,12 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         connect_zoom_button="📹 اتصال زوم",
         zoom_disconnected="✅ زوم با موفقیت قطع شد.\nبرای اتصال مجدد از /connectzoom استفاده کنید.",
         no_zoom_connected="هیچ حساب زومی متصل نیست.",
+        # Privacy mode selection
+        connect_mode_title="**اتصال به Google Calendar**\n\nحالت اتصال را انتخاب کنید:",
+        connect_full_access_button="📅 دسترسی کامل",
+        connect_privacy_mode_button="🔒 حالت حریم خصوصی",
+        connect_full_access_desc="_دسترسی کامل: ایجاد جلسات و مشاهده تقویم (/meetings همه رویدادها را نشان می‌دهد)_",
+        connect_privacy_mode_desc="_حالت حریم خصوصی: فقط ایجاد جلسات، بدون خواندن تقویم (/meetings فقط رویدادهای ایجاد شده توسط ربات را نشان می‌دهد)_",
         # Timezone
         select_timezone="منطقه زمانی خود را انتخاب کنید یا دستی وارد کنید (مثلاً `Asia/Tehran`):",
         timezone_set="✅ منطقه زمانی تنظیم شد: `{timezone}`",
@@ -164,6 +170,7 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         no_upcoming_meetings="جلسه آینده‌ای یافت نشد.",
         use_cancel_hint="_از /cancel برای لغو جلسه استفاده کنید_",
         attendees_count="👥 {count} شرکت‌کننده",
+        privacy_mode_note="_🔒 حالت حریم خصوصی: فقط جلسات ایجاد شده توسط ربات نمایش داده می‌شوند_",
         select_meeting_to_cancel="**جلسه‌ای برای لغو انتخاب کنید:**",
         page_info="صفحه {current}/{total}",
         total_meetings="{count} جلسه در کل",

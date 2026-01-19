@@ -131,6 +131,12 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         connect_zoom_button="📹 Zoom verbinden",
         zoom_disconnected="✅ Zoom erfolgreich getrennt.\nVerwende /connectzoom, um es erneut zu verbinden.",
         no_zoom_connected="Kein Zoom-Konto verbunden.",
+        # Privacy mode selection
+        connect_mode_title="**Google Calendar verbinden**\n\nVerbindungsmodus wählen:",
+        connect_full_access_button="📅 Vollzugriff",
+        connect_privacy_mode_button="🔒 Datenschutzmodus",
+        connect_full_access_desc="_Vollzugriff: Termine erstellen und Kalender ansehen (/meetings zeigt alle Termine)_",
+        connect_privacy_mode_desc="_Datenschutzmodus: Nur Termine erstellen, kein Kalenderzugriff (/meetings zeigt nur Bot-erstellte Termine)_",
         # Timezone
         select_timezone="Wahle deine Zeitzone oder gib sie manuell ein (z.B. `Europe/Berlin`):",
         timezone_set="✅ Zeitzone gesetzt auf: `{timezone}`",
@@ -164,6 +170,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         no_upcoming_meetings="Keine kommenden Besprechungen gefunden.",
         use_cancel_hint="_Benutze /cancel, um eine Besprechung abzusagen_",
         attendees_count="👥 {count} Teilnehmer",
+        privacy_mode_note="_🔒 Datenschutzmodus: Nur Bot-erstellte Termine werden angezeigt_",
         select_meeting_to_cancel="**Wahle eine Besprechung zum Absagen:**",
         page_info="Seite {current}/{total}",
         total_meetings="{count} Besprechungen insgesamt",

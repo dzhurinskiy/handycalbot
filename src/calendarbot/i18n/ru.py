@@ -131,6 +131,12 @@ _Сообщения об ошибках и предложения по улуч�
         connect_zoom_button="📹 Подключить Zoom",
         zoom_disconnected="✅ Zoom успешно отключен.\nИспользуйте /connectzoom, чтобы подключить снова.",
         no_zoom_connected="Zoom аккаунт не подключен.",
+        # Privacy mode selection
+        connect_mode_title="**Подключить Google Calendar**\n\nВыберите режим подключения:",
+        connect_full_access_button="📅 Полный доступ",
+        connect_privacy_mode_button="🔒 Режим конфиденциальности",
+        connect_full_access_desc="_Полный доступ: Создание встреч и просмотр календаря (/meetings показывает все события)_",
+        connect_privacy_mode_desc="_Режим конфиденциальности: Только создание встреч, без чтения календаря (/meetings показывает только события, созданные ботом)_",
         # Timezone
         select_timezone="Выберите часовой пояс или введите вручную (напр., `Europe/Moscow`):",
         timezone_set="✅ Часовой пояс установлен: `{timezone}`",
@@ -164,6 +170,7 @@ _Сообщения об ошибках и предложения по улуч�
         no_upcoming_meetings="Предстоящих встреч не найдено.",
         use_cancel_hint="_Используйте /cancel для отмены встречи_",
         attendees_count="👥 {count} участник(ов)",
+        privacy_mode_note="_🔒 Режим конфиденциальности: Показаны только встречи, созданные ботом_",
         select_meeting_to_cancel="**Выберите встречу для отмены:**",
         page_info="Страница {current}/{total}",
         total_meetings="{count} всего встреч",
