@@ -229,7 +229,9 @@ async def google_oauth_callback(
             )
             await session.commit()
 
-            logger.info(f"Google Calendar connected for user {telegram_id} (privacy_mode={privacy_mode})")
+            logger.info(
+                f"Google Calendar connected for user {telegram_id} (privacy_mode={privacy_mode})"
+            )
 
             # Get user's current timezone for the message
             user_timezone = user.timezone

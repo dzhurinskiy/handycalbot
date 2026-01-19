@@ -826,7 +826,9 @@ def setup_settings_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("privacy", privacy_command))
 
     # Connect mode callback (full access vs privacy mode)
-    app.add_handler(CallbackQueryHandler(connect_mode_callback, pattern=r"^connect_(full|privacy)$"))
+    app.add_handler(
+        CallbackQueryHandler(connect_mode_callback, pattern=r"^connect_(full|privacy)$")
+    )
 
     # Notifications callback
     app.add_handler(CallbackQueryHandler(notifications_callback, pattern=r"^notif_"))

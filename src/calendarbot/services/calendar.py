@@ -281,9 +281,7 @@ class CalendarService:
         token = await self.token_repo.get_token(user.id, "google")
         return token is not None and token.privacy_mode
 
-    async def get_upcoming_meetings(
-        self, user: User, limit: int = 10
-    ) -> tuple[list[dict], bool]:
+    async def get_upcoming_meetings(self, user: User, limit: int = 10) -> tuple[list[dict], bool]:
         """Get upcoming meetings.
 
         In privacy mode: returns only bot-created meetings from local DB.

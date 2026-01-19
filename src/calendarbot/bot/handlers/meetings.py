@@ -137,7 +137,9 @@ async def show_cancel_menu(
 
             calendar_service = CalendarService(session)
             # Fetch more meetings to enable pagination
-            all_meetings, is_privacy_mode = await calendar_service.get_upcoming_meetings(user, limit=50)
+            all_meetings, is_privacy_mode = await calendar_service.get_upcoming_meetings(
+                user, limit=50
+            )
     except Exception as e:
         logger.exception(f"Error fetching meetings for cancel: {e}")
         await send_message(f"Error fetching meetings: {str(e)}")

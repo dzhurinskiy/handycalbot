@@ -1,11 +1,22 @@
 {
-  "autoApprove": [
-    "Bash",
-    "Read",
-    "Write",
-    "Edit",
-    "Glob",
-    "Grep",
-    "NotebookEdit"
-  ]
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "TodoWrite",
+      "BashOutput",
+      "KillShell",
+      "ExitPlanMode",
+      "Skill",
+      "SlashCommand"
+    ]
+  }
 }

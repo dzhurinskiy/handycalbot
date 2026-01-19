@@ -98,3 +98,4 @@ docker-compose.override.yml
 
 # Alembic
 alembic/versions/*.pyc
+/img_screenshots/
