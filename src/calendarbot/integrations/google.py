@@ -162,7 +162,19 @@ class GoogleCalendarClient:
         url = f"{GOOGLE_CALENDAR_API}/calendars/{calendar_id}/events"
         # Add conferenceDataVersion param if generating Meet link
         params = {"conferenceDataVersion": "1"} if generate_meet_link else None
-        return await self._request("POST", url, json=event_body, params=params)
+        result = await self._request("POST", url, json=event_body, params=params)
+
+        # Log the response to verify event creation
+        if "error" in result:
+            logger.error(f"Google Calendar API error: {result}")
+        else:
+            event_id = result.get("id", "unknown")
+            created_attendees = [a.get("email") for a in result.get("attendees", [])]
+            logger.info(
+                f"Event created: id={event_id}, attendees_in_response={created_attendees}"
+            )
+
+        return result
 
     async def get_event(self, event_id: str, calendar_id: str = "primary") -> dict:
         """Get a single event."""
