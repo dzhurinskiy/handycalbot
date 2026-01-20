@@ -1428,9 +1428,7 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
 
             # Determine meeting link to include in calendar event details
             meeting_link = (
-                result.get("zoom_link")
-                or result.get("meet_link")
-                or result.get("custom_link")
+                result.get("zoom_link") or result.get("meet_link") or result.get("custom_link")
             )
             add_to_cal_url = build_add_to_calendar_url(
                 title=result["title"],
