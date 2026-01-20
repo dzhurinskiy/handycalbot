@@ -101,6 +101,7 @@ def build_add_to_calendar_url(
     start: datetime,
     end: datetime,
     timezone: str,
+    details: str | None = None,
 ) -> str:
     """Build a universal Google Calendar 'Add to Calendar' URL."""
     start_utc = TimezoneHelper.to_utc(start, timezone)
@@ -112,6 +113,8 @@ def build_add_to_calendar_url(
         "text": title,
         "dates": f"{start_str}/{end_str}",
     }
+    if details:
+        params["details"] = details
     query = "&".join(f"{k}={quote(str(v))}" for k, v in params.items())
     return f"https://calendar.google.com/calendar/render?{query}"
 
@@ -1423,11 +1426,18 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 register_url = f"https://t.me/{bot_username}?start=invite"
                 text += f"\n👆 {t.inline.register_link_text}: {register_url}\n"
 
+            # Determine meeting link to include in calendar event details
+            meeting_link = (
+                result.get("zoom_link")
+                or result.get("meet_link")
+                or result.get("custom_link")
+            )
             add_to_cal_url = build_add_to_calendar_url(
                 title=result["title"],
                 start=result["start"],
                 end=result["end"],
                 timezone=user.timezone,
+                details=meeting_link,
             )
 
             keyboard = InlineKeyboardMarkup(
