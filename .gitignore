@@ -99,3 +99,9 @@ docker-compose.override.yml
 # Alembic
 alembic/versions/*.pyc
 /img_screenshots/
+
+# Zoom Marketplace (private files)
+docs/security/ZOOM_MARKETPLACE_RESPONSE.md
+docs/security/pdf/
+docs/security/generate_pdfs.py
+docs/security/logo.jpg
