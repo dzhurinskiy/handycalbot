@@ -469,8 +469,8 @@ async def landing_page():
         </a>
         <div class="nav-links">
             <a href="#features">Features</a>
-            <a href="#how-it-works">How it works</a>
-            <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>
+            <a href="/docs">Docs</a>
+            <a href="/support">Support</a>
             <a href="https://t.me/handycalbot" class="btn btn-primary">Open Bot</a>
         </div>
     </nav>
@@ -565,9 +565,10 @@ async def landing_page():
         <div class="footer-content">
             <span>© {CURRENT_YEAR} HandyCalBot. Open source project.</span>
             <div class="footer-links">
+                <a href="/docs">Docs</a>
+                <a href="/support">Support</a>
                 <a href="/privacy">Privacy</a>
                 <a href="/terms">Terms</a>
-                <a href="https://github.com/dzhurinskiy/handycalbot">GitHub</a>
             </div>
         </div>
     </footer>
@@ -853,6 +854,564 @@ async def terms_of_service():
 """
 
 
+@router.get("/docs", response_class=HTMLResponse)
+async def documentation():
+    """Documentation page with adding, usage, and removal guides."""
+    return f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - HandyCalBot</title>
+    {FAVICON_LINK}
+    {COMMON_STYLES}
+    <style>
+        .doc-nav {{
+            background: #f8fafc;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }}
+        .doc-nav-inner {{
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }}
+        .doc-nav a {{
+            color: #4d4d4d;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }}
+        .doc-nav a:hover {{
+            background: #e8f2ff;
+            color: #006BFF;
+        }}
+        .doc-section {{
+            scroll-margin-top: 80px;
+        }}
+        .command-box {{
+            background: #1a1a1a;
+            color: #f8f8f2;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: monospace;
+            font-size: 0.95rem;
+        }}
+        .tip-box {{
+            background: #e8f2ff;
+            border-left: 4px solid #006BFF;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }}
+        .tip-box strong {{
+            color: #006BFF;
+        }}
+        .warning-box {{
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }}
+        .warning-box strong {{
+            color: #b45309;
+        }}
+        .feature-list {{
+            display: grid;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }}
+        .feature-item {{
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }}
+        .feature-icon {{
+            width: 32px;
+            height: 32px;
+            background: #e8f2ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }}
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <img src="/logo.jpg" alt="HandyCalBot">
+            HandyCalBot
+        </a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/support">Support</a>
+            <a href="https://t.me/handycalbot" class="btn btn-primary">Open Bot</a>
+        </div>
+    </nav>
+
+    <header class="legal-header">
+        <h1>Documentation</h1>
+        <p>Complete guide to using HandyCalBot</p>
+    </header>
+
+    <div class="doc-nav">
+        <div class="doc-nav-inner">
+            <a href="#adding">Adding the App</a>
+            <a href="#usage">Usage Guide</a>
+            <a href="#features">Features</a>
+            <a href="#troubleshooting">Troubleshooting</a>
+            <a href="#removing">Removing the App</a>
+        </div>
+    </div>
+
+    <main class="legal-content">
+
+        <section id="adding" class="doc-section">
+            <h2>Adding the App</h2>
+            <p>Follow these steps to get started with HandyCalBot:</p>
+
+            <h3>Step 1: Start the Bot</h3>
+            <p>Open Telegram and search for <strong>@handycalbot</strong>, or click this link:</p>
+            <p><a href="https://t.me/handycalbot" class="btn btn-primary" style="display: inline-flex;">Open HandyCalBot</a></p>
+            <p>Click <strong>Start</strong> to begin interacting with the bot.</p>
+
+            <h3>Step 2: Connect Your Google Calendar</h3>
+            <p>To create meetings, you need to connect your Google Calendar:</p>
+            <div class="command-box">/connect</div>
+            <p>The bot will send you an authorization link. Click it to:</p>
+            <ol>
+                <li>Sign in to your Google Account</li>
+                <li>Review the permissions requested (calendar access)</li>
+                <li>Click "Allow" to authorize HandyCalBot</li>
+                <li>You'll be redirected back with a confirmation message</li>
+            </ol>
+
+            <div class="tip-box">
+                <strong>Tip:</strong> You can choose "Privacy Mode" during setup to limit calendar access.
+                In Privacy Mode, the bot can only create events, not read your existing calendar.
+            </div>
+
+            <h3>Step 3: Set Your Timezone</h3>
+            <p>After connecting, confirm or update your timezone:</p>
+            <div class="command-box">/timezone</div>
+            <p>Select your timezone from the list or search for your city.</p>
+
+            <h3>Step 4 (Optional): Connect Zoom</h3>
+            <p>To add Zoom meeting links automatically:</p>
+            <div class="command-box">/connect_zoom</div>
+            <p>Follow the same authorization process for your Zoom account.</p>
+        </section>
+
+        <section id="usage" class="doc-section">
+            <h2>Usage Guide</h2>
+
+            <h3>Creating Meetings (Inline Mode)</h3>
+            <p>The primary way to create meetings is using Telegram's inline mode. In <strong>any chat</strong>, type:</p>
+            <div class="command-box">@handycalbot 15:00 Team Standup</div>
+            <p>A dropdown will appear with your meeting. Select it to create the event.</p>
+
+            <p><strong>Format examples:</strong></p>
+            <ul>
+                <li><code>@handycalbot 14:30 Project Review</code> - Meeting at 2:30 PM today</li>
+                <li><code>@handycalbot tomorrow 10:00 Weekly Sync</code> - Meeting tomorrow at 10 AM</li>
+                <li><code>@handycalbot 25.01 09:00 Monthly Planning</code> - Meeting on January 25th</li>
+                <li><code>@handycalbot 2h Design Workshop</code> - 2-hour meeting starting now</li>
+            </ul>
+
+            <h3>Bot Commands</h3>
+            <p>Available commands you can use in the bot chat:</p>
+            <ul>
+                <li><code>/start</code> - Welcome message and getting started</li>
+                <li><code>/help</code> - Show all available commands</li>
+                <li><code>/connect</code> - Connect your Google Calendar</li>
+                <li><code>/connect_zoom</code> - Connect your Zoom account</li>
+                <li><code>/disconnect</code> - Disconnect Google Calendar</li>
+                <li><code>/disconnect_zoom</code> - Disconnect Zoom account</li>
+                <li><code>/settings</code> - View and change your settings</li>
+                <li><code>/timezone</code> - Change your timezone</li>
+                <li><code>/meetings</code> - View your upcoming meetings</li>
+                <li><code>/cancel</code> - Cancel a meeting</li>
+            </ul>
+
+            <h3>Adding Attendees</h3>
+            <p>After creating a meeting, you can add attendees by:</p>
+            <ul>
+                <li><strong>Email:</strong> Enter email addresses (e.g., john@example.com)</li>
+                <li><strong>Telegram Username:</strong> Enter @username if they also use HandyCalBot</li>
+            </ul>
+            <p>Attendees receive calendar invitations automatically via email.</p>
+
+            <h3>Meeting Reminders</h3>
+            <p>HandyCalBot sends you Telegram notifications before your meetings. Configure reminders in:</p>
+            <div class="command-box">/settings</div>
+            <p>You can set custom reminder times (e.g., 15 minutes, 1 hour before).</p>
+        </section>
+
+        <section id="features" class="doc-section">
+            <h2>Features</h2>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon">📅</div>
+                    <div>
+                        <strong>Google Calendar Sync</strong>
+                        <p>Events are created directly in your Google Calendar with all details.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎥</div>
+                    <div>
+                        <strong>Zoom Integration</strong>
+                        <p>Automatically generate Zoom meeting links for your events.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">👥</div>
+                    <div>
+                        <strong>Attendee Invitations</strong>
+                        <p>Invite people by email or Telegram username.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔔</div>
+                    <div>
+                        <strong>Smart Reminders</strong>
+                        <p>Get notified via Telegram before your meetings start.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🌍</div>
+                    <div>
+                        <strong>Multi-language Support</strong>
+                        <p>Available in 10 languages including English, German, Spanish, French, Russian, and more.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔒</div>
+                    <div>
+                        <strong>Privacy Mode</strong>
+                        <p>Opt for minimal permissions - create events without reading your calendar.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Prerequisites</h3>
+            <ul>
+                <li>A Telegram account</li>
+                <li>A Google Account with Google Calendar</li>
+                <li>(Optional) A Zoom account for video meeting links</li>
+            </ul>
+        </section>
+
+        <section id="troubleshooting" class="doc-section">
+            <h2>Troubleshooting</h2>
+
+            <h3>Cannot connect Google Calendar</h3>
+            <ul>
+                <li>Make sure you're signed into the correct Google Account</li>
+                <li>Check that you clicked "Allow" on the permissions screen</li>
+                <li>Try disconnecting and reconnecting: <code>/disconnect</code> then <code>/connect</code></li>
+                <li>Clear your browser cache and try again</li>
+            </ul>
+
+            <h3>Meetings not appearing in calendar</h3>
+            <ul>
+                <li>Verify your calendar is connected: <code>/settings</code></li>
+                <li>Check your timezone is set correctly: <code>/timezone</code></li>
+                <li>Make sure you selected the meeting from the inline dropdown</li>
+            </ul>
+
+            <h3>Not receiving reminders</h3>
+            <ul>
+                <li>Check that notifications are enabled in <code>/settings</code></li>
+                <li>Make sure Telegram notifications are enabled on your device</li>
+                <li>Verify the meeting was created through HandyCalBot</li>
+            </ul>
+
+            <h3>Zoom link not being added</h3>
+            <ul>
+                <li>Ensure Zoom is connected: <code>/connect_zoom</code></li>
+                <li>Check that your Zoom account is active</li>
+                <li>Try disconnecting and reconnecting Zoom</li>
+            </ul>
+
+            <div class="tip-box">
+                <strong>Still having issues?</strong> Visit our <a href="/support">Support page</a> for more help options.
+            </div>
+        </section>
+
+        <section id="removing" class="doc-section">
+            <h2>Removing the App</h2>
+
+            <h3>Disconnect Your Accounts</h3>
+            <p>To disconnect HandyCalBot from your accounts:</p>
+
+            <p><strong>1. Disconnect Google Calendar:</strong></p>
+            <div class="command-box">/disconnect</div>
+            <p>This removes the connection between HandyCalBot and your Google Calendar.</p>
+
+            <p><strong>2. Disconnect Zoom (if connected):</strong></p>
+            <div class="command-box">/disconnect_zoom</div>
+
+            <h3>Revoke Access from Google</h3>
+            <p>For complete removal, also revoke access from your Google Account:</p>
+            <ol>
+                <li>Go to <a href="https://myaccount.google.com/permissions" target="_blank">Google Account Permissions</a></li>
+                <li>Find "HandyCalBot" in the list of connected apps</li>
+                <li>Click on it and select "Remove Access"</li>
+            </ol>
+
+            <h3>Revoke Access from Zoom</h3>
+            <p>To revoke Zoom access:</p>
+            <ol>
+                <li>Go to <a href="https://marketplace.zoom.us/user/installed" target="_blank">Zoom App Marketplace - Installed Apps</a></li>
+                <li>Find "HandyCalBot" and click "Uninstall"</li>
+            </ol>
+
+            <h3>What Happens When You Disconnect</h3>
+            <div class="warning-box">
+                <strong>Important:</strong> When you disconnect:
+                <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                    <li>Your OAuth tokens are deleted from our servers</li>
+                    <li>We can no longer access your calendar or create events</li>
+                    <li>Existing calendar events are NOT deleted (they remain in your Google Calendar)</li>
+                    <li>Your user preferences (timezone, settings) are retained in case you reconnect</li>
+                </ul>
+            </div>
+
+            <h3>Complete Data Deletion</h3>
+            <p>
+                To request complete deletion of all your data (including preferences and meeting history),
+                please contact us through our <a href="/support">Support page</a> or open an issue on
+                <a href="https://github.com/dzhurinskiy/handycalbot/issues">GitHub</a>.
+            </p>
+
+            <h3>Stop Using the Bot</h3>
+            <p>You can also simply stop the bot in Telegram:</p>
+            <ol>
+                <li>Open the chat with @handycalbot</li>
+                <li>Tap the bot name at the top</li>
+                <li>Select "Stop Bot" or "Block User"</li>
+            </ol>
+            <p>This prevents the bot from sending you messages, but doesn't disconnect your calendar.</p>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <span>&copy; {CURRENT_YEAR} HandyCalBot. Open source project.</span>
+            <div class="footer-links">
+                <a href="/">Home</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/terms">Terms</a>
+                <a href="/support">Support</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+"""
+
+
+@router.get("/support", response_class=HTMLResponse)
+async def support_page():
+    """Support page with contact information and help resources."""
+    return f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - HandyCalBot</title>
+    {FAVICON_LINK}
+    {COMMON_STYLES}
+    <style>
+        .support-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }}
+        .support-card {{
+            background: #f8fafc;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }}
+        .support-card:hover {{
+            border-color: #006BFF;
+            box-shadow: 0 4px 12px rgba(0, 107, 255, 0.1);
+        }}
+        .support-card h3 {{
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+        }}
+        .support-card p {{
+            color: #666;
+            margin-bottom: 1rem;
+        }}
+        .support-card a.btn {{
+            width: 100%;
+            justify-content: center;
+        }}
+        .faq-item {{
+            border-bottom: 1px solid #e0e0e0;
+            padding: 1.5rem 0;
+        }}
+        .faq-item:last-child {{
+            border-bottom: none;
+        }}
+        .faq-item h3 {{
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }}
+        .faq-item p {{
+            color: #4d4d4d;
+            margin: 0;
+        }}
+        .contact-info {{
+            background: linear-gradient(135deg, #006BFF 0%, #0052cc 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }}
+        .contact-info h3 {{
+            margin-bottom: 1rem;
+        }}
+        .contact-info p {{
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }}
+        .contact-info a {{
+            color: white;
+            text-decoration: underline;
+        }}
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <img src="/logo.jpg" alt="HandyCalBot">
+            HandyCalBot
+        </a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/docs">Documentation</a>
+            <a href="https://t.me/handycalbot" class="btn btn-primary">Open Bot</a>
+        </div>
+    </nav>
+
+    <header class="legal-header">
+        <h1>Support</h1>
+        <p>Get help with HandyCalBot</p>
+    </header>
+
+    <main class="legal-content">
+
+        <h2>How Can We Help?</h2>
+        <div class="support-grid">
+            <div class="support-card">
+                <h3>📖 Documentation</h3>
+                <p>Complete guides for adding, using, and removing the app.</p>
+                <a href="/docs" class="btn btn-secondary">View Documentation</a>
+            </div>
+            <div class="support-card">
+                <h3>🐛 Report a Bug</h3>
+                <p>Found an issue? Let us know on GitHub.</p>
+                <a href="https://github.com/dzhurinskiy/handycalbot/issues/new?labels=bug" class="btn btn-secondary" target="_blank">Report Bug</a>
+            </div>
+            <div class="support-card">
+                <h3>💡 Request a Feature</h3>
+                <p>Have an idea to improve HandyCalBot?</p>
+                <a href="https://github.com/dzhurinskiy/handycalbot/issues/new?labels=enhancement" class="btn btn-secondary" target="_blank">Request Feature</a>
+            </div>
+            <div class="support-card">
+                <h3>💬 Community</h3>
+                <p>View source code and contribute to the project.</p>
+                <a href="https://github.com/dzhurinskiy/handycalbot" class="btn btn-secondary" target="_blank">GitHub Repository</a>
+            </div>
+        </div>
+
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item">
+            <h3>Is HandyCalBot free?</h3>
+            <p>Yes! HandyCalBot is completely free to use. It's an open-source project.</p>
+        </div>
+        <div class="faq-item">
+            <h3>Is my data secure?</h3>
+            <p>Yes. We use industry-standard encryption (AES-256) to protect your OAuth tokens. We never store your Google or Zoom passwords. See our <a href="/privacy">Privacy Policy</a> for details.</p>
+        </div>
+        <div class="faq-item">
+            <h3>Can I use HandyCalBot for work?</h3>
+            <p>Absolutely! HandyCalBot works with any Google Calendar, including Google Workspace (G Suite) accounts.</p>
+        </div>
+        <div class="faq-item">
+            <h3>How do I change my timezone?</h3>
+            <p>Use the <code>/timezone</code> command in the bot chat to select your timezone.</p>
+        </div>
+        <div class="faq-item">
+            <h3>Can I invite people who don't use Telegram?</h3>
+            <p>Yes! You can invite anyone by their email address. They'll receive a standard Google Calendar invitation.</p>
+        </div>
+        <div class="faq-item">
+            <h3>How do I disconnect my account?</h3>
+            <p>Use the <code>/disconnect</code> command to disconnect Google Calendar, or <code>/disconnect_zoom</code> for Zoom. See our <a href="/docs#removing">removal guide</a> for complete instructions.</p>
+        </div>
+
+        <div class="contact-info">
+            <h3>Contact Us</h3>
+            <p><strong>Email:</strong> <a href="mailto:support@handycal.dzhurinskiy.com">support@handycal.dzhurinskiy.com</a></p>
+            <p><strong>GitHub Issues:</strong> <a href="https://github.com/dzhurinskiy/handycalbot/issues">github.com/dzhurinskiy/handycalbot/issues</a></p>
+            <p><strong>Response Time:</strong> We typically respond within 24-48 hours.</p>
+        </div>
+
+        <h2>Troubleshooting Quick Links</h2>
+        <ul>
+            <li><a href="/docs#troubleshooting">Common issues and solutions</a></li>
+            <li><a href="/docs#adding">How to connect your calendar</a></li>
+            <li><a href="/docs#removing">How to disconnect and remove your data</a></li>
+            <li><a href="https://myaccount.google.com/permissions" target="_blank">Manage Google permissions</a></li>
+            <li><a href="https://marketplace.zoom.us/user/installed" target="_blank">Manage Zoom apps</a></li>
+        </ul>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <span>&copy; {CURRENT_YEAR} HandyCalBot. Open source project.</span>
+            <div class="footer-links">
+                <a href="/">Home</a>
+                <a href="/docs">Docs</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/terms">Terms</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+"""
+
+
 @router.get("/logo.jpg", response_class=FileResponse)
 async def logo():
     """Serve the logo image."""
@@ -883,6 +1442,16 @@ async def sitemap():
         <loc>https://handycal.dzhurinskiy.com/</loc>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://handycal.dzhurinskiy.com/docs</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://handycal.dzhurinskiy.com/support</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
     </url>
     <url>
         <loc>https://handycal.dzhurinskiy.com/privacy</loc>
