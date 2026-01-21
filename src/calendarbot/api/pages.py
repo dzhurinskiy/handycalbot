@@ -1011,7 +1011,7 @@ async def documentation():
 
             <h3>Step 4 (Optional): Connect Zoom</h3>
             <p>To add Zoom meeting links automatically:</p>
-            <div class="command-box">/connect_zoom</div>
+            <div class="command-box">/connectzoom</div>
             <p>Follow the same authorization process for your Zoom account.</p>
         </section>
 
@@ -1037,9 +1037,9 @@ async def documentation():
                 <li><code>/start</code> - Welcome message and getting started</li>
                 <li><code>/help</code> - Show all available commands</li>
                 <li><code>/connect</code> - Connect your Google Calendar</li>
-                <li><code>/connect_zoom</code> - Connect your Zoom account</li>
+                <li><code>/connectzoom</code> - Connect your Zoom account</li>
                 <li><code>/disconnect</code> - Disconnect Google Calendar</li>
-                <li><code>/disconnect_zoom</code> - Disconnect Zoom account</li>
+                <li><code>/disconnectzoom</code> - Disconnect Zoom account</li>
                 <li><code>/settings</code> - View and change your settings</li>
                 <li><code>/timezone</code> - Change your timezone</li>
                 <li><code>/meetings</code> - View your upcoming meetings</li>
@@ -1143,7 +1143,7 @@ async def documentation():
 
             <h3>Zoom link not being added</h3>
             <ul>
-                <li>Ensure Zoom is connected: <code>/connect_zoom</code></li>
+                <li>Ensure Zoom is connected: <code>/connectzoom</code></li>
                 <li>Check that your Zoom account is active</li>
                 <li>Try disconnecting and reconnecting Zoom</li>
             </ul>
@@ -1164,7 +1164,7 @@ async def documentation():
             <p>This removes the connection between HandyCalBot and your Google Calendar.</p>
 
             <p><strong>2. Disconnect Zoom (if connected):</strong></p>
-            <div class="command-box">/disconnect_zoom</div>
+            <div class="command-box">/disconnectzoom</div>
 
             <h3>Revoke Access from Google</h3>
             <p>For complete removal, also revoke access from your Google Account:</p>
@@ -1375,7 +1375,7 @@ async def support_page():
         </div>
         <div class="faq-item">
             <h3>How do I disconnect my account?</h3>
-            <p>Use the <code>/disconnect</code> command to disconnect Google Calendar, or <code>/disconnect_zoom</code> for Zoom. See our <a href="/docs#removing">removal guide</a> for complete instructions.</p>
+            <p>Use the <code>/disconnect</code> command to disconnect Google Calendar, or <code>/disconnectzoom</code> for Zoom. See our <a href="/docs#removing">removal guide</a> for complete instructions.</p>
         </div>
 
         <div class="contact-info">
