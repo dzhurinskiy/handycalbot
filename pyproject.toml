@@ -24,6 +24,10 @@ dependencies = [
     "cryptography>=44.0.0",
     "python-dateutil>=2.9.0",
     "pytz>=2024.2",
+    # Security: explicit version constraints for transitive dependencies
+    "starlette>=0.45.0",
+    "urllib3>=2.6.3",
+    "fonttools>=4.60.2",
 ]
 
 [project.optional-dependencies]
