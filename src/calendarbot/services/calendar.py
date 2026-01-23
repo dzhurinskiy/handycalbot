@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -265,9 +265,10 @@ class CalendarService:
 
         # Create event based on provider
         if provider == "google":
+            google_client = cast(GoogleCalendarClient, client)
 
             async def do_create():
-                return await client.create_event(
+                return await google_client.create_event(
                     summary=meeting_data.title,
                     start_time=start_local,
                     end_time=end_local,
@@ -280,9 +281,10 @@ class CalendarService:
                 )
 
         else:  # outlook
+            outlook_client = cast(OutlookCalendarClient, client)
 
             async def do_create():
-                return await client.create_event(
+                return await outlook_client.create_event(
                     summary=meeting_data.title,
                     start_time=start_local,
                     end_time=end_local,
@@ -431,18 +433,20 @@ class CalendarService:
         client, calendar_id, provider = client_result
 
         if provider == "google":
+            google_client = cast(GoogleCalendarClient, client)
 
             async def do_list():
-                return await client.list_events(
+                return await google_client.list_events(
                     calendar_id=calendar_id,
                     time_min=datetime.utcnow(),
                     max_results=limit,
                 )
 
         else:  # outlook
+            outlook_client = cast(OutlookCalendarClient, client)
 
             async def do_list():
-                return await client.list_events(
+                return await outlook_client.list_events(
                     time_min=datetime.utcnow(),
                     max_results=limit,
                 )
@@ -536,8 +540,8 @@ class CalendarService:
         event_tz = start_data.get("timeZone", user.timezone)
         if not start_time.tzinfo:
             event_tz_obj = TimezoneHelper.get_timezone(event_tz)
-            start_time = event_tz_obj.localize(start_time)
-            end_time = event_tz_obj.localize(end_time)
+            start_time = start_time.replace(tzinfo=event_tz_obj)
+            end_time = end_time.replace(tzinfo=event_tz_obj)
 
         # Convert to user's timezone for display
         start_time = start_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
@@ -626,9 +630,10 @@ class CalendarService:
         client, calendar_id, provider = client_result
 
         if provider == "google":
+            google_client = cast(GoogleCalendarClient, client)
 
             async def do_update():
-                return await client.update_event(
+                return await google_client.update_event(
                     event_id=event_id,
                     calendar_id=calendar_id,
                     summary=title,
@@ -641,9 +646,10 @@ class CalendarService:
                 )
 
         else:  # outlook
+            outlook_client = cast(OutlookCalendarClient, client)
 
             async def do_update():
-                return await client.update_event(
+                return await outlook_client.update_event(
                     event_id=event_id,
                     summary=title,
                     start_time=start_time,
@@ -780,9 +786,11 @@ class CalendarService:
 
         # Get event details first (for the title in response)
         if provider == "google":
-            event = await client.get_event(event_id=event_id, calendar_id=calendar_id)
+            google_client = cast(GoogleCalendarClient, client)
+            event = await google_client.get_event(event_id=event_id, calendar_id=calendar_id)
         else:  # outlook
-            event = await client.get_event(event_id=event_id)
+            outlook_client = cast(OutlookCalendarClient, client)
+            event = await outlook_client.get_event(event_id=event_id)
 
         if "error" in event:
             return {"error": "Meeting not found"}
@@ -792,14 +800,16 @@ class CalendarService:
 
         # Delete from calendar
         if provider == "google":
+            google_client = cast(GoogleCalendarClient, client)
 
             async def do_delete():
-                return await client.delete_event(event_id=event_id, calendar_id=calendar_id)
+                return await google_client.delete_event(event_id=event_id, calendar_id=calendar_id)
 
         else:  # outlook
+            outlook_client = cast(OutlookCalendarClient, client)
 
             async def do_delete():
-                return await client.delete_event(event_id=event_id)
+                return await outlook_client.delete_event(event_id=event_id)
 
         result = await do_delete()
 
