@@ -533,7 +533,13 @@ async def manage_google_callback(update: Update, _context: ContextTypes.DEFAULT_
     async with async_session_factory() as session:
         user_service = UserService(session)
         user = await user_service.get_user(update.effective_user.id)
-        t = get_text(user.language if user else "en")
+
+        if not user:
+            t = get_text("en")
+            await query.edit_message_text(t.common.error_user_not_found)
+            return
+
+        t = get_text(user.language)
 
         # Get current mode
         from calendarbot.db.repository import OAuthTokenRepository
@@ -577,7 +583,13 @@ async def manage_outlook_callback(update: Update, _context: ContextTypes.DEFAULT
     async with async_session_factory() as session:
         user_service = UserService(session)
         user = await user_service.get_user(update.effective_user.id)
-        t = get_text(user.language if user else "en")
+
+        if not user:
+            t = get_text("en")
+            await query.edit_message_text(t.common.error_user_not_found)
+            return
+
+        t = get_text(user.language)
 
         # Get current mode
         from calendarbot.db.repository import OAuthTokenRepository
