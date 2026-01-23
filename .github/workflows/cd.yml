@@ -78,10 +78,13 @@ jobs:
 
             echo ">>> Migrations complete"
 
-            # Test actual bot functionality by checking logs for startup errors
+            # Test actual bot functionality by checking logs for critical startup errors
+            # Exclude known non-critical errors (token refresh for revoked tokens is expected)
             sleep 5
-            if docker logs calendarbot 2>&1 | tail -20 | grep -q "ERROR\|Exception\|Traceback"; then
-              echo "ERROR: Bot has errors in logs!"
+            CRITICAL_ERRORS=$(docker logs calendarbot 2>&1 | tail -30 | grep -E "ERROR|Exception|Traceback" | grep -v "token refresh failed\|Invalid Token\|token may be revoked" || true)
+            if [ -n "$CRITICAL_ERRORS" ]; then
+              echo "ERROR: Bot has critical errors in logs!"
+              echo "$CRITICAL_ERRORS"
               docker logs calendarbot 2>&1 | tail -50
               exit 1
             fi
