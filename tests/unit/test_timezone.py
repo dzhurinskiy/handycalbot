@@ -1,6 +1,5 @@
 """Tests for timezone utilities."""
 
-import pytest
 from datetime import datetime
 from zoneinfo import ZoneInfo
 

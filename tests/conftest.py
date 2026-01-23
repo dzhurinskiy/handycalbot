@@ -2,7 +2,6 @@
 
 import asyncio
 from collections.abc import AsyncGenerator, Generator
-from datetime import datetime
 
 import pytest
 import pytest_asyncio

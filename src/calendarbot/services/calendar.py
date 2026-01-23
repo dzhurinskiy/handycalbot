@@ -249,6 +249,7 @@ class CalendarService:
         generate_zoom_link: bool = False,
         generate_teams_link: bool = False,
         custom_link: str | None = None,
+        force_provider: str | None = None,
     ) -> dict:
         """Create a meeting on user's calendar.
 
@@ -259,6 +260,7 @@ class CalendarService:
             generate_zoom_link: If True, create a Zoom meeting and add the link.
             generate_teams_link: If True, auto-generate a Microsoft Teams link (Outlook only).
             custom_link: Custom meeting link to add to the event.
+            force_provider: Force using specific calendar ('google' or 'outlook').
 
         Returns dict with meeting details or error.
         """
@@ -270,7 +272,7 @@ class CalendarService:
                 # Use Zoom link as custom link in the calendar event
                 custom_link = zoom_link
 
-        client_result = await self._get_valid_client(user)
+        client_result = await self._get_valid_client(user, force_provider=force_provider)
         if isinstance(client_result, dict):
             return client_result  # Error
         client, calendar_id, provider = client_result

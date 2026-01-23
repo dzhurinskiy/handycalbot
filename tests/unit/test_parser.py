@@ -64,7 +64,7 @@ class TestMeetingParser:
     def test_parse_missing_title_returns_none(self):
         """Test that missing title returns None."""
         parser = MeetingParser()
-        result = parser.parse('14:30 no-quotes-title')
+        result = parser.parse("14:30 no-quotes-title")
 
         assert result is None
 
@@ -79,12 +79,14 @@ class TestMeetingParser:
         """Test email validation."""
         parser = MeetingParser()
 
-        valid, invalid = parser.validate_emails([
-            "good@example.com",
-            "also.good@test.org",
-            "bad-email",
-            "missing@domain",
-        ])
+        valid, invalid = parser.validate_emails(
+            [
+                "good@example.com",
+                "also.good@test.org",
+                "bad-email",
+                "missing@domain",
+            ]
+        )
 
         assert len(valid) == 2
         assert len(invalid) == 2
@@ -116,7 +118,7 @@ class TestMeetingParser:
     def test_parse_russian_guillemets(self):
         """Test parsing with Russian/French guillemets."""
         parser = MeetingParser(user_timezone="UTC", default_duration=60)
-        result = parser.parse('15:00 «Встреча команды»')
+        result = parser.parse("15:00 «Встреча команды»")
 
         assert result is not None
         assert result.title == "Встреча команды"
@@ -142,7 +144,7 @@ class TestMeetingParser:
     def test_parse_cjk_quotes(self):
         """Test parsing with CJK corner brackets."""
         parser = MeetingParser(user_timezone="UTC", default_duration=60)
-        result = parser.parse('10:00 「会議」')
+        result = parser.parse("10:00 「会議」")
 
         assert result is not None
         assert result.title == "会議"
@@ -159,7 +161,7 @@ class TestMeetingParser:
     def test_parse_fullwidth_quotes(self):
         """Test parsing with fullwidth quotes (common in CJK input)."""
         parser = MeetingParser(user_timezone="UTC", default_duration=60)
-        result = parser.parse('14:30 ＂Full Width＂')
+        result = parser.parse("14:30 ＂Full Width＂")
 
         assert result is not None
         assert result.title == "Full Width"
@@ -167,7 +169,7 @@ class TestMeetingParser:
     def test_parse_heavy_quotes(self):
         """Test parsing with heavy ornamental quotes."""
         parser = MeetingParser(user_timezone="UTC", default_duration=60)
-        result = parser.parse('14:30 ❝Fancy Meeting❞')
+        result = parser.parse("14:30 ❝Fancy Meeting❞")
 
         assert result is not None
         assert result.title == "Fancy Meeting"
@@ -179,12 +181,12 @@ class TestMeetingParser:
         # Test various quote types are normalized to standard double quote
         test_cases = [
             ('"curly"', '"curly"'),
-            ('«guillemets»', '"guillemets"'),
+            ("«guillemets»", '"guillemets"'),
             ('„german"', '"german"'),
             ("'single'", '"single"'),
-            ('「cjk」', '"cjk"'),
-            ('＂fullwidth＂', '"fullwidth"'),
-            ('❝heavy❞', '"heavy"'),
+            ("「cjk」", '"cjk"'),
+            ("＂fullwidth＂", '"fullwidth"'),
+            ("❝heavy❞", '"heavy"'),
         ]
 
         for input_text, expected in test_cases:

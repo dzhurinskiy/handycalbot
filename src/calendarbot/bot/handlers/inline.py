@@ -172,10 +172,17 @@ def _build_edit_menu_keyboard(result_id: str, meeting_data: dict, t) -> InlineKe
             ),
             InlineKeyboardButton(link_text, callback_data=f"em_link_{result_id}"),
         ],
-        [
-            InlineKeyboardButton(t.inline.back_button, callback_data=f"em_back_{result_id}"),
-        ],
     ]
+
+    # Add calendar selection button if both calendars are connected
+    if meeting_data.get("has_both_calendars"):
+        target = meeting_data.get("target_calendar", "google")
+        cal_label = "📅 Google" if target == "google" else "📆 Outlook"
+        buttons.append([InlineKeyboardButton(cal_label, callback_data=f"em_cal_{result_id}")])
+
+    buttons.append(
+        [InlineKeyboardButton(t.inline.back_button, callback_data=f"em_back_{result_id}")]
+    )
     return InlineKeyboardMarkup(buttons)
 
 
@@ -461,6 +468,10 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             return
 
         calendar_connected = await user_service.is_calendar_connected(user)
+        google_connected = await user_service.is_calendar_connected(user, "google")
+        outlook_connected = await user_service.is_outlook_connected(user)
+        has_both_calendars = google_connected and outlook_connected
+        default_calendar = user.default_calendar or ("google" if google_connected else "outlook")
         user_timezone = user.timezone
         user_default_duration = user.default_duration
         user_default_reminder = user.default_reminder
@@ -521,6 +532,8 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "user_id": query.from_user.id,
         "state": "preview",
         "original_query": text,
+        "has_both_calendars": has_both_calendars,
+        "target_calendar": default_calendar,  # Which calendar to create in
         "meeting": {
             "time": meeting.time,
             "date": meeting.date,
@@ -1004,6 +1017,48 @@ async def add_attendee_start_callback(update: Update, context: ContextTypes.DEFA
     )
 
 
+async def edit_calendar_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Toggle target calendar between Google and Outlook."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    result_id = query.data.replace("em_cal_", "")
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+        t = get_text(user.language if user else "en")
+
+    if context.bot_data is None:
+        await query.answer(t.inline.meeting_data_expired, show_alert=True)
+        return
+
+    meeting_data = context.bot_data.get(f"meeting_{result_id}")
+    if not meeting_data:
+        await query.answer(t.inline.meeting_data_expired, show_alert=True)
+        return
+
+    if meeting_data["user_id"] != update.effective_user.id:
+        await query.answer(t.inline.not_your_meeting, show_alert=True)
+        return
+
+    # Toggle calendar
+    current = meeting_data.get("target_calendar", "google")
+    new_target = "outlook" if current == "google" else "google"
+    meeting_data["target_calendar"] = new_target
+
+    # Show which calendar is now selected
+    cal_name = "Google Calendar" if new_target == "google" else "Outlook Calendar"
+    await query.answer(f"📅 {cal_name}")
+
+    # Update edit menu to show new calendar selection
+    keyboard = _build_edit_menu_keyboard(result_id, meeting_data, t)
+    await query.edit_message_text(
+        t.inline.edit_menu_title, parse_mode="Markdown", reply_markup=keyboard
+    )
+
+
 async def edit_link_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show link management."""
     query = update.callback_query
@@ -1459,6 +1514,9 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
             generate_zoom_link = m.get("zoom_link") == "pending"
             custom_link = m.get("custom_link")
 
+            # Use target calendar if both calendars are connected and user selected one
+            target_calendar = meeting_data.get("target_calendar")
+
             calendar_service = CalendarService(session)
             result = await calendar_service.create_meeting(
                 user,
@@ -1467,6 +1525,7 @@ async def create_meeting_callback(update: Update, context: ContextTypes.DEFAULT_
                 generate_zoom_link=generate_zoom_link,
                 generate_teams_link=generate_teams_link,
                 custom_link=custom_link,
+                force_provider=target_calendar if meeting_data.get("has_both_calendars") else None,
             )
 
             # Save recent contacts
@@ -1818,6 +1877,7 @@ def setup_inline_handlers(app: Application) -> None:
     app.add_handler(CallbackQueryHandler(edit_reminder_callback, pattern=r"^em_rem_"))
     app.add_handler(CallbackQueryHandler(edit_attendees_callback, pattern=r"^em_att_"))
     app.add_handler(CallbackQueryHandler(edit_link_callback, pattern=r"^em_link_"))
+    app.add_handler(CallbackQueryHandler(edit_calendar_callback, pattern=r"^em_cal_"))
 
     # Duration/reminder selection
     app.add_handler(CallbackQueryHandler(set_duration_callback, pattern=r"^dur_"))
