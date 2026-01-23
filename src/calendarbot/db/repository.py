@@ -166,6 +166,34 @@ class OAuthTokenRepository:
             return True
         return False
 
+    async def get_tokens_expiring_soon(
+        self, provider: str, hours_before: int = 24
+    ) -> list[OAuthToken]:
+        """Get all tokens that will expire within the specified hours.
+
+        Used for proactive token refresh to keep tokens valid for inactive users.
+        """
+        from datetime import timedelta
+
+        threshold = datetime.now(tz=UTC) + timedelta(hours=hours_before)
+        result = await self.session.execute(
+            select(OAuthToken).where(
+                OAuthToken.provider == provider,
+                OAuthToken.expires_at <= threshold,
+            )
+        )
+        return list(result.scalars().all())
+
+    async def get_all_tokens(self, provider: str) -> list[OAuthToken]:
+        """Get all tokens for a provider.
+
+        Used for periodic health checks and maintenance.
+        """
+        result = await self.session.execute(
+            select(OAuthToken).where(OAuthToken.provider == provider)
+        )
+        return list(result.scalars().all())
+
 
 class MeetingRepository:
     """Meeting data access."""

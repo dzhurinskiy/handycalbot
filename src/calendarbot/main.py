@@ -23,6 +23,7 @@ from calendarbot.bot.handlers import (
 from calendarbot.config import get_settings
 from calendarbot.db.session import init_db
 from calendarbot.services.reminder import reminder_service
+from calendarbot.services.token_refresh import token_refresh_service
 
 # Configure logging
 logging.basicConfig(
@@ -170,6 +171,12 @@ async def main() -> None:
     # Start reminder scheduler (checks every minute)
     reminder_service.start(interval_seconds=60)
     logger.info("Reminder scheduler started")
+
+    # Start token refresh scheduler (checks every hour)
+    # This proactively refreshes OAuth tokens before they expire,
+    # keeping the service working smoothly for inactive users
+    token_refresh_service.start(interval_seconds=3600)
+    logger.info("Token refresh scheduler started")
 
     # Create applications
     bot_app = create_bot_application()
