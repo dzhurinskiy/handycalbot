@@ -210,7 +210,9 @@ class TokenRefreshService:
                             stats["outlook_failed"] += 1
 
                     except Exception as e:
-                        logger.error(f"Error refreshing Outlook token for user {token.user_id}: {e}")
+                        logger.error(
+                            f"Error refreshing Outlook token for user {token.user_id}: {e}"
+                        )
                         stats["outlook_failed"] += 1
 
                 # Process Zoom tokens
@@ -266,14 +268,10 @@ class TokenRefreshService:
 
                 # Only log if there was activity
                 total_refreshed = (
-                    stats["google_refreshed"]
-                    + stats["outlook_refreshed"]
-                    + stats["zoom_refreshed"]
+                    stats["google_refreshed"] + stats["outlook_refreshed"] + stats["zoom_refreshed"]
                 )
                 total_failed = (
-                    stats["google_failed"]
-                    + stats["outlook_failed"]
-                    + stats["zoom_failed"]
+                    stats["google_failed"] + stats["outlook_failed"] + stats["zoom_failed"]
                 )
 
                 if total_refreshed > 0 or total_failed > 0:

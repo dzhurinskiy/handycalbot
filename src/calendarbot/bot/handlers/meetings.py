@@ -931,7 +931,8 @@ async def meeting_edit_link_callback(update: Update, _context: ContextTypes.DEFA
             buttons.append(
                 [
                     InlineKeyboardButton(
-                        t.inline.auto_teams_meeting, callback_data=f"mslte_{stored_user_id}_{meeting_idx}"
+                        t.inline.auto_teams_meeting,
+                        callback_data=f"mslte_{stored_user_id}_{meeting_idx}",
                     )
                 ]
             )
@@ -940,7 +941,8 @@ async def meeting_edit_link_callback(update: Update, _context: ContextTypes.DEFA
             buttons.append(
                 [
                     InlineKeyboardButton(
-                        t.inline.auto_google_meet, callback_data=f"mslm_{stored_user_id}_{meeting_idx}"
+                        t.inline.auto_google_meet,
+                        callback_data=f"mslm_{stored_user_id}_{meeting_idx}",
                     )
                 ]
             )
@@ -1308,7 +1310,9 @@ def setup_meeting_handlers(app: Application) -> None:
 
     # Link options
     app.add_handler(CallbackQueryHandler(meeting_set_link_meet_callback, pattern=r"^mslm_\d+_\d+$"))
-    app.add_handler(CallbackQueryHandler(meeting_set_link_teams_callback, pattern=r"^mslte_\d+_\d+$"))
+    app.add_handler(
+        CallbackQueryHandler(meeting_set_link_teams_callback, pattern=r"^mslte_\d+_\d+$")
+    )
     app.add_handler(CallbackQueryHandler(meeting_set_link_zoom_callback, pattern=r"^mslz_\d+_\d+$"))
 
     # Cancel meeting: mc_{user_id}_{index}

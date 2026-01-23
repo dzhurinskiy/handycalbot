@@ -433,7 +433,9 @@ async def connectoutlook_command(update: Update, _context: ContextTypes.DEFAULT_
                             if is_privacy
                             else t.settings.switch_to_privacy_button
                         ),
-                        callback_data="connect_outlook_full" if is_privacy else "connect_outlook_privacy",
+                        callback_data=(
+                            "connect_outlook_full" if is_privacy else "connect_outlook_privacy"
+                        ),
                     )
                 ],
                 [
@@ -452,7 +454,11 @@ async def connectoutlook_command(update: Update, _context: ContextTypes.DEFAULT_
 
     # Not connected - show mode selection buttons
     keyboard = [
-        [InlineKeyboardButton(t.settings.connect_full_access_button, callback_data="connect_outlook_full")],
+        [
+            InlineKeyboardButton(
+                t.settings.connect_full_access_button, callback_data="connect_outlook_full"
+            )
+        ],
         [
             InlineKeyboardButton(
                 t.settings.connect_privacy_mode_button, callback_data="connect_outlook_privacy"
@@ -1081,7 +1087,9 @@ def setup_settings_handlers(app: Application) -> None:
 
     # Connect mode callback for Outlook (full access vs privacy mode)
     app.add_handler(
-        CallbackQueryHandler(connect_outlook_mode_callback, pattern=r"^connect_outlook_(full|privacy)$")
+        CallbackQueryHandler(
+            connect_outlook_mode_callback, pattern=r"^connect_outlook_(full|privacy)$"
+        )
     )
 
     # Disconnect Outlook calendar callback (from /connectoutlook menu)

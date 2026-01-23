@@ -169,7 +169,9 @@ class OutlookCalendarClient:
             created_attendees = [
                 a.get("emailAddress", {}).get("address") for a in result.get("attendees", [])
             ]
-            logger.info(f"Outlook event created: id={event_id}, attendees_in_response={created_attendees}")
+            logger.info(
+                f"Outlook event created: id={event_id}, attendees_in_response={created_attendees}"
+            )
 
         return result
 

@@ -46,7 +46,9 @@ class CalendarService:
         if outlook_token:
             return await self._get_outlook_client(user, outlook_token)
 
-        return {"error": "No calendar connected. Use /connect or /connectoutlook to link your calendar."}
+        return {
+            "error": "No calendar connected. Use /connect or /connectoutlook to link your calendar."
+        }
 
     async def _get_google_client(
         self, user: User, token
@@ -141,7 +143,9 @@ class CalendarService:
     ) -> dict:
         """Handle API errors, refreshing token and retrying on 401."""
         if result.get("code") == 401:
-            logger.info(f"Got 401 for user {user.id} (provider={provider}), forcing token refresh...")
+            logger.info(
+                f"Got 401 for user {user.id} (provider={provider}), forcing token refresh..."
+            )
             # Force token refresh by setting expiry to past
             token = await self.token_repo.get_token(user.id, provider)
             if token:
@@ -261,6 +265,7 @@ class CalendarService:
 
         # Create event based on provider
         if provider == "google":
+
             async def do_create():
                 return await client.create_event(
                     summary=meeting_data.title,
@@ -273,7 +278,9 @@ class CalendarService:
                     generate_meet_link=generate_meet_link,
                     custom_link=custom_link,
                 )
+
         else:  # outlook
+
             async def do_create():
                 return await client.create_event(
                     summary=meeting_data.title,
@@ -424,13 +431,16 @@ class CalendarService:
         client, calendar_id, provider = client_result
 
         if provider == "google":
+
             async def do_list():
                 return await client.list_events(
                     calendar_id=calendar_id,
                     time_min=datetime.utcnow(),
                     max_results=limit,
                 )
+
         else:  # outlook
+
             async def do_list():
                 return await client.list_events(
                     time_min=datetime.utcnow(),
@@ -534,8 +544,7 @@ class CalendarService:
         end_time = end_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
 
         attendees = [
-            a.get("emailAddress", {}).get("address", "")
-            for a in event.get("attendees", [])
+            a.get("emailAddress", {}).get("address", "") for a in event.get("attendees", [])
         ]
 
         # Extract Teams link if present
@@ -617,6 +626,7 @@ class CalendarService:
         client, calendar_id, provider = client_result
 
         if provider == "google":
+
             async def do_update():
                 return await client.update_event(
                     event_id=event_id,
@@ -629,7 +639,9 @@ class CalendarService:
                     custom_link=custom_link,
                     generate_meet_link=generate_meet_link,
                 )
+
         else:  # outlook
+
             async def do_update():
                 return await client.update_event(
                     event_id=event_id,
@@ -780,9 +792,12 @@ class CalendarService:
 
         # Delete from calendar
         if provider == "google":
+
             async def do_delete():
                 return await client.delete_event(event_id=event_id, calendar_id=calendar_id)
+
         else:  # outlook
+
             async def do_delete():
                 return await client.delete_event(event_id=event_id)
 

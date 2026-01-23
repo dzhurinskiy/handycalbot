@@ -1037,7 +1037,11 @@ async def edit_link_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
 
     keyboard = _build_link_keyboard(
-        result_id, meeting_data, t, calendar_provider=calendar_provider, zoom_connected=zoom_connected
+        result_id,
+        meeting_data,
+        t,
+        calendar_provider=calendar_provider,
+        zoom_connected=zoom_connected,
     )
     await query.edit_message_text(
         t.inline.add_link_title, parse_mode="Markdown", reply_markup=keyboard
@@ -1245,7 +1249,11 @@ async def remove_link_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     await query.answer(t.inline.link_removed)
 
     keyboard = _build_link_keyboard(
-        result_id, meeting_data, t, calendar_provider=calendar_provider, zoom_connected=zoom_connected
+        result_id,
+        meeting_data,
+        t,
+        calendar_provider=calendar_provider,
+        zoom_connected=zoom_connected,
     )
     await query.edit_message_text(
         t.inline.add_link_title, parse_mode="Markdown", reply_markup=keyboard
