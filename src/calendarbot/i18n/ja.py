@@ -27,30 +27,24 @@ translations = Translations(
 Telegramから直接ミーティングをスケジュールできます。
 
 *クイックスタート:*
-1. /connect でGoogleカレンダーを接続
-2. 任意のチャットで @handycalbot と入力してミーティングを作成
+1️⃣ /connect でカレンダーを接続
+2️⃣ 任意のチャットで @handycalbot と入力してミーティングを作成
 
 *インライン使用方法:*
 `@handycalbot 14:30 "ミーティングタイトル" email@example.com`
 `@handycalbot 10:00 25-01-2026 "プロジェクト同期"`
 `@handycalbot 14:30 "ミーティング" r 10m` (リマインダー付き)
+`@handycalbot 14:30 "ミーティング" @alice @bob` (ユーザー名で招待)
 
-*すべてのコマンド:*
-/start - ウェルカムメッセージ
-/help - ヘルプと使用方法
-/connect - Googleカレンダーを接続
-/disconnect - カレンダーを切断
-/connectzoom - ミーティングリンク用にZoomを接続
-/disconnectzoom - Zoomを切断
+*コマンド:*
+/connect - カレンダーまたはZoomを接続
+/disconnect - サービスを切断
 /meetings - 予定の表示と管理
 /settings - 設定を表示
-/timezone - タイムゾーンを変更
-/duration - デフォルト時間を設定
-/reminder - デフォルトリマインダーを設定
-/notifications - リマインダーのオン/オフ
-/language - 言語を変更
+/timezone, /duration, /reminder - デフォルト設定
+/notifications, /privacy, /language - 環境設定
 /feedback - フィードバックまたはバグ報告
-/donate - ボットをサポート
+/donate - ボットをサポート ⭐
 
 _バグ報告やUI改善のご提案をお待ちしております！_
 """,
@@ -59,42 +53,39 @@ _バグ報告やUI改善のご提案をお待ちしております！_
 
 *ミーティング作成 (インライン):*
 任意のチャットで `@handycalbot` と入力後:
-- 時間 (必須): `HH:MM` (24時間形式)
-- 日付 (任意): `DD-MM-YYYY`
-- タイトル (必須): `"ミーティングタイトル"`
-- 参加者 (任意): `email@example.com`
-- リマインダー (任意): `r 10m` または `r 10m/30m` または `r`
+• 時間 (必須): `HH:MM` (24時間形式)
+• 日付 (任意): `DD-MM-YYYY`
+• タイトル (必須): `"ミーティングタイトル"`
+• 参加者 (任意): `email@example.com` または `@username`
+• リマインダー (任意): `r 10m` または `r 10m/30m` または `r`
 
 *リマインダー形式:*
-- `r 10m` - 10分前にリマインド
-- `r 1h` - 1時間前にリマインド
-- `r 1d` - 1日前にリマインド
-- `r 10m/30m` - 複数のリマインダー
-- `r` - デフォルトリマインダーを使用
-- (rなし) - リマインダーなし
+• `r 10m` - 10分前にリマインド
+• `r 1h` - 1時間前にリマインド
+• `r 1d` - 1日前にリマインド
+• `r 10m/30m` - 複数のリマインダー
+• `r` - デフォルトリマインダーを使用
+• (rなし) - リマインダーなし
 
 *例:*
 `@handycalbot 14:30 "チームスタンドアップ"`
 `@handycalbot 10:00 25-01-2026 "レビュー" tanaka@co.com`
 `@handycalbot 16:00 "クイックコール" r 15m`
-`@handycalbot 14:00 "ミーティング" sato@co.com r 10m/1h`
+`@handycalbot 14:00 "ミーティング" @alice @bob r 10m`
 
-*すべてのコマンド:*
-/start - ウェルカムメッセージ
-/help - このヘルプメッセージ
-/connect - Googleカレンダーを接続
-/disconnect - カレンダーを切断
-/connectzoom - ミーティングリンク用にZoomを接続
-/disconnectzoom - Zoomを切断
-/meetings - 予定の表示と管理
-/settings - 設定を表示
+*コマンド:*
+/connect - Googleカレンダー、Outlook、またはZoomを接続
+/disconnect - サービスを切断
+/meetings - 今後の予定を表示と管理
+/settings - 現在の設定を表示
 /timezone - タイムゾーンを設定
 /duration - デフォルトミーティング時間を設定
 /reminder - デフォルトリマインダーを設定
 /notifications - リマインダー通知のオン/オフ
+/privacy - ユーザー名招待の設定
 /language - 言語を変更
 /feedback - フィードバックまたはバグ報告
-/donate - Starsでボットをサポート
+/donate - Starsでボットをサポート ⭐
 """,
         timezone_detected="Telegramの言語設定に基づいてタイムゾーンを`{timezone}`に設定しました。変更するには /timezone を使用してください。",
         support_button="⭐ HandyCalBotをサポート",
@@ -181,10 +172,20 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         privacy_updated="{emoji} ユーザー名招待が{status}になりました。",
         # Default calendar preference
         default_calendar_label="デフォルトカレンダー",
-        default_calendar_requires_both="設定を行うには、GoogleとOutlookの両方のカレンダーを接続する必要があります。\n\n/connect と /connectoutlook を使用して両方を接続してください。",
+        default_calendar_requires_both="設定を行うには、GoogleとOutlookの両方のカレンダーを接続する必要があります。\n\n/connect を使用して両方を接続してください。",
         default_calendar_title="**デフォルトカレンダー** 🎯",
         default_calendar_desc="会議作成時に使用するデフォルトのカレンダーを選択してください。\n\n編集メニューから個別の会議のカレンダーを変更できます。",
         default_calendar_updated="✅ デフォルトカレンダーを{calendar}に設定しました。\n\n新しい会議はそこに作成されます。",
+        # Unified connect/disconnect
+        connect_services_title="**サービスを接続** 🔗",
+        connect_select_service="接続するサービスを選択:",
+        connect_another_service="別のサービスを接続:",
+        connected_services_title="**接続済みサービス**",
+        manage_button="⚙️ 管理",
+        disconnect_services_title="**サービスを切断** 🔌",
+        disconnect_select_service="切断するサービスを選択:",
+        no_services_connected="サービスが接続されていません。\n\n/connect でカレンダーを接続してください。",
+        service_disconnected="✅ {service}の接続を解除しました。",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**今後のミーティング** 📅",
@@ -302,8 +303,8 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         google_meet_label="🎥 Google Meet",
         teams_meeting_label="📹 Microsoft Teams",
         zoom_meeting_label="📹 Zoomミーティング",
-        zoom_not_connected="Zoomが接続されていません。まず /connectzoom を使用してください。",
-        outlook_not_connected="Outlookが接続されていません。まず /connectoutlook を使用してください。",
+        zoom_not_connected="Zoomが接続されていません。まず /connect を使用してください。",
+        outlook_not_connected="Outlookが接続されていません。まず /connect を使用してください。",
         custom_link_label="🔗 ミーティングリンク",
         # Updates
         field_updated="✅ {field}を更新しました",
@@ -376,18 +377,14 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         help="ヘルプと使い方を表示",
         meetings="今後のミーティング一覧",
         cancel="ミーティングをキャンセル",
-        connect="Googleカレンダーを接続",
-        disconnect="Googleカレンダーを切断",
-        connectzoom="ミーティングリンク用にZoomを接続",
-        disconnectzoom="Zoomアカウントを切断",
-        connectoutlook="Outlookカレンダーを接続",
-        disconnectoutlook="Outlookカレンダーを切断",
-        settings="設定を表示",
+        connect="カレンダーまたはZoomを接続",
+        disconnect="サービスを切断",
+        settings="現在の設定を表示",
         timezone="タイムゾーンを変更",
         duration="デフォルト時間を設定",
         reminder="デフォルトリマインダーを設定",
-        notifications="通知のオン/オフ",
-        privacy="招待のプライバシー設定",
+        notifications="ミーティング通知のオン/オフ",
+        privacy="@ユーザー名招待のプライバシー設定",
         language="言語を変更",
         donate="Starsでボットをサポート",
         feedback="フィードバックまたはバグ報告",

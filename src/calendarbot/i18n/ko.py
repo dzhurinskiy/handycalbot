@@ -27,30 +27,24 @@ translations = Translations(
 텔레그램에서 직접 회의를 예약할 수 있도록 도와드립니다.
 
 *빠른 시작:*
-1. /connect로 Google 캘린더 연결
-2. 아무 채팅에서 @handycalbot 입력하여 회의 생성
+1️⃣ /connect로 캘린더 연결
+2️⃣ 아무 채팅에서 @handycalbot 입력하여 회의 생성
 
 *인라인 사용법:*
 `@handycalbot 14:30 "회의 제목" email@example.com`
 `@handycalbot 10:00 25-01-2026 "프로젝트 동기화"`
 `@handycalbot 14:30 "회의" r 10m` (알림 포함)
+`@handycalbot 14:30 "회의" @alice @bob` (사용자명으로 초대)
 
-*모든 명령어:*
-/start - 환영 메시지
-/help - 도움말 및 사용법
-/connect - Google 캘린더 연결
-/disconnect - 캘린더 연결 해제
-/connectzoom - 회의 링크용 Zoom 연결
-/disconnectzoom - Zoom 연결 해제
+*명령어:*
+/connect - 캘린더 또는 Zoom 연결
+/disconnect - 서비스 연결 해제
 /meetings - 일정 보기 및 관리
 /settings - 설정 보기
-/timezone - 시간대 변경
-/duration - 기본 시간 설정
-/reminder - 기본 알림 설정
-/notifications - 알림 켜기/끄기
-/language - 언어 변경
+/timezone, /duration, /reminder - 기본값 설정
+/notifications, /privacy, /language - 환경 설정
 /feedback - 피드백 보내기 또는 버그 신고
-/donate - 봇 후원하기
+/donate - 봇 후원하기 ⭐
 
 _버그 신고 및 UI 개선 제안을 환영합니다!_
 """,
@@ -59,42 +53,39 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
 
 *회의 만들기 (인라인):*
 아무 채팅에서 `@handycalbot` 입력 후:
-- 시간 (필수): `HH:MM` (24시간 형식)
-- 날짜 (선택): `DD-MM-YYYY`
-- 제목 (필수): `"회의 제목"`
-- 참석자 (선택): `email@example.com`
-- 알림 (선택): `r 10m` 또는 `r 10m/30m` 또는 `r`
+• 시간 (필수): `HH:MM` (24시간 형식)
+• 날짜 (선택): `DD-MM-YYYY`
+• 제목 (필수): `"회의 제목"`
+• 참석자 (선택): `email@example.com` 또는 `@사용자명`
+• 알림 (선택): `r 10m` 또는 `r 10m/30m` 또는 `r`
 
 *알림 형식:*
-- `r 10m` - 10분 전 알림
-- `r 1h` - 1시간 전 알림
-- `r 1d` - 1일 전 알림
-- `r 10m/30m` - 여러 알림
-- `r` - 기본 알림 사용
-- (r 없음) - 알림 없음
+• `r 10m` - 10분 전 알림
+• `r 1h` - 1시간 전 알림
+• `r 1d` - 1일 전 알림
+• `r 10m/30m` - 여러 알림
+• `r` - 기본 알림 사용
+• (r 없음) - 알림 없음
 
 *예시:*
 `@handycalbot 14:30 "팀 스탠드업"`
 `@handycalbot 10:00 25-01-2026 "리뷰" kim@co.com`
 `@handycalbot 16:00 "빠른 통화" r 15m`
-`@handycalbot 14:00 "회의" lee@co.com r 10m/1h`
+`@handycalbot 14:00 "회의" @alice @bob r 10m`
 
-*모든 명령어:*
-/start - 환영 메시지
-/help - 이 도움말
-/connect - Google 캘린더 연결
-/disconnect - 캘린더 연결 해제
-/connectzoom - 회의 링크용 Zoom 연결
-/disconnectzoom - Zoom 연결 해제
-/meetings - 일정 보기 및 관리
-/settings - 설정 보기
+*명령어:*
+/connect - Google 캘린더, Outlook 또는 Zoom 연결
+/disconnect - 서비스 연결 해제
+/meetings - 예정된 일정 보기 및 관리
+/settings - 현재 설정 보기
 /timezone - 시간대 설정
 /duration - 기본 회의 시간 설정
 /reminder - 기본 알림 설정
 /notifications - 알림 켜기/끄기
+/privacy - 사용자명 초대 설정
 /language - 언어 변경
 /feedback - 피드백 보내기 또는 버그 신고
-/donate - Stars로 봇 후원
+/donate - Stars로 봇 후원 ⭐
 """,
         timezone_detected="텔레그램 언어 설정을 기반으로 시간대를 `{timezone}`로 설정했습니다. 변경하려면 /timezone을 사용하세요.",
         support_button="⭐ HandyCalBot 후원하기",
@@ -182,10 +173,20 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         privacy_updated="{emoji} 사용자명 초대 {status}.",
         # Default calendar preference
         default_calendar_label="기본 캘린더",
-        default_calendar_requires_both="기본 설정을 지정하려면 Google과 Outlook 캘린더가 모두 연결되어 있어야 합니다.\n\n/connect 및 /connectoutlook을 사용하여 둘 다 연결하세요.",
+        default_calendar_requires_both="기본 설정을 지정하려면 Google과 Outlook 캘린더가 모두 연결되어 있어야 합니다.\n\n/connect를 사용하여 둘 다 연결하세요.",
         default_calendar_title="**기본 캘린더** 🎯",
         default_calendar_desc="회의 생성 시 기본으로 사용할 캘린더를 선택하세요.\n\n편집 메뉴에서 개별 회의의 캘린더를 변경할 수 있습니다.",
         default_calendar_updated="✅ 기본 캘린더가 {calendar}로 설정되었습니다.\n\n새 회의는 거기에 생성됩니다.",
+        # Unified connect/disconnect
+        connect_services_title="**서비스 연결** 🔗",
+        connect_select_service="연결할 서비스를 선택하세요:",
+        connect_another_service="다른 서비스 연결:",
+        connected_services_title="**연결된 서비스**",
+        manage_button="⚙️ 관리",
+        disconnect_services_title="**서비스 연결 해제** 🔌",
+        disconnect_select_service="연결 해제할 서비스를 선택하세요:",
+        no_services_connected="연결된 서비스가 없습니다.\n\n/connect를 사용하여 캘린더를 연결하세요.",
+        service_disconnected="✅ {service} 연결이 해제되었습니다.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**예정된 회의** 📅",
@@ -303,8 +304,8 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         google_meet_label="🎥 Google Meet",
         teams_meeting_label="📹 Microsoft Teams",
         zoom_meeting_label="📹 Zoom 회의",
-        zoom_not_connected="Zoom이 연결되지 않았습니다. 먼저 /connectzoom을 사용하세요.",
-        outlook_not_connected="Outlook이 연결되지 않았습니다. 먼저 /connectoutlook을 사용하세요.",
+        zoom_not_connected="Zoom이 연결되지 않았습니다. 먼저 /connect를 사용하세요.",
+        outlook_not_connected="Outlook이 연결되지 않았습니다. 먼저 /connect를 사용하세요.",
         custom_link_label="🔗 회의 링크",
         # Updates
         field_updated="✅ {field} 업데이트됨",
@@ -377,20 +378,16 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         help="도움말 및 사용법",
         meetings="예정된 회의 목록",
         cancel="회의 취소",
-        connect="Google 캘린더 연결",
-        disconnect="Google 캘린더 연결 해제",
-        connectzoom="회의 링크용 Zoom 연결",
-        disconnectzoom="Zoom 계정 연결 해제",
-        connectoutlook="Outlook 캘린더 연결",
-        disconnectoutlook="Outlook 캘린더 연결 해제",
+        connect="캘린더 또는 Zoom 연결",
+        disconnect="서비스 연결 해제",
         settings="설정 보기",
         timezone="시간대 변경",
         duration="기본 시간 설정",
         reminder="기본 알림 설정",
         notifications="알림 켜기/끄기",
+        privacy="@사용자명 초대 개인정보 설정",
         language="언어 변경",
         donate="Stars로 봇 후원",
         feedback="피드백 보내기 또는 버그 신고",
-        privacy="초대 개인정보 설정",
     ),
 )

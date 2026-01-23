@@ -27,30 +27,19 @@ Willkommen bei *HandyCalBot*! 📅
 Ich helfe dir, Besprechungen direkt von Telegram aus zu planen.
 
 *Schnellstart:*
-1. Verbinde deinen Google Kalender mit /connect
-2. Erstelle Besprechungen, indem du @handycalbot in einem Chat eingibst
+1️⃣ Verbinde deinen Kalender mit /connect
+2️⃣ Erstelle Besprechungen mit @handycalbot in einem Chat
 
 *Inline-Nutzung:*
 `@handycalbot 14:30 "Besprechungstitel" email@beispiel.com`
 `@handycalbot 10:00 25-01-2026 "Projektsynchronisation"`
 `@handycalbot 14:30 "Besprechung" r 10m` (mit Erinnerung)
 
-*Alle Befehle:*
-/start - Willkommensnachricht
-/help - Hilfe und Nutzung anzeigen
-/connect - Google Kalender verbinden
-/disconnect - Kalender trennen
-/connectzoom - Zoom für Meeting-Links verbinden
-/disconnectzoom - Zoom trennen
-/meetings - Termine anzeigen und verwalten
-/settings - Deine Einstellungen ansehen
-/timezone - Zeitzone andern
-/duration - Standarddauer festlegen
-/reminder - Standard-Erinnerung festlegen
-/notifications - Erinnerungen ein/ausschalten
-/language - Sprache andern
-/feedback - Feedback senden oder Fehler melden
-/donate - Den Bot unterstutzen
+*Befehle:*
+/connect - Kalender oder Zoom verbinden
+/disconnect - Dienste trennen
+/meetings - Termine anzeigen
+/settings - Einstellungen
 
 _Fehlerberichte und Verbesserungsvorschlage sind willkommen!_
 """,
@@ -79,13 +68,9 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
 `@handycalbot 16:00 "Kurzer Anruf" r 15m`
 `@handycalbot 14:00 "Besprechung" anna@co.com r 10m/1h`
 
-*Alle Befehle:*
-/start - Willkommensnachricht
-/help - Diese Hilfenachricht
-/connect - Google Kalender verbinden
-/disconnect - Kalender trennen
-/connectzoom - Zoom für Meeting-Links verbinden
-/disconnectzoom - Zoom trennen
+*Befehle:*
+/connect - Kalender oder Zoom verbinden
+/disconnect - Dienste trennen
 /meetings - Termine anzeigen und verwalten
 /settings - Deine Einstellungen ansehen
 /timezone - Deine Zeitzone festlegen
@@ -182,10 +167,20 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         privacy_updated="{emoji} Benutzername-Einladungen {status}.",
         # Default calendar preference
         default_calendar_label="Standardkalender",
-        default_calendar_requires_both="Sie müssen sowohl Google als auch Outlook Kalender verbinden, um eine Präferenz festzulegen.\n\nVerwenden Sie /connect und /connectoutlook, um beide zu verbinden.",
+        default_calendar_requires_both="Sie müssen sowohl Google als auch Outlook Kalender verbinden, um eine Präferenz festzulegen.\n\nVerwenden Sie /connect, um beide zu verbinden.",
         default_calendar_title="**Standardkalender** 🎯",
         default_calendar_desc="Wählen Sie, welcher Kalender standardmäßig beim Erstellen von Besprechungen verwendet werden soll.\n\nSie können den Kalender für einzelne Termine im Bearbeiten-Menü wechseln.",
         default_calendar_updated="✅ Standardkalender auf {calendar} gesetzt.\n\nNeue Termine werden dort erstellt.",
+        # Unified connect/disconnect
+        connect_services_title="**Dienste verbinden** 🔗",
+        connect_select_service="Wählen Sie einen Dienst zum Verbinden:",
+        connect_another_service="Weiteren Dienst verbinden:",
+        connected_services_title="**Verbundene Dienste**",
+        manage_button="⚙️ Verwalten",
+        disconnect_services_title="**Dienste trennen** 🔌",
+        disconnect_select_service="Wählen Sie einen Dienst zum Trennen:",
+        no_services_connected="Keine Dienste verbunden.\n\nVerwenden Sie /connect um Ihren Kalender zu verbinden.",
+        service_disconnected="✅ {service} erfolgreich getrennt.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Kommende Besprechungen** 📅",
@@ -303,8 +298,8 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         google_meet_label="🎥 Google Meet",
         teams_meeting_label="📹 Microsoft Teams",
         zoom_meeting_label="📹 Zoom-Meeting",
-        zoom_not_connected="Zoom nicht verbunden. Verwende zuerst /connectzoom.",
-        outlook_not_connected="Outlook nicht verbunden. Verwende zuerst /connectoutlook.",
+        zoom_not_connected="Zoom nicht verbunden. Verwende zuerst /connect.",
+        outlook_not_connected="Outlook nicht verbunden. Verwende zuerst /connect.",
         custom_link_label="🔗 Besprechungslink",
         # Updates
         field_updated="✅ {field} aktualisiert",
@@ -377,12 +372,8 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         help="Hilfe und Anleitung anzeigen",
         meetings="Kommende Besprechungen auflisten",
         cancel="Eine Besprechung absagen",
-        connect="Google Kalender verbinden",
-        disconnect="Google Kalender trennen",
-        connectzoom="Zoom für Meeting-Links verbinden",
-        disconnectzoom="Zoom-Konto trennen",
-        connectoutlook="Outlook Kalender verbinden",
-        disconnectoutlook="Outlook Kalender trennen",
+        connect="Kalender oder Zoom verbinden",
+        disconnect="Dienste trennen",
         settings="Deine Einstellungen ansehen",
         timezone="Zeitzone andern",
         duration="Standarddauer festlegen",

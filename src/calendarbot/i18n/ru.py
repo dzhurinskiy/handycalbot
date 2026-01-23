@@ -27,32 +27,26 @@ translations = Translations(
 Я помогаю планировать встречи прямо из Telegram.
 
 *Быстрый старт:*
-1. Подключите Google Календарь с помощью /connect
-2. Создавайте встречи, набирая @handycalbot в любом чате
+1️⃣ Подключите календарь с помощью /connect
+2️⃣ Создавайте встречи, набирая @handycalbot в любом чате
 
 *Использование inline:*
 `@handycalbot 14:30 "Название встречи" email@example.com`
 `@handycalbot 10:00 25-01-2026 "Синхронизация"`
 `@handycalbot 14:30 "Встреча" r 10m` (с напоминанием)
+`@handycalbot 14:30 "Встреча" @alice @bob` (пригласить по имени)
 
-*Все команды:*
-/start - Приветственное сообщение
-/help - Показать справку и использование
-/connect - Подключить Google Календарь
-/disconnect - Отключить календарь
-/connectzoom - Подключить Zoom для ссылок на встречи
-/disconnectzoom - Отключить Zoom
+*Команды:*
+/connect - Подключить календарь или Zoom
+/disconnect - Отключить сервисы
 /meetings - Просмотр и управление встречами
 /settings - Посмотреть настройки
-/timezone - Изменить часовой пояс
-/duration - Установить длительность по умолчанию
-/reminder - Установить напоминание по умолчанию
-/notifications - Включить/выключить напоминания
-/language - Изменить язык
-/feedback - Отправить отзыв или сообщить об ошибке
-/donate - Поддержать бота
+/timezone, /duration, /reminder - Настроить по умолчанию
+/notifications, /privacy, /language - Предпочтения
+/feedback - Отправить отзыв
+/donate - Поддержать бота ⭐
 
-_Сообщения об ошибках и предложения по улучшению приветствуются!_
+_Сообщения об ошибках и предложения приветствуются!_
 """,
         help_message="""
 *Справка HandyCalBot* 📅
@@ -62,7 +56,7 @@ _Сообщения об ошибках и предложения по улуч�
 - Время (обязательно): `ЧЧ:ММ` (24-часовой формат)
 - Дата (опционально): `ДД-ММ-ГГГГ`
 - Название (обязательно): `"Название вашей встречи"`
-- Участники (опционально): `email@example.com`
+- Участники (опционально): `email@example.com` или `@имя`
 - Напоминание (опционально): `r 10m` или `r 10m/30m` или просто `r`
 
 *Формат напоминаний:*
@@ -77,24 +71,17 @@ _Сообщения об ошибках и предложения по улуч�
 `@handycalbot 14:30 "Стендап команды"`
 `@handycalbot 10:00 25-01-2026 "Обзор" ivan@co.com`
 `@handycalbot 16:00 "Быстрый звонок" r 15m`
-`@handycalbot 14:00 "Встреча" anna@co.com r 10m/1h`
+`@handycalbot 14:00 "Встреча" @alice @bob r 10m`
 
-*Все команды:*
-/start - Приветственное сообщение
-/help - Эта справка
-/connect - Подключить Google Календарь
-/disconnect - Отключить календарь
-/connectzoom - Подключить Zoom для ссылок на встречи
-/disconnectzoom - Отключить Zoom
+*Команды:*
+/connect - Подключить календарь или Zoom
+/disconnect - Отключить сервисы
 /meetings - Просмотр и управление встречами
 /settings - Посмотреть настройки
-/timezone - Установить часовой пояс
-/duration - Установить длительность по умолчанию
-/reminder - Установить напоминание по умолчанию
-/notifications - Переключить уведомления
-/language - Изменить язык
-/feedback - Отправить отзыв или сообщить об ошибке
-/donate - Поддержать бота Stars
+/timezone, /duration, /reminder - Настроить по умолчанию
+/notifications, /privacy, /language - Предпочтения
+/feedback - Отправить отзыв
+/donate - Поддержать бота ⭐
 """,
         timezone_detected="Я установил ваш часовой пояс как `{timezone}` на основе языка Telegram. Используйте /timezone для изменения.",
         support_button="⭐ Поддержать HandyCalBot",
@@ -182,10 +169,20 @@ _Сообщения об ошибках и предложения по улуч�
         privacy_updated="{emoji} Приглашения по имени пользователя {status}.",
         # Default calendar preference
         default_calendar_label="Календарь по умолчанию",
-        default_calendar_requires_both="Вам нужно подключить и Google, и Outlook календари, чтобы установить предпочтение.\n\nИспользуйте /connect и /connectoutlook для подключения обоих.",
+        default_calendar_requires_both="Вам нужно подключить и Google, и Outlook календари, чтобы установить предпочтение.\n\nИспользуйте /connect для подключения обоих.",
         default_calendar_title="**Календарь по умолчанию** 🎯",
         default_calendar_desc="Выберите, какой календарь использовать по умолчанию при создании встреч.\n\nВы можете переключить календарь для отдельных встреч в меню редактирования.",
         default_calendar_updated="✅ Календарь по умолчанию установлен на {calendar}.\n\nНовые встречи будут создаваться там.",
+        # Unified connect/disconnect
+        connect_services_title="**Подключить сервисы** 🔗",
+        connect_select_service="Выберите сервис для подключения:",
+        connect_another_service="Подключить другой сервис:",
+        connected_services_title="**Подключенные сервисы**",
+        manage_button="⚙️ Управление",
+        disconnect_services_title="**Отключить сервисы** 🔌",
+        disconnect_select_service="Выберите сервис для отключения:",
+        no_services_connected="Сервисы не подключены.\n\nИспользуйте /connect для подключения календаря.",
+        service_disconnected="✅ {service} успешно отключён.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Предстоящие встречи** 📅",
@@ -303,8 +300,8 @@ _Сообщения об ошибках и предложения по улуч�
         google_meet_label="🎥 Google Meet",
         teams_meeting_label="📹 Microsoft Teams",
         zoom_meeting_label="📹 Zoom-встреча",
-        zoom_not_connected="Zoom не подключен. Сначала используйте /connectzoom.",
-        outlook_not_connected="Outlook не подключен. Сначала используйте /connectoutlook.",
+        zoom_not_connected="Zoom не подключен. Сначала используйте /connect.",
+        outlook_not_connected="Outlook не подключен. Сначала используйте /connect.",
         custom_link_label="🔗 Ссылка на встречу",
         # Updates
         field_updated="✅ {field} обновлено",
@@ -377,12 +374,8 @@ _Сообщения об ошибках и предложения по улуч�
         help="Показать справку и инструкции",
         meetings="Список предстоящих встреч",
         cancel="Отменить встречу",
-        connect="Подключить Google Календарь",
-        disconnect="Отключить Google Календарь",
-        connectzoom="Подключить Zoom для ссылок на встречи",
-        disconnectzoom="Отключить аккаунт Zoom",
-        connectoutlook="Подключить Outlook Календарь",
-        disconnectoutlook="Отключить Outlook Календарь",
+        connect="Подключить календарь или Zoom",
+        disconnect="Отключить сервисы",
         settings="Посмотреть настройки",
         timezone="Изменить часовой пояс",
         duration="Установить длительность по умолчанию",

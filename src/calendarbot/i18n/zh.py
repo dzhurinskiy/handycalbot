@@ -27,30 +27,24 @@ translations = Translations(
 我可以帮助您直接从 Telegram 安排会议。
 
 *快速开始:*
-1. 使用 /connect 连接您的 Google 日历
-2. 在任意聊天中输入 @handycalbot 创建会议
+1️⃣ 使用 /connect 连接您的日历
+2️⃣ 在任意聊天中输入 @handycalbot 创建会议
 
 *内联使用方法:*
 `@handycalbot 14:30 "会议标题" email@example.com`
 `@handycalbot 10:00 25-01-2026 "项目同步"`
 `@handycalbot 14:30 "会议" r 10m` (带提醒)
+`@handycalbot 14:30 "会议" @alice @bob` (通过用户名邀请)
 
-*所有命令:*
-/start - 欢迎消息
-/help - 显示帮助和用法
-/connect - 连接 Google 日历
-/disconnect - 断开日历连接
-/connectzoom - 连接 Zoom 获取会议链接
-/disconnectzoom - 断开Zoom连接
+*命令:*
+/connect - 连接日历或 Zoom
+/disconnect - 断开服务连接
 /meetings - 查看和管理会议
 /settings - 查看设置
-/timezone - 更改时区
-/duration - 设置默认时长
-/reminder - 设置默认提醒
-/notifications - 开关提醒
-/language - 更改语言
+/timezone, /duration, /reminder - 配置默认值
+/notifications, /privacy, /language - 偏好设置
 /feedback - 发送反馈或报告错误
-/donate - 支持机器人
+/donate - 支持机器人 ⭐
 
 _欢迎提交错误报告和UI改进建议！_
 """,
@@ -59,42 +53,39 @@ _欢迎提交错误报告和UI改进建议！_
 
 *创建会议 (内联):*
 在任意聊天中输入 `@handycalbot` 后跟:
-- 时间 (必需): `HH:MM` (24小时格式)
-- 日期 (可选): `DD-MM-YYYY`
-- 标题 (必需): `"您的会议标题"`
-- 参与者 (可选): `email@example.com`
-- 提醒 (可选): `r 10m` 或 `r 10m/30m` 或仅 `r`
+• 时间 (必需): `HH:MM` (24小时格式)
+• 日期 (可选): `DD-MM-YYYY`
+• 标题 (必需): `"您的会议标题"`
+• 参与者 (可选): `email@example.com` 或 `@用户名`
+• 提醒 (可选): `r 10m` 或 `r 10m/30m` 或仅 `r`
 
 *提醒格式:*
-- `r 10m` - 10分钟前提醒
-- `r 1h` - 1小时前提醒
-- `r 1d` - 1天前提醒
-- `r 10m/30m` - 多个提醒
-- `r` - 使用默认提醒
-- (无r) - 无提醒
+• `r 10m` - 10分钟前提醒
+• `r 1h` - 1小时前提醒
+• `r 1d` - 1天前提醒
+• `r 10m/30m` - 多个提醒
+• `r` - 使用默认提醒
+• (无r) - 无提醒
 
 *示例:*
 `@handycalbot 14:30 "团队站会"`
 `@handycalbot 10:00 25-01-2026 "评审" wang@co.com`
 `@handycalbot 16:00 "快速通话" r 15m`
-`@handycalbot 14:00 "会议" li@co.com r 10m/1h`
+`@handycalbot 14:00 "会议" @alice @bob r 10m`
 
-*所有命令:*
-/start - 欢迎消息
-/help - 此帮助消息
-/connect - 连接 Google 日历
-/disconnect - 断开日历连接
-/connectzoom - 连接 Zoom 获取会议链接
-/disconnectzoom - 断开Zoom连接
-/meetings - 查看和管理会议
-/settings - 查看设置
+*命令:*
+/connect - 连接 Google 日历、Outlook 或 Zoom
+/disconnect - 断开服务连接
+/meetings - 查看和管理即将到来的会议
+/settings - 查看当前设置
 /timezone - 设置时区
 /duration - 设置默认会议时长
 /reminder - 设置默认提醒
 /notifications - 开关提醒通知
+/privacy - 用户名邀请设置
 /language - 更改语言
 /feedback - 发送反馈或报告错误
-/donate - 用 Stars 支持机器人
+/donate - 用 Stars 支持机器人 ⭐
 """,
         timezone_detected="根据您的 Telegram 语言设置，已将时区设置为 `{timezone}`。如需更改请使用 /timezone。",
         support_button="⭐ 支持 HandyCalBot",
@@ -181,10 +172,20 @@ _欢迎提交错误报告和UI改进建议！_
         privacy_updated="{emoji} 用户名邀请{status}。",
         # Default calendar preference
         default_calendar_label="默认日历",
-        default_calendar_requires_both="您需要同时连接 Google 和 Outlook 日历才能设置偏好。\n\n使用 /connect 和 /connectoutlook 连接两者。",
+        default_calendar_requires_both="您需要同时连接 Google 和 Outlook 日历才能设置偏好。\n\n使用 /connect 连接两者。",
         default_calendar_title="**默认日历** 🎯",
         default_calendar_desc="选择创建会议时默认使用的日历。\n\n您可以从编辑菜单更改单个会议的日历。",
         default_calendar_updated="✅ 默认日历已设置为 {calendar}。\n\n新会议将在那里创建。",
+        # Unified connect/disconnect
+        connect_services_title="**连接服务** 🔗",
+        connect_select_service="选择要连接的服务:",
+        connect_another_service="连接其他服务:",
+        connected_services_title="**已连接服务**",
+        manage_button="⚙️ 管理",
+        disconnect_services_title="**断开服务** 🔌",
+        disconnect_select_service="选择要断开的服务:",
+        no_services_connected="没有已连接的服务。\n\n使用 /connect 连接您的日历。",
+        service_disconnected="✅ {service}已成功断开。",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**即将到来的会议** 📅",
@@ -302,8 +303,8 @@ _欢迎提交错误报告和UI改进建议！_
         google_meet_label="🎥 Google Meet",
         teams_meeting_label="📹 Microsoft Teams",
         zoom_meeting_label="📹 Zoom 会议",
-        zoom_not_connected="Zoom 未连接。请先使用 /connectzoom。",
-        outlook_not_connected="Outlook 未连接。请先使用 /connectoutlook。",
+        zoom_not_connected="Zoom 未连接。请先使用 /connect。",
+        outlook_not_connected="Outlook 未连接。请先使用 /connect。",
         custom_link_label="🔗 会议链接",
         # Updates
         field_updated="✅ {field}已更新",
@@ -376,20 +377,16 @@ _欢迎提交错误报告和UI改进建议！_
         help="显示帮助和使用说明",
         meetings="列出即将到来的会议",
         cancel="取消会议",
-        connect="连接 Google 日历",
-        disconnect="断开 Google 日历",
-        connectzoom="连接 Zoom 获取会议链接",
-        disconnectzoom="断开 Zoom 账户",
-        connectoutlook="连接 Outlook 日历",
-        disconnectoutlook="断开 Outlook 日历",
-        settings="查看设置",
+        connect="连接日历或 Zoom",
+        disconnect="断开服务连接",
+        settings="查看当前设置",
         timezone="更改时区",
-        duration="设置默认时长",
+        duration="设置默认会议时长",
         reminder="设置默认提醒",
-        notifications="开关通知",
-        privacy="邀请隐私设置",
+        notifications="开关会议通知",
+        privacy="@用户名邀请的隐私设置",
         language="更改语言",
-        donate="用 Stars 支持机器人",
+        donate="用 Telegram Stars 支持机器人",
         feedback="发送反馈或报告错误",
     ),
 )

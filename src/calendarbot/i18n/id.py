@@ -27,28 +27,22 @@ Selamat datang di *HandyCalBot*! 📅
 Saya membantu Anda menjadwalkan rapat langsung dari Telegram.
 
 *Mulai Cepat:*
-1️⃣ Hubungkan Google Calendar Anda dengan /connect
+1️⃣ Hubungkan kalender Anda dengan /connect
 2️⃣ Buat rapat dengan mengetik @handycalbot di chat mana pun
 
 *Penggunaan Inline:*
 `@handycalbot 14:30 "Judul Rapat" email@contoh.com`
 `@handycalbot 10:00 25-01-2026 "Sinkronisasi Proyek"`
 `@handycalbot 14:30 "Rapat" r 10m` (dengan pengingat)
+`@handycalbot 14:30 "Rapat" @alice @bob` (undang via username)
 
-*Semua Perintah:*
-/start - Pesan selamat datang
-/help - Tampilkan bantuan dan penggunaan
-/connect - Hubungkan Google Calendar
-/disconnect - Putuskan koneksi kalender
-/connectzoom - Hubungkan Zoom untuk tautan rapat
-/disconnectzoom - Putuskan Zoom
+*Perintah:*
+/connect - Hubungkan kalender atau Zoom
+/disconnect - Putuskan layanan
 /meetings - Lihat dan kelola rapat
 /settings - Lihat pengaturan Anda
-/timezone - Ubah zona waktu
-/duration - Atur durasi default
-/reminder - Atur pengingat default
-/notifications - Aktifkan/nonaktifkan pengingat
-/language - Ubah bahasa
+/timezone, /duration, /reminder - Atur default
+/notifications, /privacy, /language - Preferensi
 /feedback - Kirim masukan atau laporkan bug
 /donate - Dukung bot ⭐
 
@@ -62,7 +56,7 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
 • Waktu (wajib): `HH:MM` (format 24 jam)
 • Tanggal (opsional): `DD-MM-YYYY`
 • Judul (wajib): `"Judul Rapat Anda"`
-• Peserta (opsional): `email@contoh.com`
+• Peserta (opsional): `email@contoh.com` atau `@username`
 • Pengingat (opsional): `r 10m` atau `r 10m/30m` atau hanya `r`
 
 *Format Pengingat:*
@@ -77,21 +71,18 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
 `@handycalbot 14:30 "Standup Tim"`
 `@handycalbot 10:00 25-01-2026 "Review" john@co.com`
 `@handycalbot 16:00 "Panggilan Cepat" r 15m`
-`@handycalbot 14:00 "Rapat" alice@co.com r 10m/1h`
+`@handycalbot 14:00 "Rapat" @alice @bob r 10m`
 
-*Semua Perintah:*
-/start - Pesan selamat datang
-/help - Pesan bantuan ini
-/connect - Hubungkan Google Calendar
-/disconnect - Putuskan koneksi kalender
-/connectzoom - Hubungkan Zoom untuk tautan rapat
-/disconnectzoom - Putuskan Zoom
-/meetings - Lihat dan kelola rapat
-/settings - Lihat pengaturan Anda
+*Perintah:*
+/connect - Hubungkan Google Calendar, Outlook, atau Zoom
+/disconnect - Putuskan layanan
+/meetings - Lihat dan kelola rapat mendatang
+/settings - Lihat pengaturan saat ini
 /timezone - Atur zona waktu Anda
 /duration - Atur durasi rapat default
 /reminder - Atur pengingat default
 /notifications - Aktifkan/nonaktifkan notifikasi
+/privacy - Pengaturan undangan username
 /language - Ubah bahasa
 /feedback - Kirim masukan atau laporkan bug
 /donate - Dukung bot dengan Stars ⭐
@@ -182,10 +173,20 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         privacy_updated="{emoji} Undangan username {status}.",
         # Default calendar preference
         default_calendar_label="Kalender Default",
-        default_calendar_requires_both="Anda perlu menghubungkan kalender Google dan Outlook untuk menetapkan preferensi.\n\nGunakan /connect dan /connectoutlook untuk menghubungkan keduanya.",
+        default_calendar_requires_both="Anda perlu menghubungkan kalender Google dan Outlook untuk menetapkan preferensi.\n\nGunakan /connect untuk menghubungkan keduanya.",
         default_calendar_title="**Kalender Default** 🎯",
         default_calendar_desc="Pilih kalender mana yang akan digunakan secara default saat membuat rapat.\n\nAnda dapat mengubah kalender untuk rapat individual dari menu Edit.",
         default_calendar_updated="✅ Kalender default diatur ke {calendar}.\n\nRapat baru akan dibuat di sana.",
+        # Unified connect/disconnect
+        connect_services_title="**Hubungkan Layanan** 🔗",
+        connect_select_service="Pilih layanan untuk dihubungkan:",
+        connect_another_service="Hubungkan layanan lain:",
+        connected_services_title="**Layanan Terhubung**",
+        manage_button="⚙️ Kelola",
+        disconnect_services_title="**Putuskan Layanan** 🔌",
+        disconnect_select_service="Pilih layanan untuk diputuskan:",
+        no_services_connected="Tidak ada layanan yang terhubung.\n\nGunakan /connect untuk menghubungkan kalender Anda.",
+        service_disconnected="✅ {service} berhasil diputuskan.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Rapat Mendatang** 📅",
@@ -303,8 +304,8 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         google_meet_label="🎥 Google Meet",
         teams_meeting_label="📹 Microsoft Teams",
         zoom_meeting_label="📹 Rapat Zoom",
-        zoom_not_connected="Zoom tidak terhubung. Gunakan /connectzoom terlebih dahulu.",
-        outlook_not_connected="Outlook tidak terhubung. Gunakan /connectoutlook terlebih dahulu.",
+        zoom_not_connected="Zoom tidak terhubung. Gunakan /connect terlebih dahulu.",
+        outlook_not_connected="Outlook tidak terhubung. Gunakan /connect terlebih dahulu.",
         custom_link_label="🔗 Link Rapat",
         # Updates
         field_updated="✅ {field} diperbarui",
@@ -377,20 +378,16 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         help="Tampilkan bantuan dan instruksi",
         meetings="Daftar rapat mendatang",
         cancel="Batalkan rapat",
-        connect="Hubungkan Google Calendar",
-        disconnect="Putuskan Google Calendar",
-        connectzoom="Hubungkan Zoom untuk tautan rapat",
-        disconnectzoom="Putuskan akun Zoom",
-        connectoutlook="Hubungkan Outlook Calendar",
-        disconnectoutlook="Putuskan Outlook Calendar",
+        connect="Hubungkan kalender atau Zoom",
+        disconnect="Putuskan layanan",
         settings="Lihat pengaturan Anda",
         timezone="Ubah zona waktu",
         duration="Atur durasi default",
         reminder="Atur pengingat default",
         notifications="Aktifkan/nonaktifkan notifikasi",
-        privacy="Pengaturan privasi untuk undangan",
+        privacy="Pengaturan privasi untuk undangan @username",
         language="Ubah bahasa",
-        donate="Dukung bot dengan Stars",
+        donate="Dukung bot dengan Telegram Stars",
         feedback="Kirim masukan atau laporkan bug",
     ),
 )

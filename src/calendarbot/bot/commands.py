@@ -19,8 +19,6 @@ def get_bot_commands(language: str = "en") -> list[BotCommand]:
         BotCommand("cancel", t.commands.cancel),
         BotCommand("connect", t.commands.connect),
         BotCommand("disconnect", t.commands.disconnect),
-        BotCommand("connectzoom", t.commands.connectzoom),
-        BotCommand("disconnectzoom", t.commands.disconnectzoom),
         BotCommand("settings", t.commands.settings),
         BotCommand("timezone", t.commands.timezone),
         BotCommand("duration", t.commands.duration),

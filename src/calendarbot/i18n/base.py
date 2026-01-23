@@ -133,6 +133,17 @@ class SettingsTranslations:
     default_calendar_desc: str
     default_calendar_updated: str
 
+    # Unified connect/disconnect
+    connect_services_title: str
+    connect_select_service: str
+    connect_another_service: str
+    connected_services_title: str
+    manage_button: str
+    disconnect_services_title: str
+    disconnect_select_service: str
+    no_services_connected: str
+    service_disconnected: str
+
 
 @dataclass(frozen=True)
 class MeetingsTranslations:
@@ -379,10 +390,6 @@ class CommandTranslations:
     cancel: str
     connect: str
     disconnect: str
-    connectoutlook: str
-    disconnectoutlook: str
-    connectzoom: str
-    disconnectzoom: str
     settings: str
     timezone: str
     duration: str

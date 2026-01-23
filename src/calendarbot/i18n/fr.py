@@ -27,30 +27,24 @@ Bienvenue sur *HandyCalBot*! 📅
 Je vous aide a planifier des reunions directement depuis Telegram.
 
 *Demarrage Rapide:*
-1. Connectez votre Google Calendar avec /connect
-2. Creez des reunions en tapant @handycalbot dans n'importe quel chat
+1️⃣ Connectez votre calendrier avec /connect
+2️⃣ Creez des reunions en tapant @handycalbot dans n'importe quel chat
 
 *Utilisation Inline:*
 `@handycalbot 14:30 "Titre de Reunion" email@exemple.com`
 `@handycalbot 10:00 25-01-2026 "Synchronisation"`
 `@handycalbot 14:30 "Reunion" r 10m` (avec rappel)
+`@handycalbot 14:30 "Reunion" @alice @bob` (inviter par nom d'utilisateur)
 
-*Toutes les Commandes:*
-/start - Message de bienvenue
-/help - Afficher l'aide et l'utilisation
-/connect - Connecter Google Calendar
-/disconnect - Deconnecter le calendrier
-/connectzoom - Connecter Zoom pour les liens de reunion
-/disconnectzoom - Déconnecter Zoom
-/meetings - Voir et gérer les réunions
+*Commandes:*
+/connect - Connecter calendrier ou Zoom
+/disconnect - Deconnecter des services
+/meetings - Voir et gerer les reunions
 /settings - Voir vos parametres
-/timezone - Changer le fuseau horaire
-/duration - Definir la duree par defaut
-/reminder - Definir le rappel par defaut
-/notifications - Activer/desactiver les rappels
-/language - Changer la langue
+/timezone, /duration, /reminder - Configurer les valeurs par defaut
+/notifications, /privacy, /language - Preferences
 /feedback - Envoyer des commentaires ou signaler des bugs
-/donate - Soutenir le bot
+/donate - Soutenir le bot ⭐
 
 _Les rapports de bugs et suggestions d'amelioration sont les bienvenus!_
 """,
@@ -59,42 +53,39 @@ _Les rapports de bugs et suggestions d'amelioration sont les bienvenus!_
 
 *Creer des Reunions (Inline):*
 Tapez `@handycalbot` dans n'importe quel chat suivi de:
-- Heure (requise): `HH:MM` (format 24 heures)
-- Date (optionnelle): `JJ-MM-AAAA`
-- Titre (requis): `"Votre Titre de Reunion"`
-- Participants (optionnel): `email@exemple.com`
-- Rappel (optionnel): `r 10m` ou `r 10m/30m` ou juste `r`
+• Heure (requise): `HH:MM` (format 24 heures)
+• Date (optionnelle): `JJ-MM-AAAA`
+• Titre (requis): `"Votre Titre de Reunion"`
+• Participants (optionnel): `email@exemple.com` ou `@nomutilisateur`
+• Rappel (optionnel): `r 10m` ou `r 10m/30m` ou juste `r`
 
 *Format de Rappel:*
-- `r 10m` - rappeler 10 minutes avant
-- `r 1h` - rappeler 1 heure avant
-- `r 1d` - rappeler 1 jour avant
-- `r 10m/30m` - rappels multiples
-- `r` - utiliser le rappel par defaut
-- (sans r) - pas de rappel
+• `r 10m` - rappeler 10 minutes avant
+• `r 1h` - rappeler 1 heure avant
+• `r 1d` - rappeler 1 jour avant
+• `r 10m/30m` - rappels multiples
+• `r` - utiliser le rappel par defaut
+• (sans r) - pas de rappel
 
 *Exemples:*
 `@handycalbot 14:30 "Reunion d'Equipe"`
 `@handycalbot 10:00 25-01-2026 "Revue" jean@co.com`
 `@handycalbot 16:00 "Appel Rapide" r 15m`
-`@handycalbot 14:00 "Reunion" alice@co.com r 10m/1h`
+`@handycalbot 14:00 "Reunion" @alice @bob r 10m`
 
-*Toutes les Commandes:*
-/start - Message de bienvenue
-/help - Ce message d'aide
-/connect - Connecter Google Calendar
-/disconnect - Deconnecter le calendrier
-/connectzoom - Connecter Zoom pour les liens de reunion
-/disconnectzoom - Déconnecter Zoom
-/meetings - Voir et gérer les réunions
-/settings - Voir vos parametres
+*Commandes:*
+/connect - Connecter Google Calendar, Outlook ou Zoom
+/disconnect - Deconnecter des services
+/meetings - Voir et gerer les prochaines reunions
+/settings - Voir vos parametres actuels
 /timezone - Definir votre fuseau horaire
 /duration - Definir la duree par defaut
 /reminder - Definir le rappel par defaut
 /notifications - Activer/desactiver les notifications
+/privacy - Parametres d'invitation par nom d'utilisateur
 /language - Changer la langue
 /feedback - Envoyer des commentaires ou signaler des bugs
-/donate - Soutenir le bot avec des Stars
+/donate - Soutenir le bot avec des Stars ⭐
 """,
         timezone_detected="J'ai defini votre fuseau horaire sur `{timezone}` en fonction de votre langue Telegram. Utilisez /timezone pour le modifier si necessaire.",
         support_button="⭐ Soutenir HandyCalBot",
@@ -181,10 +172,20 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         privacy_updated="{emoji} Invitations par nom d'utilisateur {status}.",
         # Default calendar preference
         default_calendar_label="Calendrier par Défaut",
-        default_calendar_requires_both="Vous devez avoir Google et Outlook connectés pour définir une préférence.\n\nUtilisez /connect et /connectoutlook pour connecter les deux.",
+        default_calendar_requires_both="Vous devez avoir Google et Outlook connectés pour définir une préférence.\n\nUtilisez /connect pour connecter les deux.",
         default_calendar_title="**Calendrier par Défaut** 🎯",
         default_calendar_desc="Choisissez quel calendrier utiliser par défaut lors de la création de réunions.\n\nVous pouvez changer de calendrier pour des réunions individuelles depuis le menu Modifier.",
         default_calendar_updated="✅ Calendrier par défaut défini sur {calendar}.\n\nLes nouvelles réunions y seront créées.",
+        # Unified connect/disconnect
+        connect_services_title="**Connecter des services** 🔗",
+        connect_select_service="Sélectionnez un service à connecter:",
+        connect_another_service="Connecter un autre service:",
+        connected_services_title="**Services connectés**",
+        manage_button="⚙️ Gérer",
+        disconnect_services_title="**Déconnecter des services** 🔌",
+        disconnect_select_service="Sélectionnez un service à déconnecter:",
+        no_services_connected="Aucun service connecté.\n\nUtilisez /connect pour lier votre calendrier.",
+        service_disconnected="✅ {service} déconnecté avec succès.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Prochaines Reunions** 📅",
@@ -302,8 +303,8 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         google_meet_label="🎥 Google Meet",
         teams_meeting_label="📹 Microsoft Teams",
         zoom_meeting_label="📹 Réunion Zoom",
-        zoom_not_connected="Zoom non connecté. Utilisez d'abord /connectzoom.",
-        outlook_not_connected="Outlook non connecté. Utilisez d'abord /connectoutlook.",
+        zoom_not_connected="Zoom non connecté. Utilisez d'abord /connect.",
+        outlook_not_connected="Outlook non connecté. Utilisez d'abord /connect.",
         custom_link_label="🔗 Lien de Reunion",
         # Updates
         field_updated="✅ {field} mis a jour",
@@ -376,18 +377,14 @@ Tapez `@handycalbot` dans n'importe quel chat suivi de:
         help="Afficher l'aide et les instructions",
         meetings="Lister les prochaines reunions",
         cancel="Annuler une reunion",
-        connect="Connecter Google Calendar",
-        disconnect="Deconnecter Google Calendar",
-        connectzoom="Connecter Zoom pour les liens de reunion",
-        disconnectzoom="Deconnecter le compte Zoom",
-        connectoutlook="Connecter Outlook Calendar",
-        disconnectoutlook="Deconnecter Outlook Calendar",
-        settings="Voir vos parametres",
+        connect="Connecter calendrier ou Zoom",
+        disconnect="Deconnecter des services",
+        settings="Voir vos parametres actuels",
         timezone="Changer le fuseau horaire",
         duration="Definir la duree par defaut",
         reminder="Definir le rappel par defaut",
         notifications="Activer/desactiver notifications",
-        privacy="Paramètres de confidentialité pour les invitations",
+        privacy="Parametres de confidentialite pour les invitations @nomutilisateur",
         language="Changer la langue",
         donate="Soutenir le bot avec des Stars",
         feedback="Envoyer un commentaire ou signaler un bug",

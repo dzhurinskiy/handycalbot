@@ -27,28 +27,22 @@ translations = Translations(
 من به شما کمک می‌کنم جلسات را مستقیماً از تلگرام برنامه‌ریزی کنید.
 
 *شروع سریع:*
-1️⃣ تقویم گوگل خود را با /connect متصل کنید
+1️⃣ تقویم خود را با /connect متصل کنید
 2️⃣ با تایپ @handycalbot در هر چت، جلسه بسازید
 
 *استفاده اینلاین:*
 `@handycalbot 14:30 "عنوان جلسه" email@example.com`
 `@handycalbot 10:00 25-01-2026 "همگام‌سازی پروژه"`
 `@handycalbot 14:30 "جلسه" r 10m` (با یادآوری)
+`@handycalbot 14:30 "جلسه" @alice @bob` (دعوت با نام کاربری)
 
-*همه دستورات:*
-/start - پیام خوش‌آمدگویی
-/help - نمایش راهنما
-/connect - اتصال تقویم گوگل
-/disconnect - قطع اتصال تقویم
-/connectzoom - اتصال زوم برای لینک‌های جلسه
-/disconnectzoom - قطع اتصال Zoom
+*دستورات:*
+/connect - اتصال تقویم یا زوم
+/disconnect - قطع اتصال سرویس‌ها
 /meetings - مشاهده و مدیریت جلسات
 /settings - مشاهده تنظیمات
-/timezone - تغییر منطقه زمانی
-/duration - تنظیم مدت پیش‌فرض
-/reminder - تنظیم یادآوری پیش‌فرض
-/notifications - فعال/غیرفعال کردن یادآوری
-/language - تغییر زبان
+/timezone, /duration, /reminder - پیکربندی پیش‌فرض‌ها
+/notifications, /privacy, /language - تنظیمات
 /feedback - ارسال بازخورد یا گزارش خطا
 /donate - حمایت از بات ⭐
 
@@ -62,7 +56,7 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
 • زمان (اجباری): `HH:MM` (فرمت ۲۴ ساعته)
 • تاریخ (اختیاری): `DD-MM-YYYY`
 • عنوان (اجباری): `"عنوان جلسه شما"`
-• شرکت‌کنندگان (اختیاری): `email@example.com`
+• شرکت‌کنندگان (اختیاری): `email@example.com` یا `@username`
 • یادآوری (اختیاری): `r 10m` یا `r 10m/30m` یا فقط `r`
 
 *فرمت یادآوری:*
@@ -77,21 +71,18 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
 `@handycalbot 14:30 "جلسه تیمی"`
 `@handycalbot 10:00 25-01-2026 "بررسی" john@co.com`
 `@handycalbot 16:00 "تماس سریع" r 15m`
-`@handycalbot 14:00 "جلسه" alice@co.com r 10m/1h`
+`@handycalbot 14:00 "جلسه" @alice @bob r 10m`
 
-*همه دستورات:*
-/start - پیام خوش‌آمدگویی
-/help - این پیام راهنما
-/connect - اتصال تقویم گوگل
-/disconnect - قطع اتصال تقویم
-/connectzoom - اتصال زوم برای لینک‌های جلسه
-/disconnectzoom - قطع اتصال Zoom
-/meetings - مشاهده و مدیریت جلسات
-/settings - مشاهده تنظیمات
+*دستورات:*
+/connect - اتصال تقویم گوگل، Outlook یا زوم
+/disconnect - قطع اتصال سرویس‌ها
+/meetings - مشاهده و مدیریت جلسات آینده
+/settings - مشاهده تنظیمات فعلی
 /timezone - تنظیم منطقه زمانی
 /duration - تنظیم مدت پیش‌فرض جلسه
 /reminder - تنظیم یادآوری پیش‌فرض
-/notifications - فعال/غیرفعال کردن اعلان
+/notifications - فعال/غیرفعال کردن اعلان یادآوری
+/privacy - تنظیمات دعوت با نام کاربری
 /language - تغییر زبان
 /feedback - ارسال بازخورد یا گزارش خطا
 /donate - حمایت از بات با Stars ⭐
@@ -182,10 +173,20 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         privacy_updated="{emoji} دعوت‌نامه‌های نام کاربری {status}.",
         # Default calendar preference
         default_calendar_label="تقویم پیش‌فرض",
-        default_calendar_requires_both="برای تنظیم ترجیحات، باید هر دو تقویم Google و Outlook متصل باشند.\n\nاز /connect و /connectoutlook برای اتصال هر دو استفاده کنید.",
+        default_calendar_requires_both="برای تنظیم ترجیحات، باید هر دو تقویم Google و Outlook متصل باشند.\n\nاز /connect برای اتصال هر دو استفاده کنید.",
         default_calendar_title="**تقویم پیش‌فرض** 🎯",
         default_calendar_desc="انتخاب کنید کدام تقویم به طور پیش‌فرض هنگام ایجاد جلسات استفاده شود.\n\nمی‌توانید تقویم را برای جلسات فردی از منوی ویرایش تغییر دهید.",
         default_calendar_updated="✅ تقویم پیش‌فرض روی {calendar} تنظیم شد.\n\nجلسات جدید در آنجا ایجاد می‌شوند.",
+        # Unified connect/disconnect
+        connect_services_title="**اتصال سرویس‌ها** 🔗",
+        connect_select_service="یک سرویس برای اتصال انتخاب کنید:",
+        connect_another_service="اتصال سرویس دیگر:",
+        connected_services_title="**سرویس‌های متصل**",
+        manage_button="⚙️ مدیریت",
+        disconnect_services_title="**قطع اتصال سرویس‌ها** 🔌",
+        disconnect_select_service="یک سرویس برای قطع اتصال انتخاب کنید:",
+        no_services_connected="هیچ سرویسی متصل نیست.\n\nاز /connect برای اتصال تقویم خود استفاده کنید.",
+        service_disconnected="✅ {service} با موفقیت قطع شد.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**جلسات آینده** 📅",
@@ -303,8 +304,8 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         google_meet_label="🎥 Google Meet",
         teams_meeting_label="📹 Microsoft Teams",
         zoom_meeting_label="📹 جلسه زوم",
-        zoom_not_connected="زوم متصل نیست. ابتدا /connectzoom را استفاده کنید.",
-        outlook_not_connected="Outlook متصل نیست. ابتدا /connectoutlook را استفاده کنید.",
+        zoom_not_connected="زوم متصل نیست. ابتدا /connect را استفاده کنید.",
+        outlook_not_connected="Outlook متصل نیست. ابتدا /connect را استفاده کنید.",
         custom_link_label="🔗 لینک جلسه",
         # Updates
         field_updated="✅ {field} به‌روز شد",
@@ -377,20 +378,16 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         help="نمایش راهنما و دستورالعمل‌ها",
         meetings="لیست جلسات آینده",
         cancel="لغو جلسه",
-        connect="اتصال تقویم گوگل",
-        disconnect="قطع تقویم گوگل",
-        connectzoom="اتصال زوم برای لینک‌های جلسه",
-        disconnectzoom="قطع اتصال حساب زوم",
-        connectoutlook="اتصال تقویم Outlook",
-        disconnectoutlook="قطع تقویم Outlook",
-        settings="مشاهده تنظیمات",
+        connect="اتصال تقویم یا زوم",
+        disconnect="قطع اتصال سرویس‌ها",
+        settings="مشاهده تنظیمات فعلی",
         timezone="تغییر منطقه زمانی",
         duration="تنظیم مدت پیش‌فرض",
         reminder="تنظیم یادآوری پیش‌فرض",
         notifications="فعال/غیرفعال کردن اعلان",
-        privacy="تنظیمات حریم خصوصی برای دعوت‌نامه‌ها",
+        privacy="تنظیمات حریم خصوصی برای دعوت با @نام کاربری",
         language="تغییر زبان",
-        donate="حمایت از بات با Stars",
+        donate="حمایت از بات با Telegram Stars",
         feedback="ارسال بازخورد یا گزارش خطا",
     ),
 )

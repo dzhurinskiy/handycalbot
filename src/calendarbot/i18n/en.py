@@ -27,7 +27,7 @@ Welcome to *HandyCalBot*! 📅
 I help you schedule meetings directly from Telegram.
 
 *Quick Start:*
-1️⃣ Connect your Google Calendar with /connect
+1️⃣ Connect your calendar with /connect
 2️⃣ Create meetings by typing @handycalbot in any chat
 
 *Inline Usage:*
@@ -36,21 +36,13 @@ I help you schedule meetings directly from Telegram.
 `@handycalbot 14:30 "Meeting" r 10m` (with reminder)
 `@handycalbot 14:30 "Meeting" @alice @bob` (invite by username)
 
-*All Commands:*
-/start - Welcome message
-/help - Show help and usage
-/connect - Connect Google Calendar
-/disconnect - Disconnect calendar
-/connectzoom - Connect Zoom for meeting links
-/disconnectzoom - Disconnect Zoom
+*Commands:*
+/connect - Connect calendar or Zoom
+/disconnect - Disconnect services
 /meetings - View and manage meetings
 /settings - View your settings
-/timezone - Change timezone
-/duration - Set default duration
-/reminder - Set default reminder
-/notifications - Toggle reminders
-/privacy - Username invite settings
-/language - Change language
+/timezone, /duration, /reminder - Configure defaults
+/notifications, /privacy, /language - Preferences
 /feedback - Send feedback or report bugs
 /donate - Support the bot ⭐
 
@@ -81,15 +73,11 @@ Type `@handycalbot` in any chat followed by:
 `@handycalbot 16:00 "Quick Call" r 15m`
 `@handycalbot 14:00 "Meeting" @alice @bob r 10m`
 
-*All Commands:*
-/start - Welcome message
-/help - This help message
-/connect - Connect Google Calendar
-/disconnect - Disconnect calendar
-/connectzoom - Connect Zoom for meeting links
-/disconnectzoom - Disconnect Zoom
-/meetings - View and manage meetings
-/settings - View your settings
+*Commands:*
+/connect - Connect Google Calendar, Outlook, or Zoom
+/disconnect - Disconnect services
+/meetings - View and manage upcoming meetings
+/settings - View your current settings
 /timezone - Set your timezone
 /duration - Set default meeting duration
 /reminder - Set default reminder
@@ -192,10 +180,20 @@ Type `@handycalbot` in any chat followed by:
         privacy_updated="{emoji} Username invites {status}.",
         # Default calendar preference
         default_calendar_label="Default Calendar",
-        default_calendar_requires_both="You need both Google and Outlook calendars connected to set a preference.\n\nUse /connect and /connectoutlook to connect both.",
+        default_calendar_requires_both="You need both Google and Outlook calendars connected to set a preference.\n\nUse /connect to connect both.",
         default_calendar_title="**Default Calendar** 🎯",
         default_calendar_desc="Choose which calendar to use by default when creating meetings.\n\nYou can switch calendars for individual meetings from the Edit menu.",
         default_calendar_updated="✅ Default calendar set to {calendar}.\n\nNew meetings will be created there.",
+        # Unified connect/disconnect
+        connect_services_title="**Connect Services** 🔗",
+        connect_select_service="Select a service to connect:",
+        connect_another_service="Connect another service:",
+        connected_services_title="**Connected Services**",
+        manage_button="⚙️ Manage",
+        disconnect_services_title="**Disconnect Services** 🔌",
+        disconnect_select_service="Select a service to disconnect:",
+        no_services_connected="No services connected.\n\nUse /connect to link your calendar.",
+        service_disconnected="✅ {service} disconnected successfully.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Upcoming Meetings** 📅",
@@ -322,8 +320,8 @@ Type `@handycalbot` in any chat followed by:
         google_meet_label="🎥 Google Meet",
         teams_meeting_label="📹 Microsoft Teams",
         zoom_meeting_label="📹 Zoom Meeting",
-        zoom_not_connected="Zoom not connected. Use /connectzoom first.",
-        outlook_not_connected="Outlook not connected. Use /connectoutlook first.",
+        zoom_not_connected="Zoom not connected. Use /connect first.",
+        outlook_not_connected="Outlook not connected. Use /connect first.",
         custom_link_label="🔗 Meeting Link",
         # Updates
         field_updated="✅ {field} updated",
@@ -396,12 +394,8 @@ Type `@handycalbot` in any chat followed by:
         help="Show help and usage instructions",
         meetings="List your upcoming meetings",
         cancel="Cancel a meeting",
-        connect="Connect Google Calendar",
-        disconnect="Disconnect Google Calendar",
-        connectoutlook="Connect Outlook Calendar",
-        disconnectoutlook="Disconnect Outlook Calendar",
-        connectzoom="Connect Zoom for meeting links",
-        disconnectzoom="Disconnect Zoom account",
+        connect="Connect calendar or Zoom",
+        disconnect="Disconnect services",
         settings="View your current settings",
         timezone="Change your timezone",
         duration="Set default meeting duration",
