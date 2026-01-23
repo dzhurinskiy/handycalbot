@@ -26,8 +26,7 @@ def upgrade() -> None:
     conn = op.get_bind()
 
     # Add default_calendar column if it doesn't exist
-    conn.execute(
-        sa.text("""
+    conn.execute(sa.text("""
             DO $$
             BEGIN
                 IF NOT EXISTS (
@@ -37,15 +36,12 @@ def upgrade() -> None:
                     ALTER TABLE users ADD COLUMN default_calendar VARCHAR(20) DEFAULT NULL;
                 END IF;
             END $$;
-            """)
-    )
+            """))
 
 
 def downgrade() -> None:
     """Remove default_calendar column."""
     conn = op.get_bind()
-    conn.execute(
-        sa.text("""
+    conn.execute(sa.text("""
             ALTER TABLE users DROP COLUMN IF EXISTS default_calendar
-            """)
-    )
+            """))
