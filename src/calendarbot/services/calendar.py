@@ -488,6 +488,72 @@ class CalendarService:
             "meet_link": meet_link,
         }
 
+    async def create_zoom_link(
+        self,
+        user: User,
+        title: str,
+        start_time: datetime,
+        duration_minutes: int,
+    ) -> dict:
+        """Create a Zoom meeting link.
+
+        Args:
+            user: The user creating the Zoom meeting.
+            title: Meeting title.
+            start_time: Meeting start time.
+            duration_minutes: Meeting duration in minutes.
+
+        Returns dict with zoom_link on success, or error.
+        """
+        token = await self.token_repo.get_token(user.id, "zoom")
+        if not token:
+            return {"error": "Zoom not connected. Use /connect to link your Zoom account."}
+
+        access_token = self.encryption.decrypt(token.access_token_encrypted)
+        refresh_token = self.encryption.decrypt(token.refresh_token_encrypted)
+
+        zoom_client = ZoomClient(access_token=access_token, refresh_token=refresh_token)
+
+        result = await zoom_client.create_meeting(
+            topic=title,
+            start_time=start_time,
+            duration=duration_minutes,
+            timezone=user.timezone,
+        )
+
+        if "error" in result:
+            # Try token refresh on 401
+            if result.get("code") == 401:
+                logger.info(f"Zoom token expired for user {user.id}, refreshing...")
+                new_tokens = await zoom_client.refresh_access_token()
+                if new_tokens:
+                    await self.token_repo.save_token(
+                        user_id=user.id,
+                        provider="zoom",
+                        access_token_encrypted=self.encryption.encrypt(new_tokens["access_token"]),
+                        refresh_token_encrypted=self.encryption.encrypt(
+                            new_tokens.get("refresh_token") or refresh_token
+                        ),
+                        expires_at=new_tokens["expires_at"],
+                    )
+                    # Retry with new token
+                    zoom_client = ZoomClient(
+                        access_token=new_tokens["access_token"],
+                        refresh_token=new_tokens.get("refresh_token") or refresh_token,
+                    )
+                    result = await zoom_client.create_meeting(
+                        topic=title,
+                        start_time=start_time,
+                        duration=duration_minutes,
+                        timezone=user.timezone,
+                    )
+
+            if "error" in result:
+                logger.error(f"Failed to create Zoom meeting for user {user.id}: {result}")
+                return {"error": "Failed to create Zoom meeting. Please try reconnecting Zoom."}
+
+        return {"success": True, "zoom_link": result.get("join_url")}
+
     async def cancel_meeting(self, user: User, event_id: str) -> dict:
         """Cancel a meeting by Google event ID."""
         client_result = await self._get_valid_client(user)

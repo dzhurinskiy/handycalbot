@@ -1021,6 +1021,91 @@ async def meeting_set_link_meet_callback(
         await query.edit_message_text(f"Error: {str(e)}")
 
 
+async def meeting_set_link_zoom_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Add Zoom link to meeting."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    await query.answer()
+
+    try:
+        parts = query.data.split("_")
+        stored_user_id = int(parts[1])
+        meeting_idx = int(parts[2])
+
+        if stored_user_id != update.effective_user.id:
+            return
+
+        meetings_key = f"meetings_{stored_user_id}"
+        if not context.bot_data or meetings_key not in context.bot_data:
+            return
+
+        meetings = context.bot_data[meetings_key]
+        m = meetings[meeting_idx]
+
+        async with async_session_factory() as session:
+            user_service = UserService(session)
+            user = await user_service.get_user(update.effective_user.id)
+
+            if not user:
+                return
+
+            t = get_text(user.language)
+
+            # Check if Zoom is connected
+            if not await user_service.is_zoom_connected(user):
+                await query.edit_message_text(t.inline.zoom_not_connected)
+                return
+
+            # Calculate duration from meeting times
+            start_time = m["start_time"]
+            end_time = m["end_time"]
+            duration_minutes = int((end_time - start_time).total_seconds() / 60)
+
+            # Create Zoom meeting
+            calendar_service = CalendarService(session)
+            zoom_result = await calendar_service.create_zoom_link(
+                user=user,
+                title=m["title"],
+                start_time=start_time,
+                duration_minutes=duration_minutes,
+            )
+
+            if "error" in zoom_result:
+                await query.edit_message_text(f"❌ {zoom_result['error']}")
+                return
+
+            zoom_link = zoom_result["zoom_link"]
+
+            # Update calendar event with Zoom link
+            result = await calendar_service.update_meeting(
+                user=user,
+                event_id=m["id"],
+                custom_link=zoom_link,
+            )
+            await session.commit()
+
+        if "error" in result:
+            await query.edit_message_text(f"❌ {result['error']}")
+            return
+
+        # Update cached meeting with link
+        m["link"] = zoom_link
+
+        await query.edit_message_text(t.inline.link_added, parse_mode="Markdown")
+
+        # Show detail view
+        query.data = f"md_{stored_user_id}_{meeting_idx}"
+        await meeting_detail_callback(update, context)
+
+    except Exception as e:
+        logger.exception(f"Error in meeting_set_link_zoom_callback: {e}")
+        await query.edit_message_text(f"Error: {str(e)}")
+
+
 async def meeting_cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle cancel meeting from detail view."""
     query = update.callback_query
@@ -1140,6 +1225,7 @@ def setup_meeting_handlers(app: Application) -> None:
 
     # Link options
     app.add_handler(CallbackQueryHandler(meeting_set_link_meet_callback, pattern=r"^mslm_\d+_\d+$"))
+    app.add_handler(CallbackQueryHandler(meeting_set_link_zoom_callback, pattern=r"^mslz_\d+_\d+$"))
 
     # Cancel meeting: mc_{user_id}_{index}
     app.add_handler(CallbackQueryHandler(meeting_cancel_callback, pattern=r"^mc_\d+_\d+$"))
