@@ -921,13 +921,29 @@ async def meeting_edit_link_callback(update: Update, _context: ContextTypes.DEFA
 
         text = t.inline.add_link_title
 
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    t.inline.auto_google_meet, callback_data=f"mslm_{stored_user_id}_{meeting_idx}"
-                )
-            ],
-        ]
+        buttons = []
+
+        # Show appropriate video link option based on calendar provider
+        calendar_service = CalendarService(session)
+        calendar_provider = await calendar_service.get_calendar_provider(user) if user else None
+
+        if calendar_provider == "outlook":
+            buttons.append(
+                [
+                    InlineKeyboardButton(
+                        t.inline.auto_teams_meeting, callback_data=f"mslte_{stored_user_id}_{meeting_idx}"
+                    )
+                ]
+            )
+        else:
+            # Default to Google Meet for Google calendar or no calendar
+            buttons.append(
+                [
+                    InlineKeyboardButton(
+                        t.inline.auto_google_meet, callback_data=f"mslm_{stored_user_id}_{meeting_idx}"
+                    )
+                ]
+            )
 
         if zoom_connected:
             buttons.append(
@@ -1106,6 +1122,73 @@ async def meeting_set_link_zoom_callback(
         await query.edit_message_text(f"Error: {str(e)}")
 
 
+async def meeting_set_link_teams_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Add Microsoft Teams link to meeting."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    await query.answer()
+
+    try:
+        parts = query.data.split("_")
+        stored_user_id = int(parts[1])
+        meeting_idx = int(parts[2])
+
+        if stored_user_id != update.effective_user.id:
+            return
+
+        meetings_key = f"meetings_{stored_user_id}"
+        if not context.bot_data or meetings_key not in context.bot_data:
+            return
+
+        meetings = context.bot_data[meetings_key]
+        m = meetings[meeting_idx]
+
+        async with async_session_factory() as session:
+            user_service = UserService(session)
+            user = await user_service.get_user(update.effective_user.id)
+
+            if not user:
+                return
+
+            t = get_text(user.language)
+
+            # Check if Outlook is connected
+            if not await user_service.is_outlook_connected(user):
+                await query.edit_message_text(t.inline.outlook_not_connected)
+                return
+
+            # Update meeting with Teams link
+            calendar_service = CalendarService(session)
+            result = await calendar_service.update_meeting(
+                user=user,
+                event_id=m["id"],
+                generate_teams_link=True,
+            )
+            await session.commit()
+
+        if "error" in result:
+            await query.edit_message_text(f"❌ {result['error']}")
+            return
+
+        # Update cached meeting with link
+        if result.get("teams_link"):
+            m["link"] = result["teams_link"]
+
+        await query.edit_message_text(t.inline.link_added, parse_mode="Markdown")
+
+        # Show detail view
+        query.data = f"md_{stored_user_id}_{meeting_idx}"
+        await meeting_detail_callback(update, context)
+
+    except Exception as e:
+        logger.exception(f"Error in meeting_set_link_teams_callback: {e}")
+        await query.edit_message_text(f"Error: {str(e)}")
+
+
 async def meeting_cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle cancel meeting from detail view."""
     query = update.callback_query
@@ -1225,6 +1308,7 @@ def setup_meeting_handlers(app: Application) -> None:
 
     # Link options
     app.add_handler(CallbackQueryHandler(meeting_set_link_meet_callback, pattern=r"^mslm_\d+_\d+$"))
+    app.add_handler(CallbackQueryHandler(meeting_set_link_teams_callback, pattern=r"^mslte_\d+_\d+$"))
     app.add_handler(CallbackQueryHandler(meeting_set_link_zoom_callback, pattern=r"^mslz_\d+_\d+$"))
 
     # Cancel meeting: mc_{user_id}_{index}

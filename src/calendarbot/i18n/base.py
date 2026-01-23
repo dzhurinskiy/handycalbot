@@ -37,6 +37,7 @@ class SettingsTranslations:
     reminder_label: str
     notifications_label: str
     google_calendar_label: str
+    outlook_calendar_label: str
     change_settings: str
     connected: str
     not_connected: str
@@ -63,6 +64,15 @@ class SettingsTranslations:
     connect_zoom_button: str
     zoom_disconnected: str
     no_zoom_connected: str
+
+    # Outlook Connect/Disconnect
+    outlook_already_connected: str
+    click_to_connect_outlook: str
+    connect_outlook_button: str
+    outlook_disconnected: str
+    no_outlook_connected: str
+    connect_outlook_mode_title: str
+    outlook_connected_status: str
 
     # Privacy mode selection
     connect_mode_title: str
@@ -252,6 +262,7 @@ class InlineTranslations:
     invalid_time_format: str
     invalid_date_format: str
     auto_google_meet: str
+    auto_teams_meeting: str
     auto_zoom_meeting: str
     paste_custom_link: str
     enter_link_prompt: str
@@ -259,8 +270,10 @@ class InlineTranslations:
     link_removed: str
     remove_link_button: str
     google_meet_label: str
+    teams_meeting_label: str
     zoom_meeting_label: str
     zoom_not_connected: str
+    outlook_not_connected: str
     custom_link_label: str
 
     # Updates
@@ -358,6 +371,8 @@ class CommandTranslations:
     cancel: str
     connect: str
     disconnect: str
+    connectoutlook: str
+    disconnectoutlook: str
     connectzoom: str
     disconnectzoom: str
     settings: str

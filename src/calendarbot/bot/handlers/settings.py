@@ -18,6 +18,7 @@ from calendarbot.bot.commands import set_user_commands
 from calendarbot.db.session import async_session_factory
 from calendarbot.i18n import LANGUAGE_NAMES, get_text
 from calendarbot.integrations.google import GoogleOAuthFlow
+from calendarbot.integrations.outlook import OutlookOAuthFlow
 from calendarbot.integrations.zoom import ZoomOAuthFlow
 from calendarbot.services.user import UserService
 from calendarbot.utils.timezone import TimezoneHelper
@@ -110,9 +111,15 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     )
 
     # Format calendar status
-    calendar_status = (
+    google_status = (
         t.settings.connected
         if summary["google_calendar"] == "Connected"
+        else t.settings.not_connected
+    )
+
+    outlook_status = (
+        t.settings.connected
+        if summary.get("outlook_calendar") == "Connected"
         else t.settings.not_connected
     )
 
@@ -132,7 +139,8 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 🔔 {t.settings.reminder_label}: `{reminder_display}`
 📬 {t.settings.notifications_label}: {notifications_status}
 🔒 {t.settings.privacy_username_invites}: {privacy_status}
-📅 {t.settings.google_calendar_label}: {calendar_status}
+📅 {t.settings.google_calendar_label}: {google_status}
+📆 {t.settings.outlook_calendar_label}: {outlook_status}
 📹 Zoom: {zoom_status}
 
 {t.settings.change_settings}
@@ -143,6 +151,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 /privacy - {t.settings.privacy_username_invites}
 /language - Language
 /connect - {t.settings.google_calendar_label}
+/connectoutlook - {t.settings.outlook_calendar_label}
 /connectzoom - Zoom
 """
 
@@ -384,6 +393,176 @@ async def disconnectzoom_command(update: Update, _context: ContextTypes.DEFAULT_
         await session.commit()
 
     await update.message.reply_text(t.settings.zoom_disconnected)
+
+
+async def connectoutlook_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /connectoutlook command - show connection mode selection or current status."""
+    if not update.effective_user or not update.message:
+        return
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await update.message.reply_text(t.common.please_start_first)
+            return
+
+        t = get_text(user.language)
+
+        # Check if already connected
+        if await user_service.is_outlook_connected(user):
+            # Get current mode
+            from calendarbot.db.repository import OAuthTokenRepository
+
+            token_repo = OAuthTokenRepository(session)
+            token = await token_repo.get_token(user.id, "outlook")
+            is_privacy = token.privacy_mode if token else False
+
+            current_mode = (
+                t.settings.current_mode_privacy if is_privacy else t.settings.current_mode_full
+            )
+
+            # Show current status with options to switch or disconnect
+            keyboard = [
+                [
+                    InlineKeyboardButton(
+                        (
+                            t.settings.switch_to_full_button
+                            if is_privacy
+                            else t.settings.switch_to_privacy_button
+                        ),
+                        callback_data="connect_outlook_full" if is_privacy else "connect_outlook_privacy",
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        t.settings.disconnect_button, callback_data="disconnect_outlook"
+                    )
+                ],
+            ]
+
+            await update.message.reply_text(
+                t.settings.outlook_connected_status.format(mode=current_mode),
+                reply_markup=InlineKeyboardMarkup(keyboard),
+                parse_mode="Markdown",
+            )
+            return
+
+    # Not connected - show mode selection buttons
+    keyboard = [
+        [InlineKeyboardButton(t.settings.connect_full_access_button, callback_data="connect_outlook_full")],
+        [
+            InlineKeyboardButton(
+                t.settings.connect_privacy_mode_button, callback_data="connect_outlook_privacy"
+            )
+        ],
+    ]
+
+    await update.message.reply_text(
+        f"{t.settings.connect_outlook_mode_title}\n\n"
+        f"{t.settings.connect_full_access_desc}\n\n"
+        f"{t.settings.connect_privacy_mode_desc}",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="Markdown",
+    )
+
+
+async def connect_outlook_mode_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle Outlook connection mode selection (full or privacy)."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    await query.answer()
+
+    privacy_mode = query.data == "connect_outlook_privacy"
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await query.edit_message_text(t.common.error_user_not_found)
+            return
+
+        t = get_text(user.language)
+
+    # Generate OAuth state with privacy mode flag
+    state = f"{update.effective_user.id}:{secrets.token_urlsafe(16)}:{'privacy' if privacy_mode else 'full'}"
+
+    # Store state in context for verification
+    if context.bot_data is None:
+        context.bot_data = {}
+    context.bot_data[f"outlook_oauth_state_{update.effective_user.id}"] = state
+
+    # Generate auth URL with appropriate scopes
+    oauth = OutlookOAuthFlow()
+    auth_url = oauth.get_authorization_url(state, privacy_mode=privacy_mode)
+
+    keyboard = [[InlineKeyboardButton(t.settings.connect_outlook_button, url=auth_url)]]
+
+    await query.edit_message_text(
+        t.settings.click_to_connect_outlook,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+
+async def disconnect_outlook_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle disconnect button from /connectoutlook menu."""
+    query = update.callback_query
+    if not query or not update.effective_user:
+        return
+
+    await query.answer()
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await query.edit_message_text(t.common.error_user_not_found)
+            return
+
+        t = get_text(user.language)
+
+        if not await user_service.is_outlook_connected(user):
+            await query.edit_message_text(t.settings.no_outlook_connected)
+            return
+
+        await user_service.disconnect_outlook(user)
+        await session.commit()
+
+    await query.edit_message_text(t.settings.outlook_disconnected)
+
+
+async def disconnectoutlook_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /disconnectoutlook command."""
+    if not update.effective_user or not update.message:
+        return
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await update.message.reply_text(t.common.please_start_first)
+            return
+
+        t = get_text(user.language)
+
+        if not await user_service.is_outlook_connected(user):
+            await update.message.reply_text(t.settings.no_outlook_connected)
+            return
+
+        await user_service.disconnect_outlook(user)
+        await session.commit()
+
+    await update.message.reply_text(t.settings.outlook_disconnected)
 
 
 async def timezone_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -882,20 +1061,32 @@ def setup_settings_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("settings", settings_command))
     app.add_handler(CommandHandler("connect", connect_command))
     app.add_handler(CommandHandler("disconnect", disconnect_command))
+    app.add_handler(CommandHandler("connectoutlook", connectoutlook_command))
+    app.add_handler(CommandHandler("disconnectoutlook", disconnectoutlook_command))
     app.add_handler(CommandHandler("connectzoom", connectzoom_command))
     app.add_handler(CommandHandler("disconnectzoom", disconnectzoom_command))
     app.add_handler(CommandHandler("notifications", notifications_command))
     app.add_handler(CommandHandler("language", language_command))
     app.add_handler(CommandHandler("privacy", privacy_command))
 
-    # Connect mode callback (full access vs privacy mode)
+    # Connect mode callback for Google (full access vs privacy mode)
     app.add_handler(
         CallbackQueryHandler(connect_mode_callback, pattern=r"^connect_(full|privacy)$")
     )
 
-    # Disconnect calendar callback (from /connect menu)
+    # Disconnect Google calendar callback (from /connect menu)
     app.add_handler(
         CallbackQueryHandler(disconnect_calendar_callback, pattern=r"^disconnect_calendar$")
+    )
+
+    # Connect mode callback for Outlook (full access vs privacy mode)
+    app.add_handler(
+        CallbackQueryHandler(connect_outlook_mode_callback, pattern=r"^connect_outlook_(full|privacy)$")
+    )
+
+    # Disconnect Outlook calendar callback (from /connectoutlook menu)
+    app.add_handler(
+        CallbackQueryHandler(disconnect_outlook_callback, pattern=r"^disconnect_outlook$")
     )
 
     # Notifications callback

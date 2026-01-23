@@ -13,6 +13,7 @@ from calendarbot.db.models import User
 from calendarbot.db.repository import OAuthTokenRepository
 from calendarbot.db.session import async_session_factory
 from calendarbot.integrations.google import GoogleCalendarClient
+from calendarbot.integrations.outlook import OutlookCalendarClient
 from calendarbot.integrations.zoom import ZoomClient
 from calendarbot.utils.encryption import TokenEncryption
 
@@ -91,6 +92,38 @@ class TokenRefreshService:
 
         return None
 
+    async def refresh_outlook_token(
+        self,
+        token_repo: OAuthTokenRepository,
+        user_id: int,
+        access_token: str,
+        refresh_token: str,
+    ) -> dict | None:
+        """Attempt to refresh an Outlook OAuth token.
+
+        Returns new token data on success, None on failure.
+        """
+        client = OutlookCalendarClient(
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
+
+        new_tokens = await client.refresh_access_token()
+        if new_tokens:
+            # Save the refreshed token
+            await token_repo.save_token(
+                user_id=user_id,
+                provider="outlook",
+                access_token_encrypted=self.encryption.encrypt(new_tokens["access_token"]),
+                refresh_token_encrypted=self.encryption.encrypt(
+                    new_tokens.get("refresh_token") or refresh_token
+                ),
+                expires_at=new_tokens["expires_at"],
+            )
+            return new_tokens
+
+        return None
+
     async def refresh_expiring_tokens(self) -> dict[str, int]:
         """Refresh all tokens that are expiring soon.
 
@@ -99,6 +132,8 @@ class TokenRefreshService:
         stats = {
             "google_refreshed": 0,
             "google_failed": 0,
+            "outlook_refreshed": 0,
+            "outlook_failed": 0,
             "zoom_refreshed": 0,
             "zoom_failed": 0,
         }
@@ -144,6 +179,39 @@ class TokenRefreshService:
                     except Exception as e:
                         logger.error(f"Error refreshing Google token for user {token.user_id}: {e}")
                         stats["google_failed"] += 1
+
+                # Process Outlook tokens
+                outlook_tokens = await token_repo.get_tokens_expiring_soon(
+                    provider="outlook", hours_before=hours_threshold
+                )
+
+                for token in outlook_tokens:
+                    try:
+                        access_token = self.encryption.decrypt(token.access_token_encrypted)
+                        refresh_token = self.encryption.decrypt(token.refresh_token_encrypted)
+
+                        user = await session.get(User, token.user_id)
+                        user_info = f"user_id={token.user_id}"
+                        if user:
+                            user_info = f"telegram_id={user.telegram_id}"
+
+                        result = await self.refresh_outlook_token(
+                            token_repo, token.user_id, access_token, refresh_token
+                        )
+
+                        if result:
+                            logger.info(f"Proactively refreshed Outlook token for {user_info}")
+                            stats["outlook_refreshed"] += 1
+                        else:
+                            logger.warning(
+                                f"Failed to refresh Outlook token for {user_info} - "
+                                "token may be revoked"
+                            )
+                            stats["outlook_failed"] += 1
+
+                    except Exception as e:
+                        logger.error(f"Error refreshing Outlook token for user {token.user_id}: {e}")
+                        stats["outlook_failed"] += 1
 
                 # Process Zoom tokens
                 zoom_tokens = await token_repo.get_tokens_expiring_soon(
@@ -197,13 +265,22 @@ class TokenRefreshService:
                 stats = await self.refresh_expiring_tokens()
 
                 # Only log if there was activity
-                total_refreshed = stats["google_refreshed"] + stats["zoom_refreshed"]
-                total_failed = stats["google_failed"] + stats["zoom_failed"]
+                total_refreshed = (
+                    stats["google_refreshed"]
+                    + stats["outlook_refreshed"]
+                    + stats["zoom_refreshed"]
+                )
+                total_failed = (
+                    stats["google_failed"]
+                    + stats["outlook_failed"]
+                    + stats["zoom_failed"]
+                )
 
                 if total_refreshed > 0 or total_failed > 0:
                     logger.info(
                         f"Token refresh cycle: "
                         f"Google ({stats['google_refreshed']} OK, {stats['google_failed']} failed), "
+                        f"Outlook ({stats['outlook_refreshed']} OK, {stats['outlook_failed']} failed), "
                         f"Zoom ({stats['zoom_refreshed']} OK, {stats['zoom_failed']} failed)"
                     )
 

@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     zoom_client_secret: str = ""
     zoom_redirect_uri: str = "https://handycal.dzhurinskiy.com/auth/zoom/callback"
 
+    # Microsoft Outlook OAuth
+    outlook_client_id: str = ""
+    outlook_client_secret: str = ""
+    outlook_redirect_uri: str = "https://handycal.dzhurinskiy.com/oauth/outlook/callback"
+
     # Security
     encryption_key: str = ""
 

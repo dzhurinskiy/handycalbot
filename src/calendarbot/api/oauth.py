@@ -10,6 +10,7 @@ from calendarbot.config import get_settings
 from calendarbot.db.repository import OAuthTokenRepository, UserRepository
 from calendarbot.db.session import async_session_factory
 from calendarbot.integrations.google import GoogleOAuthFlow
+from calendarbot.integrations.outlook import OutlookOAuthFlow
 from calendarbot.integrations.zoom import ZoomOAuthFlow
 from calendarbot.utils.encryption import TokenEncryption
 
@@ -476,5 +477,251 @@ async def zoom_oauth_callback(
         logger.exception("Error saving Zoom OAuth tokens")
         return HTMLResponse(
             content=ZOOM_ERROR_HTML.format(error=str(e)),
+            status_code=500,
+        )
+
+
+OUTLOOK_SUCCESS_HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CalendarBot - Outlook Connected!</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #0078D4 0%, #005A9E 100%);
+        }
+        .card {
+            background: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 400px;
+        }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        p {
+            color: #718096;
+            margin-bottom: 1.5rem;
+        }
+        .close-hint {
+            font-size: 0.875rem;
+            color: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">📅</div>
+        <h1>Outlook Connected!</h1>
+        <p>Your Microsoft Outlook Calendar is now linked to HandyCalBot.</p>
+        <p>You can now create meetings with Microsoft Teams links!</p>
+        <p class="close-hint">You can close this window and return to Telegram.</p>
+    </div>
+</body>
+</html>
+"""
+
+OUTLOOK_ERROR_HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CalendarBot - Outlook Error</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+        }
+        .card {
+            background: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 400px;
+        }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        p {
+            color: #718096;
+        }
+        .error-detail {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">❌</div>
+        <h1>Outlook Connection Failed</h1>
+        <p>Could not connect your Microsoft Outlook account.</p>
+        <div class="error-detail">{error}</div>
+        <p style="margin-top: 1.5rem;">Please try again from Settings in Telegram.</p>
+    </div>
+</body>
+</html>
+"""
+
+
+@router.get("/outlook/callback")
+async def outlook_oauth_callback(
+    code: str = Query(None),
+    state: str = Query(None),
+    error: str = Query(None),
+) -> HTMLResponse:
+    """Handle Microsoft Outlook OAuth callback."""
+    # Check for errors from Microsoft
+    if error:
+        logger.error(f"Outlook OAuth error: {error}")
+        return HTMLResponse(content=OUTLOOK_ERROR_HTML.format(error=error), status_code=400)
+
+    if not code or not state:
+        return HTMLResponse(
+            content=OUTLOOK_ERROR_HTML.format(error="Missing code or state"),
+            status_code=400,
+        )
+
+    # Parse state to get telegram user ID and privacy mode
+    # State format: "telegram_id:random_token:mode" where mode is "privacy" or "full"
+    try:
+        parts = state.split(":")
+        telegram_id = int(parts[0])
+        # Privacy mode is indicated by "privacy" at the end of state
+        privacy_mode = len(parts) >= 3 and parts[-1] == "privacy"
+    except (ValueError, AttributeError, IndexError):
+        return HTMLResponse(
+            content=OUTLOOK_ERROR_HTML.format(error="Invalid state parameter"),
+            status_code=400,
+        )
+
+    # Exchange code for tokens
+    oauth = OutlookOAuthFlow()
+    tokens = await oauth.exchange_code(code)
+
+    if not tokens:
+        return HTMLResponse(
+            content=OUTLOOK_ERROR_HTML.format(error="Failed to exchange authorization code"),
+            status_code=400,
+        )
+
+    # Save tokens to database
+    try:
+        encryption = TokenEncryption()
+
+        # Fetch user's email from Microsoft using the fresh tokens
+        from calendarbot.integrations.outlook import OutlookCalendarClient
+
+        client = OutlookCalendarClient(
+            access_token=tokens["access_token"],
+            refresh_token=tokens["refresh_token"],
+        )
+        user_email = await client.get_user_email()
+        logger.info(f"Fetched Outlook email for user {telegram_id}: {user_email}")
+
+        async with async_session_factory() as session:
+            user_repo = UserRepository(session)
+            token_repo = OAuthTokenRepository(session)
+
+            user = await user_repo.get_by_telegram_id(telegram_id)
+            if not user:
+                return HTMLResponse(
+                    content=OUTLOOK_ERROR_HTML.format(
+                        error="User not found. Please /start the bot first."
+                    ),
+                    status_code=400,
+                )
+
+            await token_repo.save_token(
+                user_id=user.id,
+                provider="outlook",
+                access_token_encrypted=encryption.encrypt(tokens["access_token"]),
+                refresh_token_encrypted=encryption.encrypt(tokens["refresh_token"]),
+                expires_at=tokens["expires_at"],
+                calendar_id="primary",
+                email_encrypted=encryption.encrypt(user_email) if user_email else None,
+                privacy_mode=privacy_mode,
+            )
+            await session.commit()
+
+            logger.info(
+                f"Outlook Calendar connected for user {telegram_id} (privacy_mode={privacy_mode})"
+            )
+
+            # Get user's current timezone for the message
+            user_timezone = user.timezone
+
+        # Send timezone confirmation message to user
+        privacy_note = (
+            "\n\n🔒 _Privacy mode: Your calendar won't be read. /meetings will show only bot-created events._"
+            if privacy_mode
+            else ""
+        )
+        timezone_message = (
+            "📅 *Outlook Calendar connected successfully!*\n\n"
+            f"📍 Your current timezone is set to: `{user_timezone}`\n\n"
+            "Please confirm this is correct, or choose a different timezone.\n"
+            f"_Correct timezone is important for scheduling meetings at the right time._{privacy_note}"
+        )
+
+        # Build inline keyboard with timezone options
+        from calendarbot.utils.timezone import TimezoneHelper
+
+        common_tzs = TimezoneHelper.get_common_timezones()[:8]  # Top 8 timezones
+
+        keyboard_rows = []
+        row = []
+        for tz in common_tzs:
+            label = f"✓ {tz}" if tz == user_timezone else tz
+            row.append({"text": label, "callback_data": f"tz_{tz}"})
+            if len(row) == 2:
+                keyboard_rows.append(row)
+                row = []
+        if row:
+            keyboard_rows.append(row)
+
+        # Add "Keep current" button
+        keyboard_rows.append(
+            [{"text": f"✅ Keep {user_timezone}", "callback_data": f"tz_{user_timezone}"}]
+        )
+
+        reply_markup = {"inline_keyboard": keyboard_rows}
+
+        await send_telegram_message(telegram_id, timezone_message, reply_markup)
+
+        return HTMLResponse(content=OUTLOOK_SUCCESS_HTML)
+
+    except Exception as e:
+        logger.exception("Error saving Outlook OAuth tokens")
+        return HTMLResponse(
+            content=OUTLOOK_ERROR_HTML.format(error=str(e)),
             status_code=500,
         )

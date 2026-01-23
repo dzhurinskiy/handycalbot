@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from calendarbot.db.models import User
 from calendarbot.db.repository import MeetingRepository, OAuthTokenRepository
 from calendarbot.integrations.google import GoogleCalendarClient
+from calendarbot.integrations.outlook import OutlookCalendarClient
 from calendarbot.integrations.zoom import ZoomClient
 from calendarbot.services.parser import ParsedMeeting
 from calendarbot.utils.encryption import TokenEncryption
@@ -26,15 +27,31 @@ class CalendarService:
         self.token_repo = OAuthTokenRepository(session)
         self.encryption = TokenEncryption()
 
-    async def _get_valid_client(self, user: User) -> tuple[GoogleCalendarClient, str] | dict:
-        """Get a Google Calendar client with valid tokens, refreshing if needed.
+    async def _get_valid_client(
+        self, user: User
+    ) -> tuple[GoogleCalendarClient | OutlookCalendarClient, str, str] | dict:
+        """Get a calendar client with valid tokens, refreshing if needed.
 
-        Returns GoogleCalendarClient on success, or dict with error on failure.
+        Checks Google first, then Outlook.
+
+        Returns (client, calendar_id, provider) on success, or dict with error on failure.
         """
-        token = await self.token_repo.get_token(user.id, "google")
-        if not token:
-            return {"error": "Google Calendar not connected. Use /connect to link your calendar."}
+        # Try Google first
+        google_token = await self.token_repo.get_token(user.id, "google")
+        if google_token:
+            return await self._get_google_client(user, google_token)
 
+        # Try Outlook second
+        outlook_token = await self.token_repo.get_token(user.id, "outlook")
+        if outlook_token:
+            return await self._get_outlook_client(user, outlook_token)
+
+        return {"error": "No calendar connected. Use /connect or /connectoutlook to link your calendar."}
+
+    async def _get_google_client(
+        self, user: User, token
+    ) -> tuple[GoogleCalendarClient, str, str] | dict:
+        """Get a Google Calendar client with valid tokens."""
         access_token = self.encryption.decrypt(token.access_token_encrypted)
         refresh_token = self.encryption.decrypt(token.refresh_token_encrypted)
 
@@ -42,7 +59,7 @@ class CalendarService:
         from datetime import timedelta
 
         if datetime.utcnow() >= (token.expires_at - timedelta(minutes=5)):
-            logger.info(f"Token expired or expiring soon for user {user.id}, refreshing...")
+            logger.info(f"Google token expired or expiring soon for user {user.id}, refreshing...")
             client = GoogleCalendarClient(
                 access_token=access_token,
                 refresh_token=refresh_token,
@@ -59,9 +76,9 @@ class CalendarService:
                     expires_at=new_tokens["expires_at"],
                 )
                 access_token = new_tokens["access_token"]
-                logger.info(f"Token refreshed successfully for user {user.id}")
+                logger.info(f"Google token refreshed successfully for user {user.id}")
             else:
-                logger.error(f"Token refresh failed for user {user.id}")
+                logger.error(f"Google token refresh failed for user {user.id}")
                 return {
                     "error": "Failed to refresh Google token. Please /disconnect and /connect again."
                 }
@@ -72,14 +89,61 @@ class CalendarService:
                 refresh_token=refresh_token,
             ),
             token.calendar_id or "primary",
+            "google",
         )
 
-    async def _handle_api_error(self, result: dict, user: User, retry_func) -> dict:
+    async def _get_outlook_client(
+        self, user: User, token
+    ) -> tuple[OutlookCalendarClient, str, str] | dict:
+        """Get an Outlook Calendar client with valid tokens."""
+        access_token = self.encryption.decrypt(token.access_token_encrypted)
+        refresh_token = self.encryption.decrypt(token.refresh_token_encrypted)
+
+        # Always try to refresh if token is expired or close to expiry (5 min buffer)
+        from datetime import timedelta
+
+        if datetime.utcnow() >= (token.expires_at - timedelta(minutes=5)):
+            logger.info(f"Outlook token expired or expiring soon for user {user.id}, refreshing...")
+            client = OutlookCalendarClient(
+                access_token=access_token,
+                refresh_token=refresh_token,
+            )
+            new_tokens = await client.refresh_access_token()
+            if new_tokens:
+                await self.token_repo.save_token(
+                    user_id=user.id,
+                    provider="outlook",
+                    access_token_encrypted=self.encryption.encrypt(new_tokens["access_token"]),
+                    refresh_token_encrypted=self.encryption.encrypt(
+                        new_tokens.get("refresh_token") or refresh_token
+                    ),
+                    expires_at=new_tokens["expires_at"],
+                )
+                access_token = new_tokens["access_token"]
+                logger.info(f"Outlook token refreshed successfully for user {user.id}")
+            else:
+                logger.error(f"Outlook token refresh failed for user {user.id}")
+                return {
+                    "error": "Failed to refresh Outlook token. Please /disconnectoutlook and /connectoutlook again."
+                }
+
+        return (
+            OutlookCalendarClient(
+                access_token=access_token,
+                refresh_token=refresh_token,
+            ),
+            token.calendar_id or "primary",
+            "outlook",
+        )
+
+    async def _handle_api_error(
+        self, result: dict, user: User, retry_func, provider: str = "google"
+    ) -> dict:
         """Handle API errors, refreshing token and retrying on 401."""
         if result.get("code") == 401:
-            logger.info(f"Got 401 for user {user.id}, forcing token refresh...")
+            logger.info(f"Got 401 for user {user.id} (provider={provider}), forcing token refresh...")
             # Force token refresh by setting expiry to past
-            token = await self.token_repo.get_token(user.id, "google")
+            token = await self.token_repo.get_token(user.id, provider)
             if token:
                 from datetime import timedelta
 
@@ -160,6 +224,7 @@ class CalendarService:
         meeting_data: ParsedMeeting,
         generate_meet_link: bool = False,
         generate_zoom_link: bool = False,
+        generate_teams_link: bool = False,
         custom_link: str | None = None,
     ) -> dict:
         """Create a meeting on user's calendar.
@@ -167,8 +232,9 @@ class CalendarService:
         Args:
             user: The user creating the meeting.
             meeting_data: Parsed meeting data.
-            generate_meet_link: If True, auto-generate a Google Meet link.
+            generate_meet_link: If True, auto-generate a Google Meet link (Google only).
             generate_zoom_link: If True, create a Zoom meeting and add the link.
+            generate_teams_link: If True, auto-generate a Microsoft Teams link (Outlook only).
             custom_link: Custom meeting link to add to the event.
 
         Returns dict with meeting details or error.
@@ -184,44 +250,64 @@ class CalendarService:
         client_result = await self._get_valid_client(user)
         if isinstance(client_result, dict):
             return client_result  # Error
-        client, calendar_id = client_result
+        client, calendar_id, provider = client_result
 
-        # Keep times in user's local timezone for Google API
+        # Keep times in user's local timezone for calendar API
         start_local = meeting_data.start_datetime
         end_local = meeting_data.end_datetime
 
         # Determine reminders to use
         reminders = self._resolve_reminders(user, meeting_data)
 
-        async def do_create():
-            return await client.create_event(
-                summary=meeting_data.title,
-                start_time=start_local,
-                end_time=end_local,
-                attendees=meeting_data.attendees,
-                timezone=user.timezone,
-                calendar_id=calendar_id,
-                reminders=reminders,
-                generate_meet_link=generate_meet_link,
-                custom_link=custom_link,
-            )
+        # Create event based on provider
+        if provider == "google":
+            async def do_create():
+                return await client.create_event(
+                    summary=meeting_data.title,
+                    start_time=start_local,
+                    end_time=end_local,
+                    attendees=meeting_data.attendees,
+                    timezone=user.timezone,
+                    calendar_id=calendar_id,
+                    reminders=reminders,
+                    generate_meet_link=generate_meet_link,
+                    custom_link=custom_link,
+                )
+        else:  # outlook
+            async def do_create():
+                return await client.create_event(
+                    summary=meeting_data.title,
+                    start_time=start_local,
+                    end_time=end_local,
+                    attendees=meeting_data.attendees,
+                    timezone=user.timezone,
+                    reminders=reminders,
+                    generate_teams_link=generate_teams_link,
+                    custom_link=custom_link,
+                )
 
         result = await do_create()
 
         # Retry on 401
         if result.get("code") == 401:
-            result = await self._handle_api_error(result, user, do_create)
+            result = await self._handle_api_error(result, user, do_create, provider)
 
         if "error" in result:
             return result
 
-        # Extract Meet link from conference data if present
+        # Extract Meet link from conference data if present (Google)
         meet_link = None
-        if "conferenceData" in result:
+        if provider == "google" and "conferenceData" in result:
             for entry_point in result["conferenceData"].get("entryPoints", []):
                 if entry_point.get("entryPointType") == "video":
                     meet_link = entry_point.get("uri")
                     break
+
+        # Extract Teams link if present (Outlook)
+        teams_link = None
+        if provider == "outlook" and result.get("isOnlineMeeting"):
+            online_meeting = result.get("onlineMeeting", {})
+            teams_link = online_meeting.get("joinUrl")
 
         # Convert to UTC for local cache storage (naive datetime for PostgreSQL)
         start_utc = TimezoneHelper.to_utc(meeting_data.start_datetime, user.timezone)
@@ -234,7 +320,7 @@ class CalendarService:
         await self.meeting_repo.save_meeting(
             user_id=user.id,
             external_id=result["id"],
-            provider="google",
+            provider=provider,
             title=meeting_data.title,
             start_time=start_utc_naive,
             end_time=end_utc_naive,
@@ -245,15 +331,17 @@ class CalendarService:
         return {
             "success": True,
             "event_id": result["id"],
-            "link": result.get("htmlLink", ""),
+            "link": result.get("htmlLink") or result.get("webLink", ""),
             "title": meeting_data.title,
             "start": meeting_data.start_datetime,
             "end": meeting_data.end_datetime,
             "attendees": meeting_data.attendees,
             "reminders": reminders,
             "meet_link": meet_link,
+            "teams_link": teams_link,
             "zoom_link": zoom_link,
             "custom_link": custom_link if not zoom_link else None,
+            "provider": provider,
         }
 
     def _resolve_reminders(self, user: User, meeting_data: ParsedMeeting) -> list[int] | None:
@@ -277,10 +365,38 @@ class CalendarService:
             # No 'r' in request - no reminders
             return []
 
-    async def is_privacy_mode(self, user: User) -> bool:
-        """Check if user is connected in privacy mode (no calendar read access)."""
-        token = await self.token_repo.get_token(user.id, "google")
-        return token is not None and token.privacy_mode
+    async def is_privacy_mode(self, user: User, provider: str | None = None) -> bool:
+        """Check if user is connected in privacy mode (no calendar read access).
+
+        Args:
+            user: The user to check
+            provider: Optional provider to check. If None, checks Google then Outlook.
+        """
+        if provider:
+            token = await self.token_repo.get_token(user.id, provider)
+            return token is not None and token.privacy_mode
+
+        # Check Google first, then Outlook
+        google_token = await self.token_repo.get_token(user.id, "google")
+        if google_token:
+            return google_token.privacy_mode
+
+        outlook_token = await self.token_repo.get_token(user.id, "outlook")
+        if outlook_token:
+            return outlook_token.privacy_mode
+
+        return False
+
+    async def get_calendar_provider(self, user: User) -> str | None:
+        """Get which calendar provider the user has connected.
+
+        Returns 'google', 'outlook', or None.
+        """
+        if await self.token_repo.get_token(user.id, "google"):
+            return "google"
+        if await self.token_repo.get_token(user.id, "outlook"):
+            return "outlook"
+        return None
 
     async def get_upcoming_meetings(
         self, user: User, limit: int = 10
@@ -288,7 +404,7 @@ class CalendarService:
         """Get upcoming meetings.
 
         In privacy mode: returns only bot-created meetings from local DB.
-        In full access mode: returns meetings from Google Calendar API.
+        In full access mode: returns meetings from calendar API.
 
         Returns:
             Tuple of (meetings list, is_privacy_mode flag, error message or None)
@@ -300,25 +416,32 @@ class CalendarService:
             # Privacy mode: fetch from local database only
             return await self._get_local_meetings(user, limit), True, None
 
-        # Full access mode: fetch from Google Calendar
+        # Full access mode: fetch from calendar API
         client_result = await self._get_valid_client(user)
         if isinstance(client_result, dict):
             # Return the error message so the caller can display it
             return [], False, client_result.get("error")
-        client, calendar_id = client_result
+        client, calendar_id, provider = client_result
 
-        async def do_list():
-            return await client.list_events(
-                calendar_id=calendar_id,
-                time_min=datetime.utcnow(),
-                max_results=limit,
-            )
+        if provider == "google":
+            async def do_list():
+                return await client.list_events(
+                    calendar_id=calendar_id,
+                    time_min=datetime.utcnow(),
+                    max_results=limit,
+                )
+        else:  # outlook
+            async def do_list():
+                return await client.list_events(
+                    time_min=datetime.utcnow(),
+                    max_results=limit,
+                )
 
         result = await do_list()
 
         # Retry on 401
         if result.get("code") == 401:
-            result = await self._handle_api_error(result, user, do_list)
+            result = await self._handle_api_error(result, user, do_list, provider)
 
         if "error" in result:
             logger.error(f"Failed to list events for user {user.id}: {result}")
@@ -328,50 +451,109 @@ class CalendarService:
         meetings = []
 
         for event in events:
-            start_data = event.get("start", {})
-            end_data = event.get("end", {})
+            if provider == "google":
+                meeting = self._parse_google_event(event, user)
+            else:  # outlook
+                meeting = self._parse_outlook_event(event, user)
 
-            # Handle both dateTime (timed events) and date (all-day events)
-            start_str = start_data.get("dateTime") or start_data.get("date")
-            end_str = end_data.get("dateTime") or end_data.get("date")
-
-            if not start_str or not end_str:
-                continue
-
-            # Parse datetime - Google returns ISO format with timezone
-            from dateutil import parser as dateutil_parser
-
-            start_time = dateutil_parser.isoparse(start_str)
-            end_time = dateutil_parser.isoparse(end_str)
-
-            # Convert to user's timezone for display
-            if start_time.tzinfo:
-                start_time = start_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
-                end_time = end_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
-
-            attendees = [a.get("email", "") for a in event.get("attendees", [])]
-
-            # Extract meet link
-            meet_link = event.get("hangoutLink")
-            if not meet_link and "conferenceData" in event:
-                for entry_point in event["conferenceData"].get("entryPoints", []):
-                    if entry_point.get("entryPointType") == "video":
-                        meet_link = entry_point.get("uri")
-                        break
-
-            meetings.append(
-                {
-                    "id": event.get("id"),
-                    "external_id": event.get("id"),
-                    "title": event.get("summary", "(No title)"),
-                    "start_time": start_time,
-                    "end_time": end_time,
-                    "attendees": attendees,
-                    "link": meet_link,
-                }
-            )
+            if meeting:
+                meetings.append(meeting)
 
         return meetings, False, None
+
+    def _parse_google_event(self, event: dict, user: User) -> dict | None:
+        """Parse a Google Calendar event into a meeting dict."""
+        start_data = event.get("start", {})
+        end_data = event.get("end", {})
+
+        # Handle both dateTime (timed events) and date (all-day events)
+        start_str = start_data.get("dateTime") or start_data.get("date")
+        end_str = end_data.get("dateTime") or end_data.get("date")
+
+        if not start_str or not end_str:
+            return None
+
+        # Parse datetime - Google returns ISO format with timezone
+        from dateutil import parser as dateutil_parser
+
+        start_time = dateutil_parser.isoparse(start_str)
+        end_time = dateutil_parser.isoparse(end_str)
+
+        # Convert to user's timezone for display
+        if start_time.tzinfo:
+            start_time = start_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
+            end_time = end_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
+
+        attendees = [a.get("email", "") for a in event.get("attendees", [])]
+
+        # Extract meet link
+        meet_link = event.get("hangoutLink")
+        if not meet_link and "conferenceData" in event:
+            for entry_point in event["conferenceData"].get("entryPoints", []):
+                if entry_point.get("entryPointType") == "video":
+                    meet_link = entry_point.get("uri")
+                    break
+
+        return {
+            "id": event.get("id"),
+            "external_id": event.get("id"),
+            "title": event.get("summary", "(No title)"),
+            "start_time": start_time,
+            "end_time": end_time,
+            "attendees": attendees,
+            "link": meet_link,
+            "provider": "google",
+        }
+
+    def _parse_outlook_event(self, event: dict, user: User) -> dict | None:
+        """Parse an Outlook Calendar event into a meeting dict."""
+        start_data = event.get("start", {})
+        end_data = event.get("end", {})
+
+        start_str = start_data.get("dateTime")
+        end_str = end_data.get("dateTime")
+
+        if not start_str or not end_str:
+            return None
+
+        # Parse datetime - Outlook returns ISO format
+        from dateutil import parser as dateutil_parser
+
+        start_time = dateutil_parser.isoparse(start_str)
+        end_time = dateutil_parser.isoparse(end_str)
+
+        # Outlook doesn't include timezone in dateTime, use the timeZone field
+        event_tz = start_data.get("timeZone", user.timezone)
+        if not start_time.tzinfo:
+            event_tz_obj = TimezoneHelper.get_timezone(event_tz)
+            start_time = event_tz_obj.localize(start_time)
+            end_time = event_tz_obj.localize(end_time)
+
+        # Convert to user's timezone for display
+        start_time = start_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
+        end_time = end_time.astimezone(TimezoneHelper.get_timezone(user.timezone))
+
+        attendees = [
+            a.get("emailAddress", {}).get("address", "")
+            for a in event.get("attendees", [])
+        ]
+
+        # Extract Teams link if present
+        meeting_link = None
+        if event.get("isOnlineMeeting"):
+            online_meeting = event.get("onlineMeeting", {})
+            meeting_link = online_meeting.get("joinUrl")
+
+        return {
+            "id": event.get("id"),
+            "external_id": event.get("id"),
+            "title": event.get("subject", "(No title)"),
+            "start_time": start_time,
+            "end_time": end_time,
+            "attendees": attendees,
+            "link": meeting_link,
+            "provider": "outlook",
+        }
 
     async def _get_local_meetings(self, user: User, limit: int = 10) -> list[dict]:
         """Get upcoming meetings from local database cache (for privacy mode)."""
@@ -412,44 +594,59 @@ class CalendarService:
         attendees: list[str] | None = None,
         custom_link: str | None = None,
         generate_meet_link: bool = False,
+        generate_teams_link: bool = False,
     ) -> dict:
         """Update an existing meeting.
 
         Args:
             user: The user updating the meeting.
-            event_id: Google Calendar event ID.
+            event_id: Calendar event ID.
             title: New title (or None to keep existing).
             start_time: New start time in user's timezone (or None to keep).
             end_time: New end time in user's timezone (or None to keep).
             attendees: New attendee list (or None to keep).
             custom_link: Custom meeting link (or None to keep).
-            generate_meet_link: If True, add Google Meet link.
+            generate_meet_link: If True, add Google Meet link (Google only).
+            generate_teams_link: If True, add Teams link (Outlook only).
 
         Returns dict with updated meeting details or error.
         """
         client_result = await self._get_valid_client(user)
         if isinstance(client_result, dict):
             return client_result  # Error
-        client, calendar_id = client_result
+        client, calendar_id, provider = client_result
 
-        async def do_update():
-            return await client.update_event(
-                event_id=event_id,
-                calendar_id=calendar_id,
-                summary=title,
-                start_time=start_time,
-                end_time=end_time,
-                timezone=user.timezone,
-                attendees=attendees,
-                custom_link=custom_link,
-                generate_meet_link=generate_meet_link,
-            )
+        if provider == "google":
+            async def do_update():
+                return await client.update_event(
+                    event_id=event_id,
+                    calendar_id=calendar_id,
+                    summary=title,
+                    start_time=start_time,
+                    end_time=end_time,
+                    timezone=user.timezone,
+                    attendees=attendees,
+                    custom_link=custom_link,
+                    generate_meet_link=generate_meet_link,
+                )
+        else:  # outlook
+            async def do_update():
+                return await client.update_event(
+                    event_id=event_id,
+                    summary=title,
+                    start_time=start_time,
+                    end_time=end_time,
+                    timezone=user.timezone,
+                    attendees=attendees,
+                    custom_link=custom_link,
+                    generate_teams_link=generate_teams_link,
+                )
 
         result = await do_update()
 
         # Retry on 401
         if result.get("code") == 401:
-            result = await self._handle_api_error(result, user, do_update)
+            result = await self._handle_api_error(result, user, do_update, provider)
 
         if "error" in result:
             return result
@@ -470,22 +667,30 @@ class CalendarService:
                 local_updates["attendees"] = {"emails": attendees}
 
             await self.meeting_repo.update_by_external_id(
-                user.id, event_id, "google", **local_updates
+                user.id, event_id, provider, **local_updates
             )
 
-        # Extract Meet link from response if present
+        # Extract Meet link from response if present (Google)
         meet_link = None
-        if "conferenceData" in result:
+        if provider == "google" and "conferenceData" in result:
             for entry_point in result["conferenceData"].get("entryPoints", []):
                 if entry_point.get("entryPointType") == "video":
                     meet_link = entry_point.get("uri")
                     break
 
+        # Extract Teams link from response if present (Outlook)
+        teams_link = None
+        if provider == "outlook" and result.get("isOnlineMeeting"):
+            online_meeting = result.get("onlineMeeting", {})
+            teams_link = online_meeting.get("joinUrl")
+
         return {
             "success": True,
             "event_id": result.get("id"),
-            "title": result.get("summary", "(No title)"),
+            "title": result.get("summary") or result.get("subject", "(No title)"),
             "meet_link": meet_link,
+            "teams_link": teams_link,
+            "provider": provider,
         }
 
     async def create_zoom_link(
@@ -555,34 +760,42 @@ class CalendarService:
         return {"success": True, "zoom_link": result.get("join_url")}
 
     async def cancel_meeting(self, user: User, event_id: str) -> dict:
-        """Cancel a meeting by Google event ID."""
+        """Cancel a meeting by calendar event ID."""
         client_result = await self._get_valid_client(user)
         if isinstance(client_result, dict):
             return client_result  # Error
-        client, calendar_id = client_result
+        client, calendar_id, provider = client_result
 
         # Get event details first (for the title in response)
-        event = await client.get_event(event_id=event_id, calendar_id=calendar_id)
+        if provider == "google":
+            event = await client.get_event(event_id=event_id, calendar_id=calendar_id)
+        else:  # outlook
+            event = await client.get_event(event_id=event_id)
 
         if "error" in event:
             return {"error": "Meeting not found"}
 
-        title = event.get("summary", "(No title)")
+        # Get title (different field names for Google vs Outlook)
+        title = event.get("summary") or event.get("subject", "(No title)")
 
-        # Delete from Google Calendar
-        async def do_delete():
-            return await client.delete_event(event_id=event_id, calendar_id=calendar_id)
+        # Delete from calendar
+        if provider == "google":
+            async def do_delete():
+                return await client.delete_event(event_id=event_id, calendar_id=calendar_id)
+        else:  # outlook
+            async def do_delete():
+                return await client.delete_event(event_id=event_id)
 
         result = await do_delete()
 
         # Retry on 401
         if result.get("code") == 401:
-            result = await self._handle_api_error(result, user, do_delete)
+            result = await self._handle_api_error(result, user, do_delete, provider)
 
         if "error" in result:
             return result
 
         # Remove from local cache if exists
-        await self.meeting_repo.delete_by_external_id(user.id, event_id, "google")
+        await self.meeting_repo.delete_by_external_id(user.id, event_id, provider)
 
         return {"success": True, "title": title}
