@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 
 router = APIRouter(tags=["pages"])
 
@@ -1465,3 +1465,15 @@ async def sitemap():
     </url>
 </urlset>"""
     return PlainTextResponse(sitemap_content, media_type="application/xml")
+
+
+@router.get("/.well-known/microsoft-identity-association.json", response_class=JSONResponse)
+async def microsoft_identity_association():
+    """Serve Microsoft identity association file for Azure AD domain verification."""
+    return JSONResponse(
+        content={
+            "associatedApplications": [
+                {"applicationId": "4a38f049-d7b7-4048-8316-a8a940c3118a"}
+            ]
+        }
+    )
