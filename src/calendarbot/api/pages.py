@@ -1472,8 +1472,6 @@ async def microsoft_identity_association():
     """Serve Microsoft identity association file for Azure AD domain verification."""
     return JSONResponse(
         content={
-            "associatedApplications": [
-                {"applicationId": "4a38f049-d7b7-4048-8316-a8a940c3118a"}
-            ]
+            "associatedApplications": [{"applicationId": "4a38f049-d7b7-4048-8316-a8a940c3118a"}]
         }
     )
