@@ -200,13 +200,14 @@ async def connect_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -
     # Connected services section
     connected_text = ""
     if google_connected or outlook_connected or zoom_connected:
-        connected_text = f"{t.settings.connected_services_title}\n"
+        connected_text = f"{t.settings.connected_services_title}:\n"
         if google_connected:
             connected_text += "📅 Google Calendar ✅\n"
             buttons.append(
                 [
                     InlineKeyboardButton(
-                        f"📅 {t.settings.manage_button}", callback_data="manage_google"
+                        f"📅 {t.settings.manage_button} Google Calendar",
+                        callback_data="manage_google",
                     )
                 ]
             )
@@ -215,12 +216,21 @@ async def connect_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -
             buttons.append(
                 [
                     InlineKeyboardButton(
-                        f"📆 {t.settings.manage_button}", callback_data="manage_outlook"
+                        f"📆 {t.settings.manage_button} Outlook Calendar",
+                        callback_data="manage_outlook",
                     )
                 ]
             )
         if zoom_connected:
             connected_text += "📹 Zoom ✅\n"
+            buttons.append(
+                [
+                    InlineKeyboardButton(
+                        f"📹 {t.settings.manage_button} Zoom",
+                        callback_data="manage_zoom",
+                    )
+                ]
+            )
         connected_text += "\n"
 
     # Services to connect
@@ -464,13 +474,14 @@ async def connect_back_callback(update: Update, _context: ContextTypes.DEFAULT_T
     # Connected services section
     connected_text = ""
     if google_connected or outlook_connected or zoom_connected:
-        connected_text = f"{t.settings.connected_services_title}\n"
+        connected_text = f"{t.settings.connected_services_title}:\n"
         if google_connected:
             connected_text += "📅 Google Calendar ✅\n"
             buttons.append(
                 [
                     InlineKeyboardButton(
-                        f"📅 {t.settings.manage_button}", callback_data="manage_google"
+                        f"📅 {t.settings.manage_button} Google Calendar",
+                        callback_data="manage_google",
                     )
                 ]
             )
@@ -479,12 +490,21 @@ async def connect_back_callback(update: Update, _context: ContextTypes.DEFAULT_T
             buttons.append(
                 [
                     InlineKeyboardButton(
-                        f"📆 {t.settings.manage_button}", callback_data="manage_outlook"
+                        f"📆 {t.settings.manage_button} Outlook Calendar",
+                        callback_data="manage_outlook",
                     )
                 ]
             )
         if zoom_connected:
             connected_text += "📹 Zoom ✅\n"
+            buttons.append(
+                [
+                    InlineKeyboardButton(
+                        f"📹 {t.settings.manage_button} Zoom",
+                        callback_data="manage_zoom",
+                    )
+                ]
+            )
         connected_text += "\n"
 
     # Services to connect
@@ -617,6 +637,37 @@ async def manage_outlook_callback(update: Update, _context: ContextTypes.DEFAULT
 
     await query.edit_message_text(
         t.settings.outlook_connected_status.format(mode=current_mode),
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="Markdown",
+    )
+
+
+async def manage_zoom_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle manage Zoom button."""
+    query = update.callback_query
+    if not query or not update.effective_user:
+        return
+
+    await query.answer()
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await query.edit_message_text(t.common.error_user_not_found)
+            return
+
+        t = get_text(user.language)
+
+    keyboard = [
+        [InlineKeyboardButton(t.settings.disconnect_button, callback_data="disc_zoom")],
+        [InlineKeyboardButton(t.inline.back_button, callback_data="connect_back")],
+    ]
+
+    await query.edit_message_text(
+        t.settings.zoom_connected_status,
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown",
     )
@@ -1350,6 +1401,7 @@ def setup_settings_handlers(app: Application) -> None:
     # Manage service callbacks
     app.add_handler(CallbackQueryHandler(manage_google_callback, pattern=r"^manage_google$"))
     app.add_handler(CallbackQueryHandler(manage_outlook_callback, pattern=r"^manage_outlook$"))
+    app.add_handler(CallbackQueryHandler(manage_zoom_callback, pattern=r"^manage_zoom$"))
 
     # Disconnect callbacks
     app.add_handler(CallbackQueryHandler(disconnect_google_callback, pattern=r"^disc_google$"))

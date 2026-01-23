@@ -46,7 +46,7 @@ Saya membantu Anda menjadwalkan rapat langsung dari Telegram.
 /feedback - Kirim masukan atau laporkan bug
 /donate - Dukung bot ⭐
 
-_Laporan bug dan saran perbaikan UI sangat diterima!_
+_Bergabunglah dengan [grup pengujian](https://t.me/+AkSef5YmU6MyYTcy) kami untuk pembaruan dan masukan!_
 """,
         help_message="""
 *Bantuan HandyCalBot* 📅
@@ -86,6 +86,7 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
 /language - Ubah bahasa
 /feedback - Kirim masukan atau laporkan bug
 /donate - Dukung bot dengan Stars ⭐
+_Bergabunglah dengan [grup pengujian](https://t.me/+AkSef5YmU6MyYTcy) kami untuk pembaruan!_
 """,
         timezone_detected="Saya telah mengatur zona waktu Anda ke `{timezone}` berdasarkan bahasa Telegram Anda. Gunakan /timezone untuk mengubahnya jika perlu.",
         support_button="⭐ Dukung HandyCalBot",
@@ -123,6 +124,7 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         connect_zoom_button="📹 Hubungkan Zoom",
         zoom_disconnected="✅ Zoom berhasil diputus.\nGunakan /connectzoom untuk menghubungkan kembali.",
         no_zoom_connected="Tidak ada akun Zoom yang terhubung.",
+        zoom_connected_status="**Zoom Terhubung** ✅\n\nAnda dapat memutuskan di bawah:",
         # Outlook Connect/Disconnect
         outlook_already_connected="Outlook Calendar sudah terhubung!\nGunakan /disconnectoutlook untuk memutuskan koneksi terlebih dahulu.",
         click_to_connect_outlook="Klik tombol di bawah untuk menghubungkan Microsoft Outlook Calendar Anda.\n\nAnda akan dialihkan ke Microsoft untuk mengotorisasi akses.",

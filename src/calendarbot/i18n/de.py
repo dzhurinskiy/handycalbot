@@ -41,7 +41,7 @@ Ich helfe dir, Besprechungen direkt von Telegram aus zu planen.
 /meetings - Termine anzeigen
 /settings - Einstellungen
 
-_Fehlerberichte und Verbesserungsvorschlage sind willkommen!_
+_Treten Sie unserer [Testgruppe](https://t.me/+AkSef5YmU6MyYTcy) bei für Updates und Feedback!_
 """,
         help_message="""
 *HandyCalBot Hilfe* 📅
@@ -80,6 +80,8 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
 /language - Sprache andern
 /feedback - Feedback senden oder Fehler melden
 /donate - Den Bot mit Stars unterstutzen
+
+_Treten Sie unserer [Testgruppe](https://t.me/+AkSef5YmU6MyYTcy) für Updates bei!_
 """,
         timezone_detected="Ich habe deine Zeitzone basierend auf deiner Telegram-Sprache auf `{timezone}` gesetzt. Benutze /timezone, um sie bei Bedarf zu andern.",
         support_button="⭐ HandyCalBot unterstützen",
@@ -117,6 +119,7 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         connect_zoom_button="📹 Zoom verbinden",
         zoom_disconnected="✅ Zoom erfolgreich getrennt.\nVerwende /connectzoom, um es erneut zu verbinden.",
         no_zoom_connected="Kein Zoom-Konto verbunden.",
+        zoom_connected_status="**Zoom verbunden** ✅\n\nSie können unten trennen:",
         # Outlook Connect/Disconnect
         outlook_already_connected="Outlook Kalender ist bereits verbunden!\nVerwende /disconnectoutlook, um ihn zuerst zu trennen.",
         click_to_connect_outlook="Klicke auf den Button unten, um deinen Microsoft Outlook Kalender zu verbinden.\n\nDu wirst zu Microsoft weitergeleitet, um den Zugriff zu autorisieren.",

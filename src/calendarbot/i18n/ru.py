@@ -46,7 +46,7 @@ translations = Translations(
 /feedback - Отправить отзыв
 /donate - Поддержать бота ⭐
 
-_Сообщения об ошибках и предложения приветствуются!_
+_Присоединяйтесь к нашей [тестовой группе](https://t.me/+AkSef5YmU6MyYTcy) для обновлений и обратной связи!_
 """,
         help_message="""
 *Справка HandyCalBot* 📅
@@ -82,6 +82,8 @@ _Сообщения об ошибках и предложения приветс
 /notifications, /privacy, /language - Предпочтения
 /feedback - Отправить отзыв
 /donate - Поддержать бота ⭐
+
+_Присоединяйтесь к нашей [тестовой группе](https://t.me/+AkSef5YmU6MyYTcy) для обновлений!_
 """,
         timezone_detected="Я установил ваш часовой пояс как `{timezone}` на основе языка Telegram. Используйте /timezone для изменения.",
         support_button="⭐ Поддержать HandyCalBot",
@@ -119,6 +121,7 @@ _Сообщения об ошибках и предложения приветс
         connect_zoom_button="📹 Подключить Zoom",
         zoom_disconnected="✅ Zoom успешно отключен.\nИспользуйте /connectzoom, чтобы подключить снова.",
         no_zoom_connected="Zoom аккаунт не подключен.",
+        zoom_connected_status="**Zoom подключён** ✅\n\nВы можете отключить ниже:",
         # Outlook Connect/Disconnect
         outlook_already_connected="Outlook Календарь уже подключен!\nИспользуйте /disconnectoutlook, чтобы сначала отключить.",
         click_to_connect_outlook="Нажмите кнопку ниже, чтобы подключить Microsoft Outlook Календарь.\n\nВы будете перенаправлены в Microsoft для авторизации.",

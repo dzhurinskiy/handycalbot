@@ -46,7 +46,7 @@ translations = Translations(
 /feedback - 发送反馈或报告错误
 /donate - 支持机器人 ⭐
 
-_欢迎提交错误报告和UI改进建议！_
+_加入我们的[测试群组](https://t.me/+AkSef5YmU6MyYTcy)获取更新和反馈！_
 """,
         help_message="""
 *HandyCalBot 帮助* 📅
@@ -86,6 +86,8 @@ _欢迎提交错误报告和UI改进建议！_
 /language - 更改语言
 /feedback - 发送反馈或报告错误
 /donate - 用 Stars 支持机器人 ⭐
+
+_加入我们的[测试群组](https://t.me/+AkSef5YmU6MyYTcy)获取更新！_
 """,
         timezone_detected="根据您的 Telegram 语言设置，已将时区设置为 `{timezone}`。如需更改请使用 /timezone。",
         support_button="⭐ 支持 HandyCalBot",
@@ -123,6 +125,7 @@ _欢迎提交错误报告和UI改进建议！_
         connect_zoom_button="📹 连接 Zoom",
         zoom_disconnected="✅ Zoom 已成功断开连接。\n使用 /connectzoom 重新连接。",
         no_zoom_connected="未连接 Zoom 账户。",
+        zoom_connected_status="**Zoom 已连接** ✅\n\n您可以在下方断开连接:",
         # Outlook Connect/Disconnect
         outlook_already_connected="Outlook 日历已连接！\n请先使用 /disconnectoutlook 断开连接。",
         click_to_connect_outlook="点击下方按钮连接您的 Microsoft Outlook 日历。\n\n您将被重定向到 Microsoft 进行授权。",

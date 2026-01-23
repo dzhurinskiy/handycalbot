@@ -46,7 +46,7 @@ Telegramから直接ミーティングをスケジュールできます。
 /feedback - フィードバックまたはバグ報告
 /donate - ボットをサポート ⭐
 
-_バグ報告やUI改善のご提案をお待ちしております！_
+_アップデートやフィードバックは[テストグループ](https://t.me/+AkSef5YmU6MyYTcy)に参加してください！_
 """,
         help_message="""
 *HandyCalBot ヘルプ* 📅
@@ -86,6 +86,8 @@ _バグ報告やUI改善のご提案をお待ちしております！_
 /language - 言語を変更
 /feedback - フィードバックまたはバグ報告
 /donate - Starsでボットをサポート ⭐
+
+_アップデートは[テストグループ](https://t.me/+AkSef5YmU6MyYTcy)に参加してください！_
 """,
         timezone_detected="Telegramの言語設定に基づいてタイムゾーンを`{timezone}`に設定しました。変更するには /timezone を使用してください。",
         support_button="⭐ HandyCalBotをサポート",
@@ -123,6 +125,7 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         connect_zoom_button="📹 Zoomを接続",
         zoom_disconnected="✅ Zoomの接続が解除されました。\n再度接続するには /connectzoom を使用してください。",
         no_zoom_connected="Zoomアカウントが接続されていません。",
+        zoom_connected_status="**Zoom 接続済み** ✅\n\n下から切断できます:",
         # Outlook Connect/Disconnect
         outlook_already_connected="Outlookカレンダーは既に接続されています！\n先に /disconnectoutlook で解除してください。",
         click_to_connect_outlook="下のボタンをクリックしてMicrosoft Outlookカレンダーを接続してください。\n\nMicrosoftにリダイレクトされ、アクセスを許可します。",

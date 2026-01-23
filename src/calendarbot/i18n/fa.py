@@ -46,7 +46,7 @@ translations = Translations(
 /feedback - ارسال بازخورد یا گزارش خطا
 /donate - حمایت از بات ⭐
 
-_گزارش خطاها و پیشنهادات بهبود رابط کاربری استقبال می‌شود!_
+_به [گروه تست](https://t.me/+AkSef5YmU6MyYTcy) ما بپیوندید برای به‌روزرسانی‌ها و بازخورد!_
 """,
         help_message="""
 *راهنمای HandyCalBot* 📅
@@ -86,6 +86,7 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
 /language - تغییر زبان
 /feedback - ارسال بازخورد یا گزارش خطا
 /donate - حمایت از بات با Stars ⭐
+_به [گروه تست](https://t.me/+AkSef5YmU6MyYTcy) ما برای به‌روزرسانی‌ها بپیوندید!_
 """,
         timezone_detected="منطقه زمانی شما به `{timezone}` تنظیم شد بر اساس زبان تلگرام. از /timezone برای تغییر استفاده کنید.",
         support_button="⭐ حمایت از HandyCalBot",
@@ -123,6 +124,7 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         connect_zoom_button="📹 اتصال زوم",
         zoom_disconnected="✅ زوم با موفقیت قطع شد.\nبرای اتصال مجدد از /connectzoom استفاده کنید.",
         no_zoom_connected="هیچ حساب زومی متصل نیست.",
+        zoom_connected_status="**Zoom متصل است** ✅\n\nمی‌توانید در زیر قطع کنید:",
         # Outlook Connect/Disconnect
         outlook_already_connected="تقویم Outlook قبلاً متصل است!\nابتدا از /disconnectoutlook برای قطع اتصال استفاده کنید.",
         click_to_connect_outlook="روی دکمه زیر کلیک کنید تا تقویم Microsoft Outlook خود را متصل کنید.\n\nبه Microsoft هدایت خواهید شد تا دسترسی را تأیید کنید.",

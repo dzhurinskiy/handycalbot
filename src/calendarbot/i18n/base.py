@@ -64,6 +64,7 @@ class SettingsTranslations:
     connect_zoom_button: str
     zoom_disconnected: str
     no_zoom_connected: str
+    zoom_connected_status: str
 
     # Outlook Connect/Disconnect
     outlook_already_connected: str

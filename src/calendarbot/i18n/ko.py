@@ -46,7 +46,7 @@ translations = Translations(
 /feedback - 피드백 보내기 또는 버그 신고
 /donate - 봇 후원하기 ⭐
 
-_버그 신고 및 UI 개선 제안을 환영합니다!_
+_업데이트와 피드백을 위해 [테스트 그룹](https://t.me/+AkSef5YmU6MyYTcy)에 참여하세요!_
 """,
         help_message="""
 *HandyCalBot 도움말* 📅
@@ -86,6 +86,8 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
 /language - 언어 변경
 /feedback - 피드백 보내기 또는 버그 신고
 /donate - Stars로 봇 후원 ⭐
+
+_업데이트를 위해 [테스트 그룹](https://t.me/+AkSef5YmU6MyYTcy)에 참여하세요!_
 """,
         timezone_detected="텔레그램 언어 설정을 기반으로 시간대를 `{timezone}`로 설정했습니다. 변경하려면 /timezone을 사용하세요.",
         support_button="⭐ HandyCalBot 후원하기",
@@ -123,6 +125,7 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         connect_zoom_button="📹 Zoom 연결",
         zoom_disconnected="✅ Zoom 연결이 해제되었습니다.\n다시 연결하려면 /connectzoom을 사용하세요.",
         no_zoom_connected="연결된 Zoom 계정이 없습니다.",
+        zoom_connected_status="**Zoom 연결됨** ✅\n\n아래에서 연결을 해제할 수 있습니다:",
         # Outlook Connect/Disconnect
         outlook_already_connected="Outlook 캘린더가 이미 연결되어 있습니다!\n먼저 /disconnectoutlook으로 연결을 해제하세요.",
         click_to_connect_outlook="아래 버튼을 클릭하여 Microsoft Outlook 캘린더를 연결하세요.\n\nMicrosoft로 이동하여 액세스를 승인합니다.",

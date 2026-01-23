@@ -46,7 +46,7 @@ I help you schedule meetings directly from Telegram.
 /feedback - Send feedback or report bugs
 /donate - Support the bot ⭐
 
-_Bug reports and UI improvement suggestions are welcome!_
+_Join our [testing group](https://t.me/+AkSef5YmU6MyYTcy) for updates and to share feedback!_
 """,
         help_message="""
 *HandyCalBot Help* 📅
@@ -86,6 +86,8 @@ Type `@handycalbot` in any chat followed by:
 /language - Change language
 /feedback - Send feedback or report bugs
 /donate - Support the bot with Stars ⭐
+
+_Join our [testing group](https://t.me/+AkSef5YmU6MyYTcy) for updates!_
 """,
         timezone_detected="I've set your timezone to `{timezone}` based on your Telegram language. Use /timezone to change it if needed.",
         support_button="⭐ Support HandyCalBot",
@@ -123,8 +125,9 @@ Type `@handycalbot` in any chat followed by:
         zoom_already_connected="Zoom is already connected!\nUse /disconnectzoom to unlink it first.",
         click_to_connect_zoom="Click the button below to connect your Zoom account.\n\nYou'll be redirected to Zoom to authorize access.",
         connect_zoom_button="📹 Connect Zoom",
-        zoom_disconnected="✅ Zoom disconnected successfully.\nUse /connectzoom to link it again.",
+        zoom_disconnected="✅ Zoom disconnected successfully.\nUse /connect to link it again.",
         no_zoom_connected="No Zoom account connected.",
+        zoom_connected_status="**Zoom Connected** ✅\n\nYou can disconnect below:",
         # Outlook Connect/Disconnect
         outlook_already_connected="Outlook Calendar is already connected!\nUse /disconnectoutlook to unlink it first.",
         click_to_connect_outlook="Click the button below to connect your Microsoft Outlook Calendar.\n\nYou'll be redirected to Microsoft to authorize access.",
