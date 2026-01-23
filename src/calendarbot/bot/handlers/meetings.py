@@ -71,9 +71,13 @@ async def show_meetings_list(
                 return
 
             calendar_service = CalendarService(session)
-            all_meetings, is_privacy_mode = await calendar_service.get_upcoming_meetings(
+            all_meetings, is_privacy_mode, error = await calendar_service.get_upcoming_meetings(
                 user, limit=50
             )
+
+            if error:
+                await send_message(f"❌ {error}")
+                return
     except Exception as e:
         logger.exception(f"Error fetching meetings: {e}")
         await send_message(f"Error fetching meetings: {str(e)}")

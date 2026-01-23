@@ -282,26 +282,29 @@ class CalendarService:
         token = await self.token_repo.get_token(user.id, "google")
         return token is not None and token.privacy_mode
 
-    async def get_upcoming_meetings(self, user: User, limit: int = 10) -> tuple[list[dict], bool]:
+    async def get_upcoming_meetings(
+        self, user: User, limit: int = 10
+    ) -> tuple[list[dict], bool, str | None]:
         """Get upcoming meetings.
 
         In privacy mode: returns only bot-created meetings from local DB.
         In full access mode: returns meetings from Google Calendar API.
 
         Returns:
-            Tuple of (meetings list, is_privacy_mode flag)
+            Tuple of (meetings list, is_privacy_mode flag, error message or None)
         """
         # Check if user is in privacy mode
         privacy_mode = await self.is_privacy_mode(user)
 
         if privacy_mode:
             # Privacy mode: fetch from local database only
-            return await self._get_local_meetings(user, limit), True
+            return await self._get_local_meetings(user, limit), True, None
 
         # Full access mode: fetch from Google Calendar
         client_result = await self._get_valid_client(user)
         if isinstance(client_result, dict):
-            return [], False  # No calendar connected or token error
+            # Return the error message so the caller can display it
+            return [], False, client_result.get("error")
         client, calendar_id = client_result
 
         async def do_list():
@@ -319,7 +322,7 @@ class CalendarService:
 
         if "error" in result:
             logger.error(f"Failed to list events for user {user.id}: {result}")
-            return [], False
+            return [], False, result.get("error")
 
         events = result.get("items", [])
         meetings = []
@@ -368,7 +371,7 @@ class CalendarService:
                 }
             )
 
-        return meetings, False
+        return meetings, False, None
 
     async def _get_local_meetings(self, user: User, limit: int = 10) -> list[dict]:
         """Get upcoming meetings from local database cache (for privacy mode)."""
