@@ -56,6 +56,10 @@ class UserService:
             user, allow_username_invites=allow_username_invites
         )
 
+    async def update_default_calendar(self, user: User, provider: str) -> User:
+        """Update user's default calendar provider preference."""
+        return await self.user_repo.update_settings(user, default_calendar=provider)
+
     async def is_calendar_connected(self, user: User, provider: str = "google") -> bool:
         """Check if user has connected their calendar."""
         token = await self.token_repo.get_token(user.id, provider)

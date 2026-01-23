@@ -190,6 +190,12 @@ Type `@handycalbot` in any chat followed by:
         privacy_enabled_desc="Others can invite you to meetings using your @username",
         privacy_disabled_desc="Only direct email invites will work",
         privacy_updated="{emoji} Username invites {status}.",
+        # Default calendar preference
+        default_calendar_label="Default Calendar",
+        default_calendar_requires_both="You need both Google and Outlook calendars connected to set a preference.\n\nUse /connect and /connectoutlook to connect both.",
+        default_calendar_title="**Default Calendar** 🎯",
+        default_calendar_desc="Choose which calendar to use by default when creating meetings.\n\nYou can switch calendars for individual meetings from the Edit menu.",
+        default_calendar_updated="✅ Default calendar set to {calendar}.\n\nNew meetings will be created there.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Upcoming Meetings** 📅",
@@ -211,6 +217,8 @@ Type `@handycalbot` in any chat followed by:
         edit_duration_btn="⏱️ Duration",
         edit_attendees_btn="👥 Attendees",
         edit_link_btn="🔗 Link",
+        switch_to_calendar="Move to {calendar}",
+        calendar_switched="✅ Meeting moved to {calendar}.",
         field_updated="✅ {field} updated",
         # Cancel menu
         select_meeting_to_cancel="**Select a meeting to cancel:**",

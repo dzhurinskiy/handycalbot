@@ -180,6 +180,12 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         privacy_enabled_desc="دیگران می‌توانند با @نام کاربری شما را به جلسات دعوت کنند",
         privacy_disabled_desc="فقط دعوت‌نامه‌های مستقیم ایمیلی کار خواهند کرد",
         privacy_updated="{emoji} دعوت‌نامه‌های نام کاربری {status}.",
+        # Default calendar preference
+        default_calendar_label="تقویم پیش‌فرض",
+        default_calendar_requires_both="برای تنظیم ترجیحات، باید هر دو تقویم Google و Outlook متصل باشند.\n\nاز /connect و /connectoutlook برای اتصال هر دو استفاده کنید.",
+        default_calendar_title="**تقویم پیش‌فرض** 🎯",
+        default_calendar_desc="انتخاب کنید کدام تقویم به طور پیش‌فرض هنگام ایجاد جلسات استفاده شود.\n\nمی‌توانید تقویم را برای جلسات فردی از منوی ویرایش تغییر دهید.",
+        default_calendar_updated="✅ تقویم پیش‌فرض روی {calendar} تنظیم شد.\n\nجلسات جدید در آنجا ایجاد می‌شوند.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**جلسات آینده** 📅",
@@ -201,6 +207,8 @@ _گزارش خطاها و پیشنهادات بهبود رابط کاربری ا
         edit_duration_btn="⏱️ مدت",
         edit_attendees_btn="👥 شرکت‌کنندگان",
         edit_link_btn="🔗 لینک",
+        switch_to_calendar="انتقال به {calendar}",
+        calendar_switched="✅ جلسه به {calendar} منتقل شد.",
         field_updated="✅ {field} به‌روزرسانی شد",
         select_meeting_to_cancel="**جلسه‌ای برای لغو انتخاب کنید:**",
         page_info="صفحه {current}/{total}",

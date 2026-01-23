@@ -179,6 +179,12 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         privacy_enabled_desc="他のユーザーが@ユーザー名で会議に招待できます",
         privacy_disabled_desc="直接のメール招待のみ機能します",
         privacy_updated="{emoji} ユーザー名招待が{status}になりました。",
+        # Default calendar preference
+        default_calendar_label="デフォルトカレンダー",
+        default_calendar_requires_both="設定を行うには、GoogleとOutlookの両方のカレンダーを接続する必要があります。\n\n/connect と /connectoutlook を使用して両方を接続してください。",
+        default_calendar_title="**デフォルトカレンダー** 🎯",
+        default_calendar_desc="会議作成時に使用するデフォルトのカレンダーを選択してください。\n\n編集メニューから個別の会議のカレンダーを変更できます。",
+        default_calendar_updated="✅ デフォルトカレンダーを{calendar}に設定しました。\n\n新しい会議はそこに作成されます。",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**今後のミーティング** 📅",
@@ -200,6 +206,8 @@ _バグ報告やUI改善のご提案をお待ちしております！_
         edit_duration_btn="⏱️ 所要時間",
         edit_attendees_btn="👥 参加者",
         edit_link_btn="🔗 リンク",
+        switch_to_calendar="{calendar}に移動",
+        calendar_switched="✅ 会議を{calendar}に移動しました。",
         field_updated="✅ {field} を更新しました",
         select_meeting_to_cancel="**キャンセルするミーティングを選択:**",
         page_info="ページ {current}/{total}",

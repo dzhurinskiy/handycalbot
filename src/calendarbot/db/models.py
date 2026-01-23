@@ -45,6 +45,8 @@ class User(Base):
     language: Mapped[str] = mapped_column(String(10), default="en")
     # Privacy setting: allow others to invite by @username
     allow_username_invites: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Preferred calendar provider when multiple are connected ('google', 'outlook', or None)
+    default_calendar: Mapped[str | None] = mapped_column(String(20), nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()

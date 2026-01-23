@@ -180,6 +180,12 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         privacy_enabled_desc="다른 사람들이 @사용자명으로 회의에 초대할 수 있습니다",
         privacy_disabled_desc="직접 이메일 초대만 작동합니다",
         privacy_updated="{emoji} 사용자명 초대 {status}.",
+        # Default calendar preference
+        default_calendar_label="기본 캘린더",
+        default_calendar_requires_both="기본 설정을 지정하려면 Google과 Outlook 캘린더가 모두 연결되어 있어야 합니다.\n\n/connect 및 /connectoutlook을 사용하여 둘 다 연결하세요.",
+        default_calendar_title="**기본 캘린더** 🎯",
+        default_calendar_desc="회의 생성 시 기본으로 사용할 캘린더를 선택하세요.\n\n편집 메뉴에서 개별 회의의 캘린더를 변경할 수 있습니다.",
+        default_calendar_updated="✅ 기본 캘린더가 {calendar}로 설정되었습니다.\n\n새 회의는 거기에 생성됩니다.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**예정된 회의** 📅",
@@ -201,6 +207,8 @@ _버그 신고 및 UI 개선 제안을 환영합니다!_
         edit_duration_btn="⏱️ 기간",
         edit_attendees_btn="👥 참석자",
         edit_link_btn="🔗 링크",
+        switch_to_calendar="{calendar}로 이동",
+        calendar_switched="✅ 회의가 {calendar}로 이동되었습니다.",
         field_updated="✅ {field} 업데이트됨",
         select_meeting_to_cancel="**취소할 회의 선택:**",
         page_info="페이지 {current}/{total}",

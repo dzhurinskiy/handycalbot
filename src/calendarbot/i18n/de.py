@@ -180,6 +180,12 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         privacy_enabled_desc="Andere können Sie über Ihren @Benutzernamen zu Besprechungen einladen",
         privacy_disabled_desc="Nur direkte E-Mail-Einladungen funktionieren",
         privacy_updated="{emoji} Benutzername-Einladungen {status}.",
+        # Default calendar preference
+        default_calendar_label="Standardkalender",
+        default_calendar_requires_both="Sie müssen sowohl Google als auch Outlook Kalender verbinden, um eine Präferenz festzulegen.\n\nVerwenden Sie /connect und /connectoutlook, um beide zu verbinden.",
+        default_calendar_title="**Standardkalender** 🎯",
+        default_calendar_desc="Wählen Sie, welcher Kalender standardmäßig beim Erstellen von Besprechungen verwendet werden soll.\n\nSie können den Kalender für einzelne Termine im Bearbeiten-Menü wechseln.",
+        default_calendar_updated="✅ Standardkalender auf {calendar} gesetzt.\n\nNeue Termine werden dort erstellt.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Kommende Besprechungen** 📅",
@@ -201,6 +207,8 @@ Gib `@handycalbot` in einem Chat ein, gefolgt von:
         edit_duration_btn="⏱️ Dauer",
         edit_attendees_btn="👥 Teilnehmer",
         edit_link_btn="🔗 Link",
+        switch_to_calendar="Verschieben nach {calendar}",
+        calendar_switched="✅ Termin nach {calendar} verschoben.",
         field_updated="✅ {field} aktualisiert",
         select_meeting_to_cancel="**Wahle eine Besprechung zum Absagen:**",
         page_info="Seite {current}/{total}",

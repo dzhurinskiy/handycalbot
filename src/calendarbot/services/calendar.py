@@ -28,21 +28,40 @@ class CalendarService:
         self.encryption = TokenEncryption()
 
     async def _get_valid_client(
-        self, user: User
+        self, user: User, force_provider: str | None = None
     ) -> tuple[GoogleCalendarClient | OutlookCalendarClient, str, str] | dict:
         """Get a calendar client with valid tokens, refreshing if needed.
 
-        Checks Google first, then Outlook.
+        Respects user's default_calendar preference. Falls back to whichever is connected.
+
+        Args:
+            user: The user to get client for.
+            force_provider: If set, force using this provider ('google' or 'outlook').
 
         Returns (client, calendar_id, provider) on success, or dict with error on failure.
         """
-        # Try Google first
         google_token = await self.token_repo.get_token(user.id, "google")
+        outlook_token = await self.token_repo.get_token(user.id, "outlook")
+
+        # If forcing a specific provider
+        if force_provider:
+            if force_provider == "google" and google_token:
+                return await self._get_google_client(user, google_token)
+            elif force_provider == "outlook" and outlook_token:
+                return await self._get_outlook_client(user, outlook_token)
+            else:
+                return {"error": f"{force_provider.title()} calendar not connected."}
+
+        # Determine priority based on user preference
+        preferred = user.default_calendar
+        if preferred == "google" and google_token:
+            return await self._get_google_client(user, google_token)
+        elif preferred == "outlook" and outlook_token:
+            return await self._get_outlook_client(user, outlook_token)
+
+        # No preference or preferred not connected - fall back to first available
         if google_token:
             return await self._get_google_client(user, google_token)
-
-        # Try Outlook second
-        outlook_token = await self.token_repo.get_token(user.id, "outlook")
         if outlook_token:
             return await self._get_outlook_client(user, outlook_token)
 
@@ -397,15 +416,144 @@ class CalendarService:
         return False
 
     async def get_calendar_provider(self, user: User) -> str | None:
-        """Get which calendar provider the user has connected.
+        """Get which calendar provider the user has connected (respects preference).
 
         Returns 'google', 'outlook', or None.
         """
-        if await self.token_repo.get_token(user.id, "google"):
+        google = await self.token_repo.get_token(user.id, "google")
+        outlook = await self.token_repo.get_token(user.id, "outlook")
+
+        # Respect user preference
+        if user.default_calendar == "google" and google:
             return "google"
-        if await self.token_repo.get_token(user.id, "outlook"):
+        if user.default_calendar == "outlook" and outlook:
+            return "outlook"
+
+        # Fallback
+        if google:
+            return "google"
+        if outlook:
             return "outlook"
         return None
+
+    async def get_connected_providers(self, user: User) -> list[str]:
+        """Get list of all connected calendar providers.
+
+        Returns list like ['google', 'outlook'] or ['google'] or [].
+        """
+        providers = []
+        if await self.token_repo.get_token(user.id, "google"):
+            providers.append("google")
+        if await self.token_repo.get_token(user.id, "outlook"):
+            providers.append("outlook")
+        return providers
+
+    async def switch_meeting_calendar(
+        self,
+        user: User,
+        event_id: str,
+        from_provider: str,
+        to_provider: str,
+        meeting_data: dict,
+    ) -> dict:
+        """Move a meeting from one calendar to another.
+
+        Deletes from source calendar, creates in destination calendar.
+
+        Args:
+            user: The user.
+            event_id: The event ID in the source calendar.
+            from_provider: Source calendar ('google' or 'outlook').
+            to_provider: Destination calendar ('google' or 'outlook').
+            meeting_data: Dict with title, start_time, end_time, attendees, etc.
+
+        Returns dict with new event details or error.
+        """
+        # Get destination client
+        dest_result = await self._get_valid_client(user, force_provider=to_provider)
+        if isinstance(dest_result, dict):
+            return dest_result  # Error
+
+        dest_client, dest_calendar_id, _ = dest_result
+
+        # Create in destination first (so we don't lose the meeting if delete fails)
+        start_time = meeting_data.get("start_time")
+        end_time = meeting_data.get("end_time")
+        title = meeting_data.get("title", "(No title)")
+        attendees = meeting_data.get("attendees", [])
+
+        if to_provider == "google":
+            google_client = cast(GoogleCalendarClient, dest_client)
+            create_result = await google_client.create_event(
+                summary=title,
+                start_time=start_time,
+                end_time=end_time,
+                attendees=attendees,
+                timezone=user.timezone,
+                calendar_id=dest_calendar_id,
+            )
+        else:  # outlook
+            outlook_client = cast(OutlookCalendarClient, dest_client)
+            create_result = await outlook_client.create_event(
+                summary=title,
+                start_time=start_time,
+                end_time=end_time,
+                attendees=attendees,
+                timezone=user.timezone,
+            )
+
+        if "error" in create_result:
+            return {"error": f"Failed to create in {to_provider}: {create_result.get('error')}"}
+
+        new_event_id = create_result.get("id")
+
+        # Delete from source
+        source_result = await self._get_valid_client(user, force_provider=from_provider)
+        if not isinstance(source_result, dict):
+            source_client, source_calendar_id, _ = source_result
+            if from_provider == "google":
+                google_client = cast(GoogleCalendarClient, source_client)
+                await google_client.delete_event(event_id=event_id, calendar_id=source_calendar_id)
+            else:  # outlook
+                outlook_client = cast(OutlookCalendarClient, source_client)
+                await outlook_client.delete_event(event_id=event_id)
+
+            # Update local cache
+            await self.meeting_repo.delete_by_external_id(user.id, event_id, from_provider)
+
+        # Cache new meeting
+        start_utc = TimezoneHelper.to_utc(start_time, user.timezone)
+        end_utc = TimezoneHelper.to_utc(end_time, user.timezone)
+        await self.meeting_repo.save_meeting(
+            user_id=user.id,
+            external_id=new_event_id,
+            provider=to_provider,
+            title=title,
+            start_time=start_utc.replace(tzinfo=None),
+            end_time=end_utc.replace(tzinfo=None),
+            attendees=attendees,
+        )
+
+        # Extract meeting link
+        meet_link = None
+        teams_link = None
+        if to_provider == "google" and "conferenceData" in create_result:
+            for ep in create_result["conferenceData"].get("entryPoints", []):
+                if ep.get("entryPointType") == "video":
+                    meet_link = ep.get("uri")
+                    break
+        elif to_provider == "outlook" and create_result.get("isOnlineMeeting"):
+            teams_link = create_result.get("onlineMeeting", {}).get("joinUrl")
+
+        return {
+            "success": True,
+            "event_id": new_event_id,
+            "provider": to_provider,
+            "title": title,
+            "link": create_result.get("htmlLink") or create_result.get("webLink", ""),
+            "meet_link": meet_link,
+            "teams_link": teams_link,
+        }
 
     async def get_upcoming_meetings(
         self, user: User, limit: int = 10

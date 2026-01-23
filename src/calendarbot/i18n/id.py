@@ -180,6 +180,12 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         privacy_enabled_desc="Orang lain dapat mengundang Anda ke rapat menggunakan @username Anda",
         privacy_disabled_desc="Hanya undangan email langsung yang akan berfungsi",
         privacy_updated="{emoji} Undangan username {status}.",
+        # Default calendar preference
+        default_calendar_label="Kalender Default",
+        default_calendar_requires_both="Anda perlu menghubungkan kalender Google dan Outlook untuk menetapkan preferensi.\n\nGunakan /connect dan /connectoutlook untuk menghubungkan keduanya.",
+        default_calendar_title="**Kalender Default** 🎯",
+        default_calendar_desc="Pilih kalender mana yang akan digunakan secara default saat membuat rapat.\n\nAnda dapat mengubah kalender untuk rapat individual dari menu Edit.",
+        default_calendar_updated="✅ Kalender default diatur ke {calendar}.\n\nRapat baru akan dibuat di sana.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Rapat Mendatang** 📅",
@@ -201,6 +207,8 @@ Ketik `@handycalbot` di chat mana pun diikuti dengan:
         edit_duration_btn="⏱️ Durasi",
         edit_attendees_btn="👥 Peserta",
         edit_link_btn="🔗 Link",
+        switch_to_calendar="Pindahkan ke {calendar}",
+        calendar_switched="✅ Rapat dipindahkan ke {calendar}.",
         field_updated="✅ {field} diperbarui",
         select_meeting_to_cancel="**Pilih rapat untuk dibatalkan:**",
         page_info="Halaman {current}/{total}",

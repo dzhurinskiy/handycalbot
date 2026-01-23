@@ -131,6 +131,22 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     # Format privacy status
     privacy_status = f"✅ {t.settings.enabled}" if privacy_enabled else f"❌ {t.settings.disabled}"
 
+    # Format default calendar preference (only show if both connected)
+    default_calendar_line = ""
+    default_calendar_cmd = ""
+    google_connected = summary["google_calendar"] == "Connected"
+    outlook_connected = summary.get("outlook_calendar") == "Connected"
+    if google_connected and outlook_connected:
+        if user.default_calendar == "outlook":
+            default_cal_display = t.settings.outlook_calendar_label
+        elif user.default_calendar == "google":
+            default_cal_display = t.settings.google_calendar_label
+        else:
+            # No preference set, show which one is being used (Google by default)
+            default_cal_display = t.settings.google_calendar_label
+        default_calendar_line = f"\n🎯 {t.settings.default_calendar_label}: {default_cal_display}"
+        default_calendar_cmd = f"\n/defaultcalendar - {t.settings.default_calendar_label}"
+
     text = f"""
 {t.settings.your_settings}
 
@@ -141,7 +157,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 🔒 {t.settings.privacy_username_invites}: {privacy_status}
 📅 {t.settings.google_calendar_label}: {google_status}
 📆 {t.settings.outlook_calendar_label}: {outlook_status}
-📹 Zoom: {zoom_status}
+📹 Zoom: {zoom_status}{default_calendar_line}
 
 {t.settings.change_settings}
 /timezone - {t.settings.timezone_label}
@@ -152,7 +168,7 @@ async def settings_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
 /language - Language
 /connect - {t.settings.google_calendar_label}
 /connectoutlook - {t.settings.outlook_calendar_label}
-/connectzoom - Zoom
+/connectzoom - Zoom{default_calendar_cmd}
 """
 
     await update.message.reply_text(text, parse_mode="Markdown")
@@ -1061,6 +1077,99 @@ async def privacy_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) 
     )
 
 
+async def defaultcalendar_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /defaultcalendar command - set preferred calendar provider."""
+    if not update.effective_user or not update.message:
+        return
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await update.message.reply_text(t.common.please_start_first)
+            return
+
+        t = get_text(user.language)
+
+        # Check if both calendars are connected
+        google_connected = await user_service.is_calendar_connected(user)
+        outlook_connected = await user_service.is_outlook_connected(user)
+
+        if not (google_connected and outlook_connected):
+            await update.message.reply_text(
+                t.settings.default_calendar_requires_both,
+                parse_mode="Markdown",
+            )
+            return
+
+        current_pref = user.default_calendar or "google"
+
+    # Show selection buttons
+    google_label = "📅 Google Calendar" + (
+        f" {t.settings.current_suffix}" if current_pref == "google" else ""
+    )
+    outlook_label = "📆 Outlook Calendar" + (
+        f" {t.settings.current_suffix}" if current_pref == "outlook" else ""
+    )
+
+    keyboard = InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton(google_label, callback_data="defcal_google")],
+            [InlineKeyboardButton(outlook_label, callback_data="defcal_outlook")],
+        ]
+    )
+
+    await update.message.reply_text(
+        f"{t.settings.default_calendar_title}\n\n"
+        f"{t.settings.default_calendar_desc}\n\n"
+        f"{t.settings.select_option}",
+        reply_markup=keyboard,
+        parse_mode="Markdown",
+    )
+
+
+async def defaultcalendar_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle default calendar selection button press."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    await query.answer()
+
+    # Extract provider from callback data (defcal_google or defcal_outlook)
+    new_provider = query.data.replace("defcal_", "")
+    if new_provider not in ("google", "outlook"):
+        return
+
+    async with async_session_factory() as session:
+        user_service = UserService(session)
+        user = await user_service.get_user(update.effective_user.id)
+
+        if not user:
+            t = get_text("en")
+            await query.edit_message_text(t.common.error_user_not_found)
+            return
+
+        t = get_text(user.language)
+
+        # Update default calendar preference
+        await user_service.update_default_calendar(user, new_provider)
+        await session.commit()
+
+    provider_name = (
+        t.settings.google_calendar_label
+        if new_provider == "google"
+        else t.settings.outlook_calendar_label
+    )
+
+    await query.edit_message_text(
+        t.settings.default_calendar_updated.format(calendar=provider_name),
+        parse_mode="Markdown",
+    )
+
+
 def setup_settings_handlers(app: Application) -> None:
     """Register settings handlers."""
     # Simple commands
@@ -1074,6 +1183,7 @@ def setup_settings_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("notifications", notifications_command))
     app.add_handler(CommandHandler("language", language_command))
     app.add_handler(CommandHandler("privacy", privacy_command))
+    app.add_handler(CommandHandler("defaultcalendar", defaultcalendar_command))
 
     # Connect mode callback for Google (full access vs privacy mode)
     app.add_handler(
@@ -1105,6 +1215,9 @@ def setup_settings_handlers(app: Application) -> None:
 
     # Privacy callback
     app.add_handler(CallbackQueryHandler(privacy_callback, pattern=r"^privacy_"))
+
+    # Default calendar callback
+    app.add_handler(CallbackQueryHandler(defaultcalendar_callback, pattern=r"^defcal_"))
 
     # Standalone timezone callback (handles tz_ buttons from OAuth and other contexts)
     # This must be registered BEFORE the ConversationHandler to catch callbacks

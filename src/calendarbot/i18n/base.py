@@ -126,6 +126,12 @@ class SettingsTranslations:
     privacy_enabled_desc: str
     privacy_disabled_desc: str
     privacy_updated: str
+    # Default calendar preference
+    default_calendar_label: str
+    default_calendar_requires_both: str
+    default_calendar_title: str
+    default_calendar_desc: str
+    default_calendar_updated: str
 
 
 @dataclass(frozen=True)
@@ -153,6 +159,8 @@ class MeetingsTranslations:
     edit_duration_btn: str
     edit_attendees_btn: str
     edit_link_btn: str
+    switch_to_calendar: str
+    calendar_switched: str
     field_updated: str
 
     # Cancel menu (legacy, keeping for compatibility)

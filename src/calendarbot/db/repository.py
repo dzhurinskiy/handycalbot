@@ -65,6 +65,7 @@ class UserRepository:
         notifications_enabled: bool | None = None,
         language: str | None = None,
         allow_username_invites: bool | None = None,
+        default_calendar: str | None = None,
     ) -> User:
         """Update user settings."""
         if timezone is not None:
@@ -79,6 +80,8 @@ class UserRepository:
             user.language = language
         if allow_username_invites is not None:
             user.allow_username_invites = allow_username_invites
+        if default_calendar is not None:
+            user.default_calendar = default_calendar
         await self.session.flush()
         return user
 

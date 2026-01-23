@@ -180,6 +180,12 @@ _Сообщения об ошибках и предложения по улуч�
         privacy_enabled_desc="Другие могут приглашать вас на встречи по вашему @имени пользователя",
         privacy_disabled_desc="Будут работать только прямые приглашения по email",
         privacy_updated="{emoji} Приглашения по имени пользователя {status}.",
+        # Default calendar preference
+        default_calendar_label="Календарь по умолчанию",
+        default_calendar_requires_both="Вам нужно подключить и Google, и Outlook календари, чтобы установить предпочтение.\n\nИспользуйте /connect и /connectoutlook для подключения обоих.",
+        default_calendar_title="**Календарь по умолчанию** 🎯",
+        default_calendar_desc="Выберите, какой календарь использовать по умолчанию при создании встреч.\n\nВы можете переключить календарь для отдельных встреч в меню редактирования.",
+        default_calendar_updated="✅ Календарь по умолчанию установлен на {calendar}.\n\nНовые встречи будут создаваться там.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Предстоящие встречи** 📅",
@@ -201,6 +207,8 @@ _Сообщения об ошибках и предложения по улуч�
         edit_duration_btn="⏱️ Длительность",
         edit_attendees_btn="👥 Участники",
         edit_link_btn="🔗 Ссылка",
+        switch_to_calendar="Перенести в {calendar}",
+        calendar_switched="✅ Встреча перенесена в {calendar}.",
         field_updated="✅ {field} обновлено",
         select_meeting_to_cancel="**Выберите встречу для отмены:**",
         page_info="Страница {current}/{total}",

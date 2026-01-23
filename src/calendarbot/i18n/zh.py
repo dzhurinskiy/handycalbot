@@ -179,6 +179,12 @@ _欢迎提交错误报告和UI改进建议！_
         privacy_enabled_desc="其他人可以通过您的@用户名邀请您参加会议",
         privacy_disabled_desc="只有直接电子邮件邀请才会生效",
         privacy_updated="{emoji} 用户名邀请{status}。",
+        # Default calendar preference
+        default_calendar_label="默认日历",
+        default_calendar_requires_both="您需要同时连接 Google 和 Outlook 日历才能设置偏好。\n\n使用 /connect 和 /connectoutlook 连接两者。",
+        default_calendar_title="**默认日历** 🎯",
+        default_calendar_desc="选择创建会议时默认使用的日历。\n\n您可以从编辑菜单更改单个会议的日历。",
+        default_calendar_updated="✅ 默认日历已设置为 {calendar}。\n\n新会议将在那里创建。",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**即将到来的会议** 📅",
@@ -200,6 +206,8 @@ _欢迎提交错误报告和UI改进建议！_
         edit_duration_btn="⏱️ 时长",
         edit_attendees_btn="👥 参与者",
         edit_link_btn="🔗 链接",
+        switch_to_calendar="移动到 {calendar}",
+        calendar_switched="✅ 会议已移动到 {calendar}。",
         field_updated="✅ {field} 已更新",
         select_meeting_to_cancel="**选择要取消的会议:**",
         page_info="第 {current}/{total} 页",

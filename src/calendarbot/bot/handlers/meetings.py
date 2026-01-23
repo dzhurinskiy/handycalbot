@@ -265,7 +265,7 @@ async def meeting_detail_callback(update: Update, context: ContextTypes.DEFAULT_
         await query.edit_message_text(f"Error: {str(e)}")
 
 
-async def meeting_edit_menu_callback(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
+async def meeting_edit_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show edit menu with field buttons."""
     query = update.callback_query
     if not query or not query.data or not update.effective_user:
@@ -283,8 +283,21 @@ async def meeting_edit_menu_callback(update: Update, _context: ContextTypes.DEFA
 
         async with async_session_factory() as session:
             user_service = UserService(session)
+            calendar_service = CalendarService(session)
             user = await user_service.get_user(update.effective_user.id)
             t = get_text(user.language if user else "en")
+
+            # Check if both calendars are connected for switch option
+            connected_providers = await calendar_service.get_connected_providers(user)
+            has_both_calendars = len(connected_providers) == 2
+
+        # Get current meeting's provider from stored data
+        meetings_key = f"meetings_{stored_user_id}"
+        current_provider = None
+        if context.bot_data and meetings_key in context.bot_data:
+            meetings = context.bot_data[meetings_key]
+            if meeting_idx < len(meetings):
+                current_provider = meetings[meeting_idx].get("provider")
 
         text = t.meetings.edit_menu_title
 
@@ -315,12 +328,32 @@ async def meeting_edit_menu_callback(update: Update, _context: ContextTypes.DEFA
                     t.meetings.edit_link_btn, callback_data=f"meli_{stored_user_id}_{meeting_idx}"
                 ),
             ],
+        ]
+
+        # Add switch calendar button if both calendars are connected
+        if has_both_calendars and current_provider:
+            other_provider = "outlook" if current_provider == "google" else "google"
+            other_name = (
+                t.settings.outlook_calendar_label
+                if other_provider == "outlook"
+                else t.settings.google_calendar_label
+            )
+            buttons.append(
+                [
+                    InlineKeyboardButton(
+                        f"🔄 {t.meetings.switch_to_calendar.format(calendar=other_name)}",
+                        callback_data=f"mswc_{stored_user_id}_{meeting_idx}_{other_provider}",
+                    )
+                ]
+            )
+
+        buttons.append(
             [
                 InlineKeyboardButton(
                     t.inline.back_button, callback_data=f"md_{stored_user_id}_{meeting_idx}"
                 )
-            ],
-        ]
+            ]
+        )
 
         await query.edit_message_text(
             text, reply_markup=InlineKeyboardMarkup(buttons), parse_mode="Markdown"
@@ -1191,6 +1224,100 @@ async def meeting_set_link_teams_callback(
         await query.edit_message_text(f"Error: {str(e)}")
 
 
+async def meeting_switch_calendar_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Switch meeting to a different calendar provider."""
+    query = update.callback_query
+    if not query or not query.data or not update.effective_user:
+        return
+
+    await query.answer()
+
+    try:
+        # Parse callback data: mswc_{user_id}_{meeting_idx}_{target_provider}
+        parts = query.data.split("_")
+        stored_user_id = int(parts[1])
+        meeting_idx = int(parts[2])
+        target_provider = parts[3]
+
+        if stored_user_id != update.effective_user.id:
+            return
+
+        meetings_key = f"meetings_{stored_user_id}"
+        if not context.bot_data or meetings_key not in context.bot_data:
+            return
+
+        meetings = context.bot_data[meetings_key]
+        if meeting_idx >= len(meetings):
+            return
+
+        m = meetings[meeting_idx]
+        current_provider = m.get("provider", "google")
+
+        if current_provider == target_provider:
+            return  # Already on target calendar
+
+        async with async_session_factory() as session:
+            user_service = UserService(session)
+            user = await user_service.get_user(update.effective_user.id)
+
+            if not user:
+                return
+
+            t = get_text(user.language)
+
+            # Prepare meeting data for switch
+            meeting_data = {
+                "title": m.get("title", "(No title)"),
+                "start_time": m.get("start_time"),
+                "end_time": m.get("end_time"),
+                "attendees": m.get("attendees", []),
+            }
+
+            # Switch the calendar
+            calendar_service = CalendarService(session)
+            result = await calendar_service.switch_meeting_calendar(
+                user=user,
+                event_id=m["id"],
+                from_provider=current_provider,
+                to_provider=target_provider,
+                meeting_data=meeting_data,
+            )
+            await session.commit()
+
+        if "error" in result:
+            await query.edit_message_text(f"❌ {result['error']}")
+            return
+
+        # Update cached meeting with new data
+        m["id"] = result["event_id"]
+        m["external_id"] = result["event_id"]
+        m["provider"] = target_provider
+        if result.get("meet_link"):
+            m["link"] = result["meet_link"]
+        elif result.get("teams_link"):
+            m["link"] = result["teams_link"]
+
+        target_name = (
+            t.settings.outlook_calendar_label
+            if target_provider == "outlook"
+            else t.settings.google_calendar_label
+        )
+        await query.edit_message_text(
+            t.meetings.calendar_switched.format(calendar=target_name),
+            parse_mode="Markdown",
+        )
+
+        # Show detail view
+        query.data = f"md_{stored_user_id}_{meeting_idx}"
+        await meeting_detail_callback(update, context)
+
+    except Exception as e:
+        logger.exception(f"Error in meeting_switch_calendar_callback: {e}")
+        await query.edit_message_text(f"Error: {str(e)}")
+
+
 async def meeting_cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle cancel meeting from detail view."""
     query = update.callback_query
@@ -1314,6 +1441,11 @@ def setup_meeting_handlers(app: Application) -> None:
         CallbackQueryHandler(meeting_set_link_teams_callback, pattern=r"^mslte_\d+_\d+$")
     )
     app.add_handler(CallbackQueryHandler(meeting_set_link_zoom_callback, pattern=r"^mslz_\d+_\d+$"))
+
+    # Switch calendar: mswc_{user_id}_{index}_{provider}
+    app.add_handler(
+        CallbackQueryHandler(meeting_switch_calendar_callback, pattern=r"^mswc_\d+_\d+_\w+$")
+    )
 
     # Cancel meeting: mc_{user_id}_{index}
     app.add_handler(CallbackQueryHandler(meeting_cancel_callback, pattern=r"^mc_\d+_\d+$"))

@@ -179,6 +179,12 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         privacy_enabled_desc="Otros pueden invitarte a reuniones usando tu @usuario",
         privacy_disabled_desc="Solo funcionaran las invitaciones directas por email",
         privacy_updated="{emoji} Invitaciones por usuario {status}.",
+        # Default calendar preference
+        default_calendar_label="Calendario Predeterminado",
+        default_calendar_requires_both="Necesitas tener tanto Google como Outlook conectados para establecer una preferencia.\n\nUsa /connect y /connectoutlook para conectar ambos.",
+        default_calendar_title="**Calendario Predeterminado** 🎯",
+        default_calendar_desc="Elige qué calendario usar por defecto al crear reuniones.\n\nPuedes cambiar de calendario para reuniones individuales desde el menú Editar.",
+        default_calendar_updated="✅ Calendario predeterminado establecido a {calendar}.\n\nLas nuevas reuniones se crearán allí.",
     ),
     meetings=MeetingsTranslations(
         upcoming_meetings="**Proximas Reuniones** 📅",
@@ -200,6 +206,8 @@ Escribe `@handycalbot` en cualquier chat seguido de:
         edit_duration_btn="⏱️ Duración",
         edit_attendees_btn="👥 Asistentes",
         edit_link_btn="🔗 Enlace",
+        switch_to_calendar="Mover a {calendar}",
+        calendar_switched="✅ Reunión movida a {calendar}.",
         field_updated="✅ {field} actualizado",
         select_meeting_to_cancel="**Selecciona una reunion para cancelar:**",
         page_info="Pagina {current}/{total}",
