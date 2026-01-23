@@ -395,7 +395,7 @@ async def disconnectzoom_command(update: Update, _context: ContextTypes.DEFAULT_
     await update.message.reply_text(t.settings.zoom_disconnected)
 
 
-async def connectoutlook_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def connectoutlook_command(update: Update, _context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /connectoutlook command - show connection mode selection or current status."""
     if not update.effective_user or not update.message:
         return
