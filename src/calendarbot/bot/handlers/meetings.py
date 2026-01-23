@@ -1306,14 +1306,23 @@ async def meeting_switch_calendar_callback(
             if target_provider == "outlook"
             else t.settings.google_calendar_label
         )
+
+        # Show success message with back button
+        back_button = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        t.meetings.back_to_list_button,
+                        callback_data=f"md_{stored_user_id}_{meeting_idx}",
+                    )
+                ]
+            ]
+        )
         await query.edit_message_text(
             t.meetings.calendar_switched.format(calendar=target_name),
+            reply_markup=back_button,
             parse_mode="Markdown",
         )
-
-        # Show detail view
-        query.data = f"md_{stored_user_id}_{meeting_idx}"
-        await meeting_detail_callback(update, context)
 
     except Exception as e:
         logger.exception(f"Error in meeting_switch_calendar_callback: {e}")
