@@ -175,7 +175,8 @@ class OAuthTokenRepository:
         """
         from datetime import timedelta
 
-        threshold = datetime.now(tz=UTC) + timedelta(hours=hours_before)
+        # Use naive datetime to match database column (TIMESTAMP WITHOUT TIME ZONE)
+        threshold = datetime.utcnow() + timedelta(hours=hours_before)
         result = await self.session.execute(
             select(OAuthToken).where(
                 OAuthToken.provider == provider,
