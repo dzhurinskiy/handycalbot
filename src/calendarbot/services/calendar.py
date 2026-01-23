@@ -482,6 +482,10 @@ class CalendarService:
         title = meeting_data.get("title", "(No title)")
         attendees = meeting_data.get("attendees", [])
 
+        # Validate required fields
+        if not start_time or not end_time:
+            return {"error": "Missing start_time or end_time in meeting data"}
+
         if to_provider == "google":
             google_client = cast(GoogleCalendarClient, dest_client)
             create_result = await google_client.create_event(
@@ -505,7 +509,9 @@ class CalendarService:
         if "error" in create_result:
             return {"error": f"Failed to create in {to_provider}: {create_result.get('error')}"}
 
-        new_event_id = create_result.get("id")
+        new_event_id = create_result.get("id", "")
+        if not new_event_id:
+            return {"error": f"Failed to get event ID from {to_provider}"}
 
         # Delete from source
         source_result = await self._get_valid_client(user, force_provider=from_provider)

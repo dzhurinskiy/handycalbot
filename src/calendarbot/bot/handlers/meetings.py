@@ -288,8 +288,10 @@ async def meeting_edit_menu_callback(update: Update, context: ContextTypes.DEFAU
             t = get_text(user.language if user else "en")
 
             # Check if both calendars are connected for switch option
-            connected_providers = await calendar_service.get_connected_providers(user)
-            has_both_calendars = len(connected_providers) == 2
+            has_both_calendars = False
+            if user:
+                connected_providers = await calendar_service.get_connected_providers(user)
+                has_both_calendars = len(connected_providers) == 2
 
         # Get current meeting's provider from stored data
         meetings_key = f"meetings_{stored_user_id}"
