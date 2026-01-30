@@ -1010,9 +1010,25 @@ async def documentation():
             <p>Select your timezone from the list or search for your city.</p>
 
             <h3>Step 4 (Optional): Connect Zoom</h3>
-            <p>To add Zoom meeting links automatically:</p>
+            <p>To add Zoom meeting links automatically to your calendar events:</p>
             <div class="command-box">/connectzoom</div>
-            <p>Follow the same authorization process for your Zoom account.</p>
+            <ol>
+                <li>The bot will send you an authorization link to the Zoom App Marketplace</li>
+                <li>Sign in to your Zoom account</li>
+                <li>Review the permissions requested (meeting creation)</li>
+                <li>Click "Allow" to authorize HandyCalBot</li>
+                <li>You'll be redirected back with a confirmation message</li>
+            </ol>
+            <p>Once connected, all new meetings created through the bot will automatically include a Zoom meeting link.</p>
+
+            <div class="tip-box">
+                <strong>Tip:</strong> You can also install HandyCalBot directly from the
+                <a href="https://marketplace.zoom.us/" target="_blank">Zoom App Marketplace</a>
+                and then link it to your Telegram account.
+            </div>
+
+            <h3>Troubleshooting Setup</h3>
+            <p>If you run into issues during setup, check our <a href="#troubleshooting">Troubleshooting section</a> below or visit the <a href="/support">Support page</a> for help.</p>
         </section>
 
         <section id="usage" class="doc-section">
@@ -1175,29 +1191,43 @@ async def documentation():
             </ol>
 
             <h3>Revoke Access from Zoom</h3>
-            <p>To revoke Zoom access:</p>
+            <p>To remove HandyCalBot from your Zoom account:</p>
             <ol>
                 <li>Go to <a href="https://marketplace.zoom.us/user/installed" target="_blank">Zoom App Marketplace - Installed Apps</a></li>
-                <li>Find "HandyCalBot" and click "Uninstall"</li>
+                <li>Find "HandyCalBot" in the list of installed apps</li>
+                <li>Click on it and select "Uninstall"</li>
+                <li>Confirm the removal when prompted</li>
             </ol>
 
-            <h3>What Happens When You Disconnect</h3>
+            <h3>What Happens When You De-authorize / Disconnect</h3>
             <div class="warning-box">
-                <strong>Important:</strong> When you disconnect:
+                <strong>Important - implications of removal:</strong>
                 <ul style="margin-top: 0.5rem; margin-bottom: 0;">
-                    <li>Your OAuth tokens are deleted from our servers</li>
-                    <li>We can no longer access your calendar or create events</li>
-                    <li>Existing calendar events are NOT deleted (they remain in your Google Calendar)</li>
-                    <li>Your user preferences (timezone, settings) are retained in case you reconnect</li>
+                    <li><strong>OAuth tokens are deleted</strong> - Your Google and/or Zoom access tokens are immediately removed from our servers</li>
+                    <li><strong>No further access</strong> - We can no longer access your calendar, create events, or generate Zoom meeting links on your behalf</li>
+                    <li><strong>Existing events are preserved</strong> - Calendar events and Zoom meetings already created remain in your Google Calendar and Zoom account; they are NOT deleted</li>
+                    <li><strong>Preferences retained</strong> - Your user preferences (timezone, language, reminder settings) are kept in case you reconnect later</li>
+                    <li><strong>Reminders stop</strong> - You will no longer receive Telegram reminder notifications for upcoming meetings</li>
                 </ul>
             </div>
 
+            <h3>How We Handle Your Data Upon Removal</h3>
+            <p>When you disconnect or uninstall the app:</p>
+            <ul>
+                <li>All stored OAuth tokens (Google and Zoom) are permanently deleted from our database</li>
+                <li>We do not retain any calendar content or Zoom meeting data after disconnection</li>
+                <li>Basic account data (Telegram user ID, timezone, settings) is retained to allow seamless reconnection</li>
+            </ul>
+
             <h3>Complete Data Deletion</h3>
             <p>
-                To request complete deletion of all your data (including preferences and meeting history),
-                please contact us through our <a href="/support">Support page</a> or open an issue on
-                <a href="https://github.com/dzhurinskiy/handycalbot/issues">GitHub</a>.
+                To request complete deletion of <strong>all</strong> your data, including preferences, meeting history, and any stored account information, contact us via:
             </p>
+            <ul>
+                <li><strong>Email:</strong> <a href="mailto:support@handycal.dzhurinskiy.com">support@handycal.dzhurinskiy.com</a></li>
+                <li><strong>GitHub:</strong> <a href="https://github.com/dzhurinskiy/handycalbot/issues">Open an issue</a></li>
+            </ul>
+            <p>We will process your data deletion request within 30 days.</p>
 
             <h3>Stop Using the Bot</h3>
             <p>You can also simply stop the bot in Telegram:</p>
@@ -1206,7 +1236,7 @@ async def documentation():
                 <li>Tap the bot name at the top</li>
                 <li>Select "Stop Bot" or "Block User"</li>
             </ol>
-            <p>This prevents the bot from sending you messages, but doesn't disconnect your calendar.</p>
+            <p>This prevents the bot from sending you messages, but doesn't disconnect your calendar or Zoom accounts. To fully remove access, follow the disconnection steps above.</p>
         </section>
 
     </main>
@@ -1378,11 +1408,39 @@ async def support_page():
             <p>Use the <code>/disconnect</code> command to disconnect Google Calendar, or <code>/disconnectzoom</code> for Zoom. See our <a href="/docs#removing">removal guide</a> for complete instructions.</p>
         </div>
 
+        <h2>Contact Support</h2>
         <div class="contact-info">
-            <h3>Contact Us</h3>
-            <p><strong>Email:</strong> <a href="mailto:support@handycal.dzhurinskiy.com">support@handycal.dzhurinskiy.com</a></p>
+            <h3>How to Reach Us</h3>
+            <p><strong>Email Support:</strong> <a href="mailto:support@handycal.dzhurinskiy.com">support@handycal.dzhurinskiy.com</a></p>
+            <p><strong>Create a Support Case:</strong> <a href="https://github.com/dzhurinskiy/handycalbot/issues/new?labels=support">Open a support ticket on GitHub</a></p>
             <p><strong>GitHub Issues:</strong> <a href="https://github.com/dzhurinskiy/handycalbot/issues">github.com/dzhurinskiy/handycalbot/issues</a></p>
-            <p><strong>Response Time:</strong> We typically respond within 24-48 hours.</p>
+        </div>
+
+        <h2>Support Hours &amp; Response Times</h2>
+        <ul>
+            <li><strong>Support Hours:</strong> Monday through Friday, 9:00 AM - 6:00 PM (UTC+1 / CET)</li>
+            <li><strong>First Response SLA:</strong> We respond to all support requests within 24 hours during business days</li>
+            <li><strong>Critical Issues:</strong> Security-related or service outage reports are prioritized and addressed within 12 hours</li>
+            <li><strong>Email Support:</strong> Available 24/7 at <a href="mailto:support@handycal.dzhurinskiy.com">support@handycal.dzhurinskiy.com</a> - messages received outside business hours are addressed the next business day</li>
+        </ul>
+
+        <h2>Support Channels Overview</h2>
+        <div class="support-grid">
+            <div class="support-card">
+                <h3>📧 Email Support</h3>
+                <p>Send us an email for any issue, question, or data request. Best for account-specific inquiries and data deletion requests.</p>
+                <a href="mailto:support@handycal.dzhurinskiy.com" class="btn btn-primary">Email Us</a>
+            </div>
+            <div class="support-card">
+                <h3>🎫 Support Tickets</h3>
+                <p>Create a tracked support case on GitHub. You'll receive updates as your issue is investigated and resolved.</p>
+                <a href="https://github.com/dzhurinskiy/handycalbot/issues/new?labels=support" class="btn btn-primary" target="_blank">Create Ticket</a>
+            </div>
+            <div class="support-card">
+                <h3>📖 Knowledge Base</h3>
+                <p>Browse our documentation for step-by-step guides, feature descriptions, and troubleshooting tips.</p>
+                <a href="/docs" class="btn btn-primary">View Docs</a>
+            </div>
         </div>
 
         <h2>Troubleshooting Quick Links</h2>
