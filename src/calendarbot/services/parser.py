@@ -1,4 +1,4 @@
-"""Command parser for inline meeting creation."""
+﻿"""Command parser for inline meeting creation."""
 
 import re
 from dataclasses import dataclass
@@ -41,7 +41,7 @@ class MeetingParser:
     TITLE_PATTERN = r'"([^"]+)"'
     EMAIL_PATTERN = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
     # Reminder pattern: r followed by optional time values like 10m, 30m/60m, 1d
-    REMINDER_PATTERN = r"\br\s*((?:\d+[mhd](?:/\d+[mhd])*)?)\b"
+    REMINDER_PATTERN = r"\br(?!\.[a-zA-Z0-9])\s*((?:\d+[mhd](?:/\d+[mhd])*)?)\b"
     # Telegram username pattern: @username (5-32 chars, alphanumeric + underscore, starts with letter)
     # Use lookbehind to ensure @ is not preceded by word chars (to avoid matching @domain in emails)
     USERNAME_PATTERN = r"(?<![a-zA-Z0-9._%+-])@([a-zA-Z][a-zA-Z0-9_]{4,31})"
