@@ -367,6 +367,7 @@ _加入我们的[测试群组](https://t.me/+AkSef5YmU6MyYTcy)获取更新！_
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *会议提醒*",
         starting_in="{time}后开始",
+        join_link="🔗 加入: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **反馈**",

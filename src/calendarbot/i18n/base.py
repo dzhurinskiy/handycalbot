@@ -368,6 +368,7 @@ class ReminderTranslations:
 
     meeting_reminder: str
     starting_in: str
+    join_link: str
 
 
 @dataclass(frozen=True)

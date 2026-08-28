@@ -111,6 +111,8 @@ class Meeting(Base):
     start_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     end_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     attendees: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    # Join URL (Zoom, Google Meet, Teams, or custom link) for use in reminders
+    meeting_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     # Reminders in minutes before meeting (comma-separated, e.g., "10,30")
     reminders: Mapped[str | None] = mapped_column(String(100), nullable=True)
     # Which reminders have been sent (comma-separated minutes that were sent)

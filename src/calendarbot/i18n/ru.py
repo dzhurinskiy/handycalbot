@@ -364,6 +364,7 @@ _Присоединяйтесь к нашей [тестовой группе](ht
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *Напоминание о встрече*",
         starting_in="Начало через {time}",
+        join_link="🔗 Присоединиться: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **Обратная связь**",

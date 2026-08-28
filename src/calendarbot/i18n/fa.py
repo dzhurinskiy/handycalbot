@@ -367,6 +367,7 @@ _به [گروه تست](https://t.me/+AkSef5YmU6MyYTcy) ما برای به‌ر�
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *یادآوری جلسه*",
         starting_in="شروع در {time}",
+        join_link="🔗 پیوستن: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **بازخورد**",

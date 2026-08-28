@@ -367,6 +367,7 @@ _Rejoignez notre [groupe de test](https://t.me/+AkSef5YmU6MyYTcy) pour les mises
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *Rappel de Reunion*",
         starting_in="Commence dans {time}",
+        join_link="🔗 Rejoindre: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **Commentaires**",

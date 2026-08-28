@@ -367,6 +367,7 @@ _Bergabunglah dengan [grup pengujian](https://t.me/+AkSef5YmU6MyYTcy) kami untuk
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *Pengingat Rapat*",
         starting_in="Dimulai dalam {time}",
+        join_link="🔗 Gabung: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **Masukan**",

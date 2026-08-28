@@ -363,6 +363,7 @@ _¡Únete a nuestro [grupo de pruebas](https://t.me/+AkSef5YmU6MyYTcy) para actu
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *Recordatorio de Reunion*",
         starting_in="Comienza en {time}",
+        join_link="🔗 Unirse: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **Comentarios**",

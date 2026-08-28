@@ -362,6 +362,7 @@ _Treten Sie unserer [Testgruppe](https://t.me/+AkSef5YmU6MyYTcy) für Updates be
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *Besprechungserinnerung*",
         starting_in="Beginnt in {time}",
+        join_link="🔗 Beitreten: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **Feedback**",

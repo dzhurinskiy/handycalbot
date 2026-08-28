@@ -384,6 +384,7 @@ _Join our [testing group](https://t.me/+AkSef5YmU6MyYTcy) for updates!_
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *Meeting Reminder*",
         starting_in="Starting in {time}",
+        join_link="🔗 Join: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **Feedback**",

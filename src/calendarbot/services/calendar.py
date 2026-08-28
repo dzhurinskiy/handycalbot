@@ -346,6 +346,9 @@ class CalendarService:
         start_utc_naive = start_utc.replace(tzinfo=None)
         end_utc_naive = end_utc.replace(tzinfo=None)
 
+        # Pick a join URL to persist for reminders (prefer video conferencing links)
+        meeting_url = zoom_link or meet_link or teams_link or custom_link
+
         # Cache meeting locally with reminders for notification system
         await self.meeting_repo.save_meeting(
             user_id=user.id,
@@ -356,6 +359,7 @@ class CalendarService:
             end_time=end_utc_naive,
             attendees=meeting_data.attendees,
             reminders=reminders if reminders else None,
+            meeting_url=meeting_url,
         )
 
         return {
@@ -529,6 +533,17 @@ class CalendarService:
             # Update local cache
             await self.meeting_repo.delete_by_external_id(user.id, event_id, from_provider)
 
+        # Extract meeting link
+        meet_link = None
+        teams_link = None
+        if to_provider == "google" and "conferenceData" in create_result:
+            for ep in create_result["conferenceData"].get("entryPoints", []):
+                if ep.get("entryPointType") == "video":
+                    meet_link = ep.get("uri")
+                    break
+        elif to_provider == "outlook" and create_result.get("isOnlineMeeting"):
+            teams_link = create_result.get("onlineMeeting", {}).get("joinUrl")
+
         # Cache new meeting
         start_utc = TimezoneHelper.to_utc(start_time, user.timezone)
         end_utc = TimezoneHelper.to_utc(end_time, user.timezone)
@@ -540,18 +555,8 @@ class CalendarService:
             start_time=start_utc.replace(tzinfo=None),
             end_time=end_utc.replace(tzinfo=None),
             attendees=attendees,
+            meeting_url=meet_link or teams_link,
         )
-
-        # Extract meeting link
-        meet_link = None
-        teams_link = None
-        if to_provider == "google" and "conferenceData" in create_result:
-            for ep in create_result["conferenceData"].get("entryPoints", []):
-                if ep.get("entryPointType") == "video":
-                    meet_link = ep.get("uri")
-                    break
-        elif to_provider == "outlook" and create_result.get("isOnlineMeeting"):
-            teams_link = create_result.get("onlineMeeting", {}).get("joinUrl")
 
         return {
             "success": True,

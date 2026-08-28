@@ -97,6 +97,10 @@ class ReminderService:
             if emails:
                 text += f"\n\n👥 {', '.join(emails)}"
 
+        # Add join link if available
+        if meeting.meeting_url:
+            text += f"\n\n{t.reminder.join_link.format(url=meeting.meeting_url)}"
+
         return text
 
     async def check_and_send_reminders(self) -> int:

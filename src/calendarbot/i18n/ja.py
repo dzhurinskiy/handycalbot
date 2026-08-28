@@ -367,6 +367,7 @@ _アップデートは[テストグループ](https://t.me/+AkSef5YmU6MyYTcy)に
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *ミーティングリマインダー*",
         starting_in="{time}後に開始",
+        join_link="🔗 参加: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **フィードバック**",

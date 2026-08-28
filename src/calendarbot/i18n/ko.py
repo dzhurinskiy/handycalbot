@@ -368,6 +368,7 @@ _업데이트를 위해 [테스트 그룹](https://t.me/+AkSef5YmU6MyYTcy)에 �
     reminder=ReminderTranslations(
         meeting_reminder="🔔 *회의 알림*",
         starting_in="{time} 후 시작",
+        join_link="🔗 참여: {url}",
     ),
     feedback=FeedbackTranslations(
         feedback_title="📝 **피드백**",

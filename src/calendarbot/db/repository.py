@@ -230,6 +230,7 @@ class MeetingRepository:
         end_time: datetime,
         attendees: list[str] | None = None,
         reminders: list[int] | None = None,
+        meeting_url: str | None = None,
     ) -> Meeting:
         """Save meeting to local cache."""
         # Convert reminders list to comma-separated string
@@ -243,6 +244,7 @@ class MeetingRepository:
             start_time=start_time,
             end_time=end_time,
             attendees={"emails": attendees} if attendees else None,
+            meeting_url=meeting_url,
             reminders=reminders_str,
             reminders_sent=None,
         )
