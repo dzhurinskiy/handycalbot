@@ -1,5 +1,38 @@
 # Claude Code Instructions
 
+> Постоянный слой: устройство проекта, сборка, деплой, договорённости. Состояние на дату (готово / открыто /
+> вопросы к Сергею) — в `HANDOFF.md` в корне. История до bb — `docs/legacy/` (не редактировать).
+
+## Project Overview
+
+- HandyCalBot — личный проект Сергея (не Warp): Telegram-бот для назначения встреч из любого чата
+  (inline-режим и личный чат) с интеграцией Google Calendar, Outlook Calendar и Zoom.
+- Стек: Python 3.12, python-telegram-bot (webhooks), FastAPI + uvicorn, SQLAlchemy async + asyncpg (PostgreSQL),
+  Alembic, Docker Compose, nginx.
+- Код: `src/calendarbot/` — `bot/` (хендлеры), `api/` (FastAPI, OAuth-коллбэки, `/health`), `integrations/`
+  (Google, Outlook, Zoom), `services/`, `db/` (модели и миграции), `i18n/`, `static/`; точка входа
+  `calendarbot.main`. Тесты: `tests/` (`unit`, `integration`, `e2e`). Скрипты: `scripts/`. Docker: `docker/`.
+- Локальный запуск: `pip install -e ".[dev]"`, `cp .env.example .env`,
+  `docker compose -f docker-compose.dev.yml up -d db`, `python -m calendarbot.main` (подробнее — `README.md`).
+- Проверки (как в CI): `ruff check src/`, `black --check src/`, `mypy src/calendarbot --ignore-missing-imports`,
+  `pytest tests/ -v` (нужен PostgreSQL; переменные `DATABASE_URL`, `TELEGRAM_BOT_TOKEN`, `ENCRYPTION_KEY`).
+- Production: домен `handycal.bot` (`handycal.dzhurinskiy.com` редиректит на него), health —
+  `https://handycal.bot/health`. На VPS код в `/opt/handycal`, контейнеры `calendarbot` и `calendarbot-db`.
+- Переменные окружения: список — `.env.example` и `.github/workflows/cd.yml`. Значения — только в GitHub Secrets
+  (`TELEGRAM_BOT_TOKEN`, `DB_PASSWORD`, `GOOGLE_CLIENT_ID`/`_SECRET`, `GOOGLE_REDIRECT_URI`, `ENCRYPTION_KEY`,
+  `WEBHOOK_URL`, `ADMIN_CHAT_ID`, `ZOOM_CLIENT_ID`/`_SECRET`, `OUTLOOK_CLIENT_ID`/`_SECRET`, `VPS_HOST`,
+  `VPS_USER`, `VPS_SSH_KEY`). `ZOOM_REDIRECT_URI` и `OUTLOOK_REDIRECT_URI` захардкожены в `cd.yml`.
+- Документация интеграций: `docs/GOOGLE_OAUTH_SETUP.md`, `docs/OUTLOOK_SETUP.md`, `docs/security/`,
+  `docs/google-oauth-video-script.md`.
+
+## CI/CD — push в master = деплой
+
+- `.github/workflows/ci.yml`: lint (ruff, black, mypy), тесты на PostgreSQL 15, сборка Docker-образа.
+- `.github/workflows/cd.yml`: на каждый push в `main`/`master` (без `paths-ignore`, т.е. и для docs-only)
+  SSH на VPS → `git reset --hard origin/master` → генерация `.env` из Secrets → `docker compose build` и `up --wait`
+  → `alembic upgrade head` → проверка логов → уведомление в Telegram.
+- Поэтому push в master — это production deploy; порядок действий и проверки — разделы «Deployment workflow» и «Deployment Verification» ниже.
+
 ## Project Management
 
 - Be proactive and autonomous - do as much work as needed without asking for permission
@@ -61,7 +94,7 @@ ssh -o ConnectTimeout=10 -o BatchMode=yes handycal "command1 && command2 && comm
 - GitHub Secrets are the source of truth for all environment variables
 - The `.env` file is recreated during CI/CD automated deployment from GitHub Secrets
 - Never manually edit `.env` on VPS - update GitHub Secrets instead and redeploy
-- Production domain: `handycal.dzhurinskiy.com`
+- Production domain: `handycal.bot` (старый `handycal.dzhurinskiy.com` редиректит)
 
 ## Deployment Verification - CRITICAL
 
@@ -143,3 +176,4 @@ gh run list --limit 5
 3. Verify by grepping for emojis: `grep -n "📅\|⚙️\|🔔" src/calendarbot/i18n/*.py`
 
 > История до bb: `docs/legacy/HANDOFF.md` — прочитай при работе над напоминаниями, OAuth/календарными интеграциями и деплоем.
+> Текущее состояние — `HANDOFF.md` в корне.
