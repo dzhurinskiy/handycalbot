@@ -141,3 +141,5 @@ gh run list --limit 5
 1. Always add/modify English first
 2. Copy the exact emoji pattern to all other language files
 3. Verify by grepping for emojis: `grep -n "📅\|⚙️\|🔔" src/calendarbot/i18n/*.py`
+
+> История до bb: `docs/legacy/HANDOFF.md` — прочитай при работе над напоминаниями, OAuth/календарными интеграциями и деплоем.
