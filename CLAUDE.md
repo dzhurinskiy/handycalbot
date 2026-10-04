@@ -28,10 +28,10 @@
 ## CI/CD — push в master = деплой
 
 - `.github/workflows/ci.yml`: lint (ruff, black, mypy), тесты на PostgreSQL 15, сборка Docker-образа.
-- `.github/workflows/cd.yml`: на каждый push в `main`/`master` (без `paths-ignore`, т.е. и для docs-only)
+- `.github/workflows/cd.yml`: на push в `main`/`master`, кроме коммитов только с `**.md` / `docs/**` (`paths-ignore`, с 04.10.2026),
   SSH на VPS → `git reset --hard origin/master` → генерация `.env` из Secrets → `docker compose build` и `up --wait`
   → `alembic upgrade head` → проверка логов → уведомление в Telegram.
-- Поэтому push в master — это production deploy; порядок действий и проверки — разделы «Deployment workflow» и «Deployment Verification» ниже.
+- Поэтому push в master с изменением кода — это production deploy; порядок действий и проверки — разделы «Deployment workflow» и «Deployment Verification» ниже.
 
 ## Project Management
 
