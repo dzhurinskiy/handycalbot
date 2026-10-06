@@ -3,11 +3,14 @@
 Только состояние на дату. Постоянное (устройство, сборка, деплой, i18n, правила VPS) — в `CLAUDE.md`.
 История до bb — `docs/legacy/HANDOFF.md`.
 
-## Сводка на 2026-10-03
+## Сводка на 2026-10-06
+
+- 06.10: inline-режим не работал — webhook смотрел на `handycal.dzhurinskiy.com/webhook`, который отдаёт 301 на
+  `handycal.bot`; Telegram редиректы не выполняет. Webhook переставлен на `https://handycal.bot/webhook`, секрет
+  `WEBHOOK_URL` обновлён. Доступ к VPS с klava есть (`root@164.92.157.14`, ключ из `~/.ssh`, алиаса нет).
 
 - Прод работает: `https://handycal.bot/health` → 200 (проверено 3 октября).
 - Последняя фича — ссылка Zoom / Google Meet в напоминании (`3210a29`, 28 августа), CI и CD прошли.
-- Логи контейнера после этого деплоя не проверены: на klava нет SSH-алиаса `handycal`.
 - Новых задач нет; проект ждёт решения Сергея о следующем шаге.
 
 ## Напоминания и ссылки на встречи
@@ -18,15 +21,20 @@
 - Ранее: исправлен разбор команды напоминания, съедавший адреса вида `r.email@domain.com` (`47a00df`).
 
 **Открыто**
-- Не проверены логи `calendarbot` после деплоя `3210a29` на `ERROR` / `Exception` / `Traceback`.
+- Логи проверены 04.10: ошибок нет, кроме ежечасных `Zoom token refresh failed` (`invalid_grant`) у трёх
+  пользователей с отозванными токенами — некритично.
 
 ## Домен и деплой
 
 **Готово**
 - Основной домен `handycal.bot`, `handycal.dzhurinskiy.com` редиректит (`20d01f6`, `.env.example` — `a176952`).
 
+**Готово (06.10)**
+- Webhook Telegram: `https://handycal.bot/webhook` (setWebhook + GitHub Secret `WEBHOOK_URL`). Причина поломки —
+  301 со старого домена (редирект в nginx с `20d01f6`, вступил в силу при пересоздании nginx в деплое 04.10).
+
 **Открыто**
-- На klava нет SSH-алиаса `handycal` (из `CLAUDE.md`), поэтому логи и состояние VPS отсюда недоступны.
+- SSH-алиаса `handycal` (из `CLAUDE.md`) на klava нет, но `ssh root@164.92.157.14` работает.
 - В `cd.yml` `ZOOM_REDIRECT_URI` и `OUTLOOK_REDIRECT_URI` всё ещё на `handycal.dzhurinskiy.com` — работает через
   редирект; переводить ли на `handycal.bot`, не решалось.
 
@@ -36,7 +44,9 @@
 - Токен в git remote локального клона оставлен намеренно, не трогать.
 
 **Вопросы к Сергею**
-- Нужен ли доступ к VPS с klava? Если да — добавить SSH-алиас `handycal` с ключом, затем проверить логи.
+- Добавить SSH-алиас `handycal` в `~/.ssh/config`?
+- Секреты `GOOGLE_REDIRECT_URI` / `OUTLOOK_REDIRECT_URI` и Zoom redirect в `cd.yml` всё ещё на старом домене
+  (работают через 301 в браузере). Переносить на `handycal.bot` — нужно менять и в консолях Google/Microsoft/Zoom.
 
 ## Интеграции и функциональность (январь 2026, по заголовкам сессий)
 
